@@ -1,5 +1,12 @@
 import { Link } from 'react-router-dom'
-import { Lightbulb02, LayoutAlt01, Palette, Code01, CheckCircle } from '@untitled-ui/icons-react' // ganti lucide-react ➜ untitled-ui
+import {
+  Lightbulb02,
+  LayoutAlt01,
+  Palette,
+  Code01,
+  CheckCircle,
+  Pin01,
+} from '@untitled-ui/icons-react' // ganti lucide-react ➜ untitled-ui
 
 function WelcomePageBoilerPlate() {
   // tombol navigasi
@@ -12,6 +19,7 @@ function WelcomePageBoilerPlate() {
     { path: '/styling', label: 'Styling Guide', icon: <Palette className="size-5" /> },
     { path: '/forms', label: 'Forms', icon: <CheckCircle className="size-5" /> },
     { path: '/hooks', label: 'Custom Hooks', icon: <Code01 className="size-5" /> },
+    { path: '/version', label: 'App Version', icon: <Pin01 className="size-5" /> },
   ]
 
   const features = [

@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import VersionPage from '@src/pages/VersionPage'
 import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
+import ComponentReview from '@src/pages/component-review'
+import UITemplate from '@src/pages/ui-template'
 
 // eslint-disable-next-line import/prefer-default-export
 export function UnauthenticatedRoutes() {
@@ -25,6 +27,8 @@ export function UnauthenticatedRoutes() {
       /> */}
       <Route path="/welcome" element={<WelcomePageBoilerPlate />} />
       <Route path="/version" element={<VersionPage />} />
+      <Route path="/component-review" element={<ComponentReview />} />
+      <Route path="/ui-template" element={<UITemplate />} />
     </Routes>
   )
 }

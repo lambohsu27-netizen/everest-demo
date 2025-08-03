@@ -6,7 +6,8 @@ import {
   Code01,
   CheckCircle,
   Pin01,
-} from '@untitled-ui/icons-react' // ganti lucide-react ➜ untitled-ui
+  Box,
+} from '@untitled-ui/icons-react'
 
 function WelcomePageBoilerPlate() {
   // tombol navigasi
@@ -20,6 +21,7 @@ function WelcomePageBoilerPlate() {
     { path: '/forms', label: 'Forms', icon: <CheckCircle className="size-5" /> },
     { path: '/hooks', label: 'Custom Hooks', icon: <Code01 className="size-5" /> },
     { path: '/version', label: 'App Version', icon: <Pin01 className="size-5" /> },
+    { path: '/ui-template', label: 'UI template', icon: <Box className="size-5" /> },
   ]
 
   const features = [

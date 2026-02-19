@@ -20,7 +20,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // '@merpati-component': path.resolve(__dirname, './component'),
+      '@interstellar-component': path.resolve(__dirname, './interstellar-component'),
       '@src': path.resolve(__dirname, 'src'),
       '@assets': path.resolve(__dirname, 'src/assets'),
       '@pages': path.resolve(__dirname, 'src/pages'),

@@ -23,7 +23,7 @@ import {
   MyConfirmModal,
 } from '@interstellar-component'
 // Context
-import { useUser } from '../Context'
+import { useEnquiry } from '../Context'
 // Schema
 import { schema } from '../schema'
 // Utils
@@ -33,14 +33,14 @@ import { useApp } from '../../../AppContext'
 
 function Formslider() {
   const { getAccess } = useApp()
-  const access = getAccess(Access?.USER) // Note: 'access' variable is declared but not used later
+  const access = getAccess(Access?.Enquiry) // Note: 'access' variable is declared but not used later
 
   const {
     currentSlider,
     handleCurrentSlider,
-    createUser,
-    showUser,
-    updateUser,
+    createEnquiry,
+    showEnquiry,
+    updateEnquiry,
     restoreEnrollment,
     searchRole,
     searchBranch,
@@ -50,7 +50,7 @@ function Formslider() {
     setIsChanged,
     isChanged,
     handleCurrentModal,
-  } = useUser()
+  } = useEnquiry()
 
   const {
     setValue,
@@ -79,7 +79,7 @@ function Formslider() {
   const { deleted_at, branch, role, photo, delete_photo } = watch()
   // console.log('photo', photo)
 
-  const [title, setTitle] = useState('Tambah user baru')
+  const [title, setTitle] = useState('Tambah enquiry baru')
   const [clickedCopy, setClickedCopy] = useState(false)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
   const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false)
@@ -100,7 +100,7 @@ function Formslider() {
     // --- EDIT MODE ---
     if (currentSlider?.id) {
       setTitle('Memuat...')
-      showUser(currentSlider.id)
+      showEnquiry(currentSlider.id)
         .then((data) => {
           if (!isMounted) return
           setTitle(data.name)
@@ -126,7 +126,7 @@ function Formslider() {
           }, 0)
         })
         .catch((err) => {
-          console.error('Error fetching user:', err)
+          console.error('Error fetching enquiry:', err)
           if (isMounted) {
             handleError(err)
             handleCurrentSlider(null)
@@ -134,7 +134,7 @@ function Formslider() {
         })
     } else {
       // --- ADD MODE ---
-      setTitle('Tambah user baru')
+      setTitle('Tambah enquiry baru')
       reset({
         // Reset form to default values defined in useForm
         email: '',
@@ -168,7 +168,7 @@ function Formslider() {
     handleGeneratePassword,
     setIsChanged,
     setValue,
-    showUser,
+    showEnquiry,
     watch,
     reset,
     handleCurrentSlider,
@@ -245,7 +245,7 @@ function Formslider() {
   }, [watchedValues, isInitialDataLoaded, setIsChanged]) // Dependencies: run when watched values change or loading finishes
 
   const onSubmit = handleSubmit(
-    handleError(currentSlider?.id ? updateUser : createUser, control),
+    handleError(currentSlider?.id ? updateEnquiry : createEnquiry, control),
     checkErrorYup
   )
 
@@ -263,7 +263,7 @@ function Formslider() {
           setConfirmModalOpen(false)
           onSubmit()
         }}
-        title={`Anda yakin ingin ${currentSlider?.id ? 'mengubah' : 'menambahkan'} data user?`}
+        title={`Anda yakin ingin ${currentSlider?.id ? 'mengubah' : 'menambahkan'} data enquiry?`}
         message="Data yang dibuat akan masuk ke approval untuk ditinjau terlebih dahulu."
         bgColor="bg-warning-100"
       />

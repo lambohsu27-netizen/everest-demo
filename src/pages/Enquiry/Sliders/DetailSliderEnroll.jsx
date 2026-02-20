@@ -1,10 +1,10 @@
 import { XClose, ChevronLeft, ChevronRight } from '@untitled-ui/icons-react'
 import React, { useRef, useState, useEffect } from 'react'
 import SimpleBar from 'simplebar-react'
-import { useUser } from '../Context'
+import { useEnquiry } from '../Context'
 
 const DetailSliderEnroll = (nasabahDetails) => {
-  const { handleCurrentSlider } = useUser()
+  const { handleCurrentSlider } = useEnquiry()
 
   const scrollContainerRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -13,8 +13,7 @@ const DetailSliderEnroll = (nasabahDetails) => {
   // Function to check scroll position and update button states
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } =
-        scrollContainerRef.current
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
       setCanScrollLeft(scrollLeft > 100)
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1) // -1 for rounding errors
     }
@@ -71,9 +70,7 @@ const DetailSliderEnroll = (nasabahDetails) => {
             <div className="flex flex-row items-center gap-4">
               <div>
                 <p className="text-xl-bold text-gray-light-900">{'Enroll'}</p>
-                <p className="text-md text-gray-light-900">
-                  {'8 Jan 2025 • 12:35:27'}
-                </p>
+                <p className="text-md text-gray-light-900">{'8 Jan 2025 • 12:35:27'}</p>
               </div>
             </div>
           </div>
@@ -122,15 +119,11 @@ const DetailSliderEnroll = (nasabahDetails) => {
                   onClick={handleScrollLeft}
                   disabled={!canScrollLeft}
                   className={`rounded-full p-3 shadow-md ${
-                    !canScrollLeft
-                      ? 'cursor-not-allowed bg-gray-200'
-                      : 'bg-white hover:bg-gray-100'
+                    !canScrollLeft ? 'cursor-not-allowed bg-gray-200' : 'bg-white hover:bg-gray-100'
                   }`}
                 >
                   <ChevronLeft
-                    className={`size-5 ${
-                      !canScrollLeft ? 'text-gray-400' : 'text-gray-700'
-                    }`}
+                    className={`size-5 ${!canScrollLeft ? 'text-gray-400' : 'text-gray-700'}`}
                   />
                 </button>
                 <button
@@ -143,9 +136,7 @@ const DetailSliderEnroll = (nasabahDetails) => {
                   }`}
                 >
                   <ChevronRight
-                    className={`size-5 ${
-                      !canScrollRight ? 'text-gray-400' : 'text-gray-700'
-                    }`}
+                    className={`size-5 ${!canScrollRight ? 'text-gray-400' : 'text-gray-700'}`}
                   />
                 </button>
               </div>
@@ -155,12 +146,10 @@ const DetailSliderEnroll = (nasabahDetails) => {
           </section>
 
           <section className="px-6">
-            <p className="text-sm-semibold mb-4 text-brand-700">
-              Foto KTP nasabah
-            </p>
+            <p className="text-sm-semibold mb-4 text-brand-700">Foto KTP nasabah</p>
             <img
               className="rounded-xl"
-              src="https://lh3.googleusercontent.com/ehiG9Usj1GuEZcMX4pRj3Gs1z-L8TbOY7HHmSfT_1MrvsrgvD6GSQjLV5a0XryW86h2NeAoXNyMQfuHsWN4txULvnCwHCLOyAQnXNwOXuFDC1aJzvaoONqrwLHFRgEZclfAzR7O_azSUCh6bjG9B-6aZPuszfVNpq0iurE3H8ah9bVbBQvUzSepnOpGGKngVXlOqGnACJw"
+              src="https://lh3.googleenquirycontent.com/ehiG9Usj1GuEZcMX4pRj3Gs1z-L8TbOY7HHmSfT_1MrvsrgvD6GSQjLV5a0XryW86h2NeAoXNyMQfuHsWN4txULvnCwHCLOyAQnXNwOXuFDC1aJzvaoONqrwLHFRgEZclfAzR7O_azSUCh6bjG9B-6aZPuszfVNpq0iurE3H8ah9bVbBQvUzSepnOpGGKngVXlOqGnACJw"
               alt="ktp"
               style={{ width: '352px', height: '176px', objectFit: 'cover' }}
             />
@@ -177,9 +166,7 @@ const DetailSliderEnroll = (nasabahDetails) => {
           </section>
 
           <section className="px-6 column">
-            <p className="text-sm-semibold mb-4 text-brand-700">
-              Informasi lainnya
-            </p>
+            <p className="text-sm-semibold mb-4 text-brand-700">Informasi lainnya</p>
             <div>a</div>
             <div>a</div>
             <div>a</div>

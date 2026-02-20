@@ -166,13 +166,13 @@ function Navigation({ childs }) {
           </div>
           {/* TOP */}
           <div className="flex h-full flex-1 flex-col">
-            <Link to="/user">
+            <Link to="/enquiry">
               <MyTooltip
                 placement="right"
                 target={
                   <div
                     className={`${
-                      location?.pathname.includes('/user')
+                      location?.pathname.includes('/enquiry')
                         ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
                         : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
@@ -183,7 +183,7 @@ function Navigation({ childs }) {
                   </div>
                 }
               >
-                <p className="text-xs-semibold text-white">User management</p>
+                <p className="text-xs-semibold text-white">Application Enquiry</p>
               </MyTooltip>
             </Link>
 
@@ -285,13 +285,13 @@ function Navigation({ childs }) {
           {/* BOTTOM */}
           <div className="flex w-full flex-col items-center gap-y-6 pb-6">
             <div className="gap-y-2 column">
-              {/* <Link to="/user">
+              {/* <Link to="/enquiry">
                 <MyTooltip
                   placement="right"
                   target={
                     <div
                       className={`${
-                        location?.pathname.includes('/user')
+                        location?.pathname.includes('/enquiry')
                           ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
                           : 'text-gray-light-500'
                       } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${

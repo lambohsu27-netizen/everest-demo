@@ -3,12 +3,12 @@ import { myToaster } from '@interstellar-component'
 import Service from './service'
 import { useApp } from '../../AppContext'
 
-const UserContext = createContext()
+const EnquiryContext = createContext()
 
-function UserProvider({ children }) {
+function EnquiryProvider({ children }) {
   const { setSlider, getSession } = useApp()
   const [createdPassword, setCreatedPassword] = useState(null)
-  const [user, setUser] = useState({
+  const [enquiry, setEnquiry] = useState({
     data: [],
     meta: [],
     filter: [],
@@ -78,34 +78,34 @@ function UserProvider({ children }) {
 
   /* -------------------------------------------------------------------------- */
 
-  const getUser = useCallback(
+  const getEnquiry = useCallback(
     () =>
-      Service.getUser(params)
+      Service.getEnquiry(params)
         .then((res) => {
-          setUser({ data: res.data, filter: res.filter, meta: res.meta })
+          setEnquiry({ data: res.data, filter: res.filter, meta: res.meta })
         })
         .catch(myToaster),
     [params]
   )
 
-  const showUser = useCallback(
+  const showEnquiry = useCallback(
     (id) =>
-      Service.showUser(id)
+      Service.showEnquiry(id)
         .then((res) => res.data)
         .catch(myToaster),
     []
   )
 
   // Details-Slider
-  const getUserDetail = useCallback(
+  const getEnquiryDetail = useCallback(
     async (id) =>
-      await Service.getUserDetail(id, params)
+      await Service.getEnquiryDetail(id, params)
         .then((res) => res)
         .catch(myToaster),
     [params]
   )
 
-  const createUser = useCallback(
+  const createEnquiry = useCallback(
     async (body) => {
       // console.log('body create: ', body)
       const formData = new FormData()
@@ -120,16 +120,16 @@ function UserProvider({ children }) {
         formData.append('photo', body.photo)
       }
 
-      await Service.createUser(formData)
+      await Service.createEnquiry(formData)
         .then(myToaster)
         .then(() => handleCurrentSlider({ status: false, current: null }))
-        .then(getUser)
+        .then(getEnquiry)
         .catch(myToaster)
     },
-    [getUser, handleCurrentSlider]
+    [getEnquiry, handleCurrentSlider]
   )
 
-  const updateUser = useCallback(
+  const updateEnquiry = useCallback(
     async (body) => {
       // console.log('edit body: ', body)
       const formData = new FormData()
@@ -148,56 +148,56 @@ function UserProvider({ children }) {
       if (body.photo) formData.append('photo', body.photo)
       formData.append('delete_photo', body.delete_photo)
 
-      await Service.updateUser(currentSlider?.id, formData)
+      await Service.updateEnquiry(currentSlider?.id, formData)
         .then(myToaster)
         .then(() => handleCurrentSlider({ status: false, current: null }))
-        .then(getUser)
+        .then(getEnquiry)
         .then(getSession)
         .catch(myToaster)
     },
-    [currentSlider?.id, getSession, getUser, handleCurrentSlider]
+    [currentSlider?.id, getSession, getEnquiry, handleCurrentSlider]
   )
 
-  const restoreUser = useCallback(
+  const restoreEnquiry = useCallback(
     async (data) => {
-      await Service.restoreUser({ ids: data })
+      await Service.restoreEnquiry({ ids: data })
         .then(myToaster)
-        .then(getUser)
+        .then(getEnquiry)
         .then(setCheck(null))
         .catch(myToaster)
     },
-    [getUser]
+    [getEnquiry]
   )
 
-  const deleteUser = useCallback(
+  const deleteEnquiry = useCallback(
     async (data) => {
-      await Service.deleteUser({ ids: data })
+      await Service.deleteEnquiry({ ids: data })
         .then(myToaster)
-        .then(getUser)
+        .then(getEnquiry)
         .then(setCheck(null))
         .catch(myToaster)
     },
-    [getUser]
+    [getEnquiry]
   )
 
-  const enableUser = useCallback(
+  const enableEnquiry = useCallback(
     async (id) => {
-      await Service.enableUser(id)
+      await Service.enableEnquiry(id)
         .then(myToaster)
-        .then(getUser)
+        .then(getEnquiry)
         .catch(myToaster)
         .finally(() => {
           handleCurrentModal(null)
           handleCurrentSlider({ status: false, current: null })
         })
     },
-    [getUser]
+    [getEnquiry]
   )
 
-  const importUser = useCallback((values, config) => {
+  const importEnquiry = useCallback((values, config) => {
     const formData = new FormData()
-    formData.append('user', values.user)
-    return Service.importUser(formData, config)
+    formData.append('enquiry', values.enquiry)
+    return Service.importEnquiry(formData, config)
   }, [])
 
   const downloadTemplateImport = useCallback(() => {
@@ -229,9 +229,9 @@ function UserProvider({ children }) {
   )
 
   // useEffect(() => {
-  //   getUser(params)
+  //   getEnquiry(params)
   //   setCheck([])
-  // }, [getUser, params])
+  // }, [getEnquiry, params])
 
   // Utils
   const generatePassword = useCallback((setValueCallback) => {
@@ -281,17 +281,17 @@ function UserProvider({ children }) {
       handleCurrentSlider,
       params,
       setParams,
-      user,
-      setUser,
+      enquiry,
+      setEnquiry,
       searchEauth,
-      getUser,
-      showUser,
-      getUserDetail,
-      createUser,
-      updateUser,
-      deleteUser,
-      restoreUser,
-      importUser,
+      getEnquiry,
+      showEnquiry,
+      getEnquiryDetail,
+      createEnquiry,
+      updateEnquiry,
+      deleteEnquiry,
+      restoreEnquiry,
+      importEnquiry,
       downloadTemplateImport,
       downloadExport,
       currentModal,
@@ -309,24 +309,24 @@ function UserProvider({ children }) {
       copyToClipboard,
       setIsChanged,
       isChanged,
-      enableUser,
+      enableEnquiry,
     }),
     [
-      createUser,
+      createEnquiry,
       currentSlider,
-      deleteUser,
+      deleteEnquiry,
       downloadExport,
       downloadTemplateImport,
-      getUserDetail,
-      getUser,
+      getEnquiryDetail,
+      getEnquiry,
       handleCurrentSlider,
-      importUser,
+      importEnquiry,
       params,
-      restoreUser,
+      restoreEnquiry,
       searchEauth,
-      showUser,
-      user,
-      updateUser,
+      showEnquiry,
+      enquiry,
+      updateEnquiry,
       currentModal,
       setCurrentModal,
       handleCurrentModal,
@@ -341,17 +341,17 @@ function UserProvider({ children }) {
       check,
       setIsChanged,
       isChanged,
-      enableUser,
+      enableEnquiry,
     ]
   )
 
-  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+  return <EnquiryContext.Provider value={contextValue}>{children}</EnquiryContext.Provider>
 }
 
-const useUser = () => {
-  const context = useContext(UserContext)
-  if (!context) throw new Error('useUser must be used within UserProvider')
+const useEnquiry = () => {
+  const context = useContext(EnquiryContext)
+  if (!context) throw new Error('useEnquiry must be used within EnquiryProvider')
   return context
 }
 
-export { UserProvider, useUser }
+export { EnquiryProvider, useEnquiry }

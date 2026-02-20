@@ -11,6 +11,7 @@ import {
   MyModalSlider,
   MyTextField,
   MyTooltip,
+  MyButtonGroupV2,
 } from '@interstellar-component'
 import {
   AlertCircle,
@@ -20,40 +21,42 @@ import {
   Plus,
   RefreshCcw01,
   SearchLg,
+  Send01,
+  Share03,
   Trash01,
 } from '@untitled-ui/icons-react'
 import React, { useEffect, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import { debounce } from 'lodash'
-import { useUser } from './Context'
+import { useEnquiry } from './Context'
 import Formslider from './Sliders/FormSlider'
 import DetailSlider from './Sliders/DetailSlider'
 import DetailSliderEnroll from './Sliders/DetailSliderEnroll'
 import { useApp } from '../../AppContext'
 import { Access } from '../../services/Helper'
 
-function User() {
+function Enquiry() {
   // const { getAccess } = useApp()
-  // const access = getAccess(Access?.USER)
+  // const access = getAccess(Access?.Enquiry)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
 
   const {
     currentSlider,
     handleCurrentSlider,
     setParams,
-    user,
-    setUser,
+    enquiry,
+    setEnquiry,
     currentTabs,
     setCheck,
-    deleteUser,
+    deleteEnquiry,
     check,
-    restoreUser,
+    restoreEnquiry,
     params,
     downloadExport,
     currentModal,
     handleCurrentModal,
     isChanged,
-  } = useUser()
+  } = useEnquiry()
   // console.log('params', params)
 
   useEffect(() => {
@@ -66,7 +69,7 @@ function User() {
 
   return (
     <>
-      <MyModalSlider
+      {/* <MyModalSlider
         open={currentSlider?.current === 'form-slider'}
         element={<Formslider />}
         onClose={() => {
@@ -87,11 +90,11 @@ function User() {
           width={375}
           element={<DetailSliderEnroll />}
         />
-      </MyModalSlider>
+      </MyModalSlider> */}
       <MyConfirmModal
         open={isConfirmModalOpen}
         onClose={() => setConfirmModalOpen(false)}
-        onConfirm={() => deleteUser(check)}
+        onConfirm={() => deleteEnquiry(check)}
         title={`Anda yakin menghapus ${check?.length} data?`}
         message="Data yang dihapus akan masuk ke approval untuk ditinjau terlebih dahulu."
         icon={<AlertCircle className="text-warning-600" />}
@@ -107,11 +110,24 @@ function User() {
       <SimpleBar forceVisible="y" className="flex-1" style={{ height: '100vh' }}>
         <main className="flex flex-col gap-8 pb-12 pt-8">
           <div className="flex flex-col gap-6 px-8">
-            <div className="flex flex-col gap-1">
-              <p className="display-xs-semibold text-gray-light-900">Application Enquiry</p>
-              <p className="text-md-regular text-gray-light-600">
-                Manage and view all application enquiries.
-              </p>
+            <div className="flex items-center justify-between gap-1">
+              <div>
+                <p className="display-xs-semibold text-gray-light-900">Application Enquiry</p>
+                <p className="text-md-regular text-gray-light-600">
+                  Manage and view all application enquiries.
+                </p>
+              </div>
+
+              <MyButton
+                onClick={downloadExport}
+                color="primary"
+                variant="filled"
+                size="md"
+                // disabled={!access?.add}
+              >
+                <Share03 className="size-5 text-gray-400" />
+                <p className="text-sm-semibold">Export</p>
+              </MyButton>
             </div>
             <div className="w-full">
               <div className="w-full rounded-xl border border-gray-light-200 shadow-shadows/shadow-xs">
@@ -121,7 +137,7 @@ function User() {
                       <div className="flex items-center gap-2">
                         <p className="text-lg-semibold text-gray-light-900">List of Enquiry</p>
                         <MyChip
-                          label={`${user?.meta?.total || '0'} item`}
+                          label={`${Enquiry?.meta?.total || '0'} item`}
                           // color="primary"
                           variant="outlined"
                           size="sm"
@@ -138,7 +154,7 @@ function User() {
                             color="secondary"
                             variant="outlined"
                             size="sm"
-                            onClick={() => restoreUser(check)}
+                            onClick={() => restoreEnquiry(check)}
                             // disabled={!access?.edit_delete}
                           >
                             <RefreshCcw01 className="size-5" stroke="currentColor" />
@@ -159,16 +175,32 @@ function User() {
                       ) : null}
                       {/* )} */}
                       <MyButton
-                        onClick={downloadExport}
-                        color="secondary"
-                        variant="outlined"
+                        // onClick={downloadExport}
+                        color="error"
+                        variant="text"
                         size="md"
                         // disabled={!access?.add}
                       >
-                        <Download04 className="size-5 text-gray-400" />
-                        <p className="text-sm-semibold">Export</p>
+                        {/* <Trash01 className="size-5 text-gray-400" /> */}
+                        <p className="text-sm-semibold">Delete All</p>
                       </MyButton>
                       {/* {access?.edit_delete && ( */}
+                      <MyButton
+                        onClick={() =>
+                          handleCurrentSlider({
+                            status: true,
+                            current: 'form-slider',
+                          })
+                        }
+                        color="primary"
+                        variant="outlined"
+                        size="md"
+                        // disabled={!access?.edit_delete}
+                      >
+                        <Send01 className="size-5" stroke="currentColor" />
+                        <p className="text-sm-semibold">Submit All</p>
+                      </MyButton>
+
                       <MyButton
                         onClick={() =>
                           handleCurrentSlider({
@@ -182,7 +214,7 @@ function User() {
                         // disabled={!access?.edit_delete}
                       >
                         <Plus className="size-5" stroke="currentColor" />
-                        <p className="text-sm-semibold">User baru</p>
+                        <p className="text-sm-semibold">New Request</p>
                       </MyButton>
                       {/* )} */}
                     </div>
@@ -190,15 +222,29 @@ function User() {
                   <hr className="border-gray-light-200" />
                 </div>
 
-                <div className="flex items-center justify-between gap-3 border-gray-light-200 px-4 py-3">
-                  <div className="flex w-full items-start justify-start gap-3">
+                <div className="flex items-center justify-between gap-3 border-b border-gray-light/200 px-4 py-3">
+                  <MyButtonGroupV2
+                    buttons={[
+                      { label: 'View all', value: 'view all' },
+                      { label: 'Open', value: 'open' },
+                      { label: 'Closed', value: 'closed' },
+                    ]}
+                    value={params.status}
+                    onChange={(e) => {
+                      setParams((value) => ({ ...value, status: e, page: 1 }))
+                    }}
+                  />
+                  <div className="flex flex-1 items-center justify-end gap-3">
                     <div className="w-full max-w-[375px]">
                       <MyTextField
-                        placeholder="Cari"
+                        placeholder="Search"
                         id="input-search"
-                        // value={params.search}
                         startAdornment={
-                          <SearchLg className="size-5 text-gray-light-600" stroke="currentColor" />
+                          <SearchLg
+                            className="size-5"
+                            className="size-5 text-gray-light/600"
+                            stroke="currentColor"
+                          />
                         }
                         onChangeForm={debounce(
                           (e) =>
@@ -209,19 +255,14 @@ function User() {
                             })),
                           1000
                         )}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                       />
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-3">
                     <MyFilterModal
                       id="filter-ticketing"
-                      currentFilters={user?.filter}
+                      // currentFilters={ticketList?.filter}
                       onChange={(filter) => {
-                        setParams((value) => ({
-                          ...value,
+                        setParams((prev) => ({
+                          ...prev,
                           filter,
                           page: 1,
                           search: '',
@@ -232,7 +273,7 @@ function User() {
                           removeWhite
                           onClick={handleClick}
                           color="secondary"
-                          variant="text"
+                          variant="outlined"
                           size="md"
                         >
                           <FilterLines className="size-5" stroke="currentColor" />
@@ -240,24 +281,17 @@ function User() {
                         </MyButton>
                       )}
                     />
-
-                    <MyArchiveButton
-                      value={params}
-                      onChange={(e) => {
-                        setParams((value) => ({ ...value, archive: e, page: 1 }))
-                      }}
-                    />
                   </div>
                 </div>
                 <div>
                   <MyDataTable
-                    values={user}
+                    values={Enquiry}
                     paginator
                     cursorPointer
                     // onDeleteAll={bulkDeleteTerminal}
                     selectionMode="multiple"
                     onSelectionChange={(value) => {
-                      setUser(value)
+                      setEnquiry(value)
                       setCheck(value.data?.filter((e) => e.checked === true).map((e) => e.id))
                     }}
                     onChangePagination={(page) => {
@@ -276,7 +310,7 @@ function User() {
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
-                      header="Nama/NIP"
+                      header="Request Number & Date"
                       body={(value) => (
                         <div className="column">
                           <p
@@ -294,12 +328,13 @@ function User() {
                         </div>
                       )}
                     />
+
                     <MyColumn
                       field="role.name"
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
-                      header="Role"
+                      header="Name & NIK"
                       body={(value) => (
                         <p className="text-sm-regular text-gray-light-600">
                           {value?.role?.name || '-'}
@@ -308,18 +343,13 @@ function User() {
                     />
 
                     <MyColumn
-                      field="whatsapp, email"
+                      field="info"
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
-                      header="No. telepon / email"
+                      header="General Info"
                       body={(value) => (
-                        <div>
-                          <p className="text-sm-medium text-gray-900">{value?.whatsapp || '-'}</p>
-                          <p className="text-sm-regular text-gray-light-600">
-                            {value?.email || '-'}
-                          </p>
-                        </div>
+                        <p className="text-sm-regular text-gray-light-600">{value?.info}</p>
                       )}
                     />
 
@@ -328,27 +358,43 @@ function User() {
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
-                      header="Penempatan"
+                      header="Selfie With KTP"
                       body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.branch?.name}</p>
+                        <p className="text-sm-regular text-gray-light-600">{value?.idSelfie}</p>
+                      )}
+                    />
+
+                    <MyColumn
+                      field="consent"
+                      onSort={(sort) => {
+                        setParams((prev) => ({ ...prev, ...sort }))
+                      }}
+                      header="Consent"
+                      body={(value) => (
+                        <p className="text-sm-regular text-gray-light-600">{value?.consent}</p>
                       )}
                     />
 
                     <MyColumn
                       field="status"
-                      header=""
-                      body={(value) =>
-                        value?.active === false && (
-                          <MyChip
-                            startAdornment={<Lock01 className="size-3" stroke="currentColor" />}
-                            label="Akun terkunci"
-                            color="warning"
-                            variant="filled"
-                            size="sm"
-                            rounded="md"
-                          />
-                        )
-                      }
+                      onSort={(sort) => {
+                        setParams((prev) => ({ ...prev, ...sort }))
+                      }}
+                      header="Status"
+                      body={(value) => (
+                        <p className="text-sm-regular text-gray-light-600">{value?.status}</p>
+                      )}
+                    />
+
+                    <MyColumn
+                      field="status"
+                      onSort={(sort) => {
+                        setParams((prev) => ({ ...prev, ...sort }))
+                      }}
+                      header="Created By & Last Update"
+                      body={(value) => (
+                        <p className="text-sm-regular text-gray-light-600">{value?.status}</p>
+                      )}
                     />
 
                     <MyColumn
@@ -364,7 +410,7 @@ function User() {
                                   <MyButton
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      restoreUser([value.id])
+                                      restoreEnquiry([value.id])
                                     }}
                                     size="md"
                                     variant="text"
@@ -394,4 +440,4 @@ function User() {
   )
 }
 
-export default User
+export default Enquiry

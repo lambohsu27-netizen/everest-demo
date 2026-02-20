@@ -5,13 +5,13 @@ import { MyAvatar, MyButton, MyDetailView } from '@interstellar-component'
 import { useEffect, useState } from 'react'
 import { useApp } from '../../../AppContext'
 import { Access } from '../../../services/Helper'
-import { useUser } from '../Context'
+import { useEnquiry } from '../Context'
 // import MyDetailViewLocal from '../../../localComponents/MyDetailViewLocal'
-import ModalEnableUser from './components/ModalEnableUser'
+// import ModalEnableEnquiry from './components/ModalEnableEnquiry'
 
 function DetailsSlider() {
   const { getAccess } = useApp()
-  const access = getAccess(Access?.USER)
+  const access = getAccess(Access?.Enquiry)
 
   const {
     handleCurrentSlider,
@@ -21,30 +21,30 @@ function DetailsSlider() {
     setCurrentModal,
     deleteSimCard,
     restoreSimCard,
-    getUserDetail,
-    enableUser,
-  } = useUser()
-  const [userDetails, setUserDetails] = useState()
-  console.log('userDetails', userDetails?.data?.raw)
+    getEnquiryDetail,
+    enableEnquiry,
+  } = useEnquiry()
+  const [enquiryDetails, setEnquiryDetails] = useState()
+  console.log('enquiryDetails', enquiryDetails?.data?.raw)
 
-  const isArchived = userDetails?.data?.raw?.deleted_at
+  const isArchived = enquiryDetails?.data?.raw?.deleted_at
 
   useEffect(() => {
     if (currentSlider.id) {
-      getUserDetail(currentSlider.id).then((userDetail) => {
-        setUserDetails(userDetail)
+      getEnquiryDetail(currentSlider.id).then((enquiryDetail) => {
+        setEnquiryDetails(enquiryDetail)
       })
     }
-  }, [currentSlider.id, getUserDetail])
+  }, [currentSlider.id, getEnquiryDetail])
 
   return (
     <>
-      <ModalEnableUser
-        open={currentModal?.current === 'modal-enable-user'}
+      {/* <ModalEnableEnquiry
+        open={currentModal?.current === 'modal-enable-enquiry'}
         handleCurrentModal={handleCurrentModal}
         currentModal={currentModal}
-        onConfirm={() => enableUser(currentSlider.id)}
-      />
+        onConfirm={() => enableEnquiry(currentSlider.id)}
+      /> */}
       <div className="flex h-screen w-[375px] flex-col">
         <header className="relative flex flex-col px-4">
           <div className="relative flex items-start gap-x-4 pb-4 pt-8">
@@ -59,13 +59,13 @@ function DetailsSlider() {
                 stroke="currentColor"
               />
             </button>
-            <MyAvatar photo={userDetails?.data?.raw?.photo_url} size={50} />
+            <MyAvatar photo={enquiryDetails?.data?.raw?.photo_url} size={50} />
             <div className="flex flex-col gap-1">
               <p className="text-xl-semibold text-gray-light-900">
-                {userDetails?.data?.raw?.name ?? '-'}
+                {enquiryDetails?.data?.raw?.name ?? '-'}
               </p>
               <p className="text-md-regular text-gray-light-600">
-                {userDetails?.data?.raw?.role ?? '-'}
+                {enquiryDetails?.data?.raw?.role ?? '-'}
               </p>
             </div>
           </div>
@@ -76,31 +76,32 @@ function DetailsSlider() {
           <SimpleBar forceVisible="y" style={{ height: '100%' }}>
             <div className="flex flex-1 flex-col gap-8 pb-8 pt-4">
               <div className="flex flex-col gap-6">
-                {userDetails?.data?.raw?.active == false && (
+                {enquiryDetails?.data?.raw?.active == false && (
                   <div className="mx-4 flex flex-col gap-2 rounded-lg border border-warning-200 bg-warning-25 p-2">
                     <div className="flex gap-1">
                       <LockUnlocked01 className="size-5 text-warning-600" />
                       <p className="text-sm-medium text-black">Akun terkunci</p>
                     </div>
                     <div className="flex gap-2">
-                      <div className="custom-bg-inactive-user w-full rounded-lg border border-warning-100 px-4 py-3">
+                      <div className="custom-bg-inactive-enquiry w-full rounded-lg border border-warning-100 px-4 py-3">
                         <p className="text-xs-medium text-black">
                           Alasan:{' '}
-                          {userDetails?.data?.raw?.inactive_reason_code === 'INACTIVE_SESSION'
-                            ? 'User tidak aktif'
-                            : userDetails?.data?.raw?.inactive_reason_code === 'MAX_LOGIN_ATTEMPTS'
+                          {enquiryDetails?.data?.raw?.inactive_reason_code === 'INACTIVE_SESSION'
+                            ? 'Enquiry tidak aktif'
+                            : enquiryDetails?.data?.raw?.inactive_reason_code ===
+                                'MAX_LOGIN_ATTEMPTS'
                               ? 'Salah password'
                               : 'Akun tidak aktif'}
                         </p>
                       </div>
                       <MyButton
-                        disabled={userDetails?.data?.raw?.active}
+                        disabled={enquiryDetails?.data?.raw?.active}
                         type="submit"
                         color="primary"
                         variant="filled"
                         size="md"
                         onClick={() =>
-                          setCurrentModal({ status: true, current: 'enable-user-modal' })
+                          setCurrentModal({ status: true, current: 'enable-enquiry-modal' })
                         }
                       >
                         <p className="text-sm-semibold text-nowrap">Buka akun</p>
@@ -112,12 +113,12 @@ function DetailsSlider() {
                 <div className="flex-col px-4">
                   <p className="text-sm-semibold text-gray-light-700">Informasi pribadi</p>
                   <p className="text-sm-regular text-gray-light-600">
-                    Detail informasi pribadi user.
+                    Detail informasi pribadi enquiry.
                   </p>
                 </div>
                 <div className="flex flex-1 flex-col">
                   {/* <MyDetailViewLocal
-                    datas={userDetails?.data?.private_information ?? {}}
+                    datas={enquiryDetails?.data?.private_information ?? {}}
                   /> */}
                 </div>
 
@@ -133,15 +134,17 @@ function DetailsSlider() {
                     <div className="flex gap-2">
                       <div className="items-end column">
                         <p className="text-sm-medium text-gray-900">
-                          {userDetails?.data?.general_information?.created_by}
+                          {enquiryDetails?.data?.general_information?.created_by}
                         </p>
                         <p className="text-sm-regular text-gray-600">
-                          {moment(userDetails?.data?.general_information?.created_at).format(
+                          {moment(enquiryDetails?.data?.general_information?.created_at).format(
                             'DD MMM YYYY • HH:mm'
                           )}
                         </p>
                       </div>
-                      <MyAvatar photo={userDetails?.data?.general_information?.created_by_photo} />
+                      <MyAvatar
+                        photo={enquiryDetails?.data?.general_information?.created_by_photo}
+                      />
                     </div>
                   </div>
 
@@ -150,15 +153,17 @@ function DetailsSlider() {
                     <div className="flex gap-2">
                       <div className="items-end column">
                         <p className="text-sm-medium text-gray-900">
-                          {userDetails?.data?.general_information?.updated_by}
+                          {enquiryDetails?.data?.general_information?.updated_by}
                         </p>
                         <p className="text-sm-regular text-gray-600">
-                          {moment(userDetails?.data?.general_information?.updated_at).format(
+                          {moment(enquiryDetails?.data?.general_information?.updated_at).format(
                             'DD MMM YYYY • HH:mm'
                           )}
                         </p>
                       </div>
-                      <MyAvatar photo={userDetails?.data?.general_information?.updated_by_photo} />
+                      <MyAvatar
+                        photo={enquiryDetails?.data?.general_information?.updated_by_photo}
+                      />
                     </div>
                   </div>
                 </div>
@@ -168,7 +173,7 @@ function DetailsSlider() {
         </div>
 
         <footer className="flex items-center justify-end gap-4 border-t border-gray-light-200 px-4 py-4">
-          {userDetails?.raw?.deleted_at ? (
+          {enquiryDetails?.raw?.deleted_at ? (
             <MyButton
               onClick={() => restoreSimCard(currentSlider.id)}
               color="primary"

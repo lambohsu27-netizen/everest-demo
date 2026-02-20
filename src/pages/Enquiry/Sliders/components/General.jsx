@@ -53,7 +53,7 @@ const General = ({ nasabahDetails }) => {
             //   handleCurrentSlider(
             //     {
             //       status: true,
-            //       current: 'user',
+            //       current: 'enquiry',
             //     },
             //     currentSlider.id
             //   )

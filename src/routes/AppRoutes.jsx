@@ -4,12 +4,12 @@ import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
 import HomePage from '@src/pages/HomePage'
-import User from '@src/pages/User'
-import { UserProvider } from '@src/pages/User/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
+import Enquiry from '@src/pages/Enquiry'
+import { EnquiryProvider } from '@src/pages/Enquiry/Context'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -27,26 +27,24 @@ export function AuthenticatedRoutes() {
     }
   }, [Access, accesses])
 
-  const isAccessAllowed = (accessName) => {
-    const filteredAccess = accesses.filter((acc) => acc.view === true)
-    const access = filteredAccess.find((acces) => acces.name === accessName)
-    if (access) {
-      return access
-    }
-    return null
-  }
+  const isAccessAllowed = (accessName) =>
+    // const filteredAccess = accesses.filter((acc) => acc.view === true)
+    // const access = filteredAccess.find((acces) => acces.name === accessName)
+    // if (access) {
+    //   return access
+    // }
+    true
 
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
-        path="/user"
+        path="/enquiry"
         element={
-          <UserProvider>
-            {/* <User /> */}
-            {isLoading ? null : isAccessAllowed(Access?.USER) ? <User /> : <NotFound />}
-          </UserProvider>
+          <EnquiryProvider>
+            {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
+          </EnquiryProvider>
         }
       />
 

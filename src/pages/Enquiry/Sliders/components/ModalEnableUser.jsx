@@ -1,32 +1,27 @@
 import { LockUnlocked01, XClose } from '@untitled-ui/icons-react'
 
-import {
-  MyBgPatternDecorativeCircle,
-  MyButton,
-  MyModal,
-} from '@interstellar-component'
+import { MyBgPatternDecorativeCircle, MyButton, MyModal } from '@interstellar-component'
 
-function ModalEnableUser({ handleCurrentModal, currentModal, onConfirm }) {
-
+function ModalEnableEnquiry({ handleCurrentModal, currentModal, onConfirm }) {
   return (
     <MyModal
-      open={currentModal?.current === 'enable-user-modal'}
+      open={currentModal?.current === 'enable-enquiry-modal'}
       children={
-        <ModalEnableUserView
+        <ModalEnableEnquiryView
           handleCurrentModal={handleCurrentModal}
           error={currentModal?.error}
           onConfirm={onConfirm}
         />
       }
       onClose={() => handleCurrentModal(null)}
-      forceBlur={true}
+      forceBlur
     />
   )
 }
 
-export default ModalEnableUser
+export default ModalEnableEnquiry
 
-function ModalEnableUserView({ handleCurrentModal, error, onConfirm }) {
+function ModalEnableEnquiryView({ handleCurrentModal, error, onConfirm }) {
   return (
     <div className="flex w-[400px] flex-col gap-5 overflow-hidden rounded-lg bg-base-white">
       <header className="relative flex items-start gap-x-4 pt-6">
@@ -36,11 +31,7 @@ function ModalEnableUserView({ handleCurrentModal, error, onConfirm }) {
           }}
           className="absolute right-[12px] top-[12px] z-10 flex h-11 w-11 items-center justify-center rounded-lg p-2"
         >
-          <XClose
-            size={24}
-            className="text-gray-light-400"
-            stroke="currentColor"
-          />
+          <XClose size={24} className="text-gray-light-400" stroke="currentColor" />
         </button>
         <div className="flex w-full flex-col gap-4 px-4">
           <div className="z-0">
@@ -54,9 +45,7 @@ function ModalEnableUserView({ handleCurrentModal, error, onConfirm }) {
           </div>
           <div className="z-40 flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-lg-semibold text-gray-light-900">
-                Buka akun?
-              </p>
+              <p className="text-lg-semibold text-gray-light-900">Buka akun?</p>
               <p className="text-sm-regular text-gray-light-600">
                 Apakah anda yakin ingin membuka akun ini?
               </p>

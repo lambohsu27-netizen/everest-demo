@@ -3,6 +3,7 @@ export default {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
     './component/**/*.{js,jsx,ts,tsx}',
+    './interstellar-component/**/*.{js,jsx,ts,tsx}',
     '!./interstellar-component/node_modules/**/*', // Exclude the node_modules
   ],
   theme: {

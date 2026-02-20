@@ -44,7 +44,7 @@ function LoginProvider({ children }) {
 
   const login = useCallback(
     async (body) => {
-      // console.trace('body', body)
+      // console.log('body', body)
 
       const formData = new FormData()
       const encryptedPassword = CryptoJS.AES.encrypt(

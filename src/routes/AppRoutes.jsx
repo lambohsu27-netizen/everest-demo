@@ -10,6 +10,8 @@ import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import Enquiry from '@src/pages/Enquiry'
 import { EnquiryProvider } from '@src/pages/Enquiry/Context'
+import Login from '@src/pages/Login'
+import { LoginProvider } from '@src/pages/Login/Context'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -82,26 +84,16 @@ export function UnauthenticatedRoutes() {
 
   return (
     <Routes>
-      {/* <Route path="*" element={<Navigate to="/welcome" replace />} /> */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
       <Route path="/" element={<HomePage />} />
       <Route
-        path="/user"
-        element={
-          <UserProvider>
-            {/* <User /> */}
-            {/* {isLoading ? null : isAccessAllowed(Access?.USER) ? <User /> : <NotFound />} */}
-            <User />
-          </UserProvider>
-        }
-      />
-      {/* <Route
         path="/login"
         element={
           <LoginProvider>
             <Login />
           </LoginProvider>
         }
-      /> */}
+      />
       {/* <Route
         path="/forget-password"
         element={

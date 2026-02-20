@@ -79,36 +79,29 @@ function Login() {
         handleCurrentModal={handleCurrentModal}
         currentModal={currentModal}
       />
-      <main className="flex h-screen">
-        <div
-          id="left"
-          className="flex w-7/12 items-center justify-center max-md:w-full"
-        >
+      <main className="flex h-screen z-50">
+        <div id="left" className="flex w-7/12 items-center justify-center max-md:w-full">
           <form
-            className="items-center justify-center gap-6 rounded-xl p-10 column"
+            className="items-center justify-center gap-6 rounded-xl p-10 column z-50"
             onSubmit={onSubmit}
           >
             <div className="z-0">
               <MyBgPatternDecorativeCube />
             </div>
-            <img
+            {/* <img
               src={MantapLogoLogin}
               alt="logo"
               width={152}
               height={118}
               className="z-40"
-            />
+            /> */}
             <div className="z-40 flex min-w-[400px] flex-col gap-y-6">
               <div className="gap-y-2 column">
-                <p className="display-sm-semibold text-gray-900">
-                  Selamat datang
-                </p>
-                <p className="text-md-regular text-gray-600">
-                  Silahkan login terlebih dahulu.
-                </p>
+                <p className="display-sm-semibold text-gray-900">Selamat datang</p>
+                <p className="text-md-regular text-gray-600">Silahkan login terlebih dahulu.</p>
               </div>
             </div>
-            <div className="flex min-w-[400px] flex-col gap-y-5">
+            <div className="z-40 relative flex min-w-[400px] flex-col gap-y-5">
               <div className="gap-1 column">
                 <p className="text-sm-medium text-gray-700">Email / NIP</p>
                 <MyTextField
@@ -119,8 +112,8 @@ function Login() {
                   control={control}
                   value={email}
                   errors={errors?.email?.message}
-                  focusColor={'#01172D'}
-                  focusShadow={'#E6EBF0'}
+                  focusColor="#01172D"
+                  focusShadow="#E6EBF0"
                 />
               </div>
 
@@ -149,19 +142,15 @@ function Login() {
                         cursor: 'pointer',
                       }}
                     >
-                      {show ? (
-                        <Eye width={17} height={17} />
-                      ) : (
-                        <EyeOff width={17} height={17} />
-                      )}
+                      {show ? <Eye width={17} height={17} /> : <EyeOff width={17} height={17} />}
                     </span>
                   }
-                  focusColor={'#01172D'}
-                  focusShadow={'#E6EBF0'}
+                  focusColor="#01172D"
+                  focusShadow="#E6EBF0"
                 />
               </div>
             </div>
-            <section className="flex min-w-[400px] items-center justify-end">
+            <section className="z-40 relative flex min-w-[400px] items-center justify-end">
               {/* <div className="flex flex-1 items-center gap-x-2">
                 <MyCheckbox
                   name="remember_me"
@@ -173,38 +162,26 @@ function Login() {
                 />
                 <p className="text-sm-medium text-gray-light-700">Ingat saya</p>
               </div> */}
-              <MyButton
-                color="primary"
-                variant="text"
-                onClick={() => nav('/forget-password')}
-              >
+              <MyButton color="primary" variant="text" onClick={() => nav('/forget-password')}>
                 <p className="text-sm-semibold">Lupa password</p>
               </MyButton>
             </section>
-            <MyButton
-              type="submit"
-              color="primary"
-              variant="filled"
-              size="lg"
-              expanded
-              disabled={isSubmitting}
-            >
-              <p className="text-md-semibold">Login</p>
-            </MyButton>
+            <div className="z-40 relative w-[400px]">
+              <MyButton
+                type="submit"
+                color="primary"
+                variant="filled"
+                size="lg"
+                expanded
+                disabled={isSubmitting}
+              >
+                <p className="text-md-semibold">Login</p>
+              </MyButton>
+            </div>
           </form>
-          <div className="absolute bottom-8 left-8 h-[16px] w-[108px]">
-            {/* <LogoKalachakra /> */}
-          </div>
         </div>
-        <div
-          id="right"
-          className="w-5/12 overflow-hidden rounded-l-extraLarge max-md:hidden"
-        >
-          <img
-            src={loginPhoto}
-            alt="Login Illustration"
-            className="h-full w-full object-cover"
-          />
+        <div id="right" className="w-5/12 overflow-hidden rounded-l-extraLarge max-md:hidden">
+          <img src={loginPhoto} alt="Login Illustration" className="h-full w-full object-cover" />
         </div>
       </main>
     </>

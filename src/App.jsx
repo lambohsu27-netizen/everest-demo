@@ -3,6 +3,8 @@ import { useCookies } from 'react-cookie'
 import { ToastContainer } from 'react-toastify'
 
 import { UnauthenticatedRoutes } from './routes/AppRoutes'
+import Navigation from './pages/Navigation/Navigation'
+import { LoginProvider } from './pages/Login/Context'
 
 export default function App() {
   const [cookies] = useCookies(['token-backoffice'])
@@ -21,6 +23,9 @@ export default function App() {
         pauseOnHover
         closeOnClick
       />
+      <LoginProvider>
+        <Navigation />
+      </LoginProvider>
       <UnauthenticatedRoutes />
     </>
   )

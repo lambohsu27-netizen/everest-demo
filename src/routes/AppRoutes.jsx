@@ -4,13 +4,98 @@ import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
 import HomePage from '@src/pages/HomePage'
+import User from '@src/pages/User'
+import { UserProvider } from '@src/pages/User/Context'
+import { useEffect, useState } from 'react'
+import NotFound from '@src/pages/NotFound'
+import { useApp } from '@src/AppContext'
+import { Access } from '@src/services/Helper'
 
-// eslint-disable-next-line import/prefer-default-export
+export function AuthenticatedRoutes() {
+  // const { accesses } = useApp()
+  const [isLoading, setIsLoading] = useState(true)
+  const accesses = [
+    {
+      name: Access?.USER,
+      view: true,
+    },
+  ]
+
+  useEffect(() => {
+    if (Access && accesses.length > 0) {
+      setIsLoading(false)
+    }
+  }, [Access, accesses])
+
+  const isAccessAllowed = (accessName) => {
+    const filteredAccess = accesses.filter((acc) => acc.view === true)
+    const access = filteredAccess.find((acces) => acces.name === accessName)
+    if (access) {
+      return access
+    }
+    return null
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route
+        path="/user"
+        element={
+          <UserProvider>
+            {/* <User /> */}
+            {isLoading ? null : isAccessAllowed(Access?.USER) ? <User /> : <NotFound />}
+          </UserProvider>
+        }
+      />
+
+      <Route path="/404" element={<NotFound />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
+    </Routes>
+  )
+}
+
 export function UnauthenticatedRoutes() {
+  // const { accesses } = useApp()
+  // make this accessess dummy data
+  const accesses = [
+    {
+      name: Access?.USER,
+      view: true,
+    },
+  ]
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (Access && accesses.length > 0) {
+      setIsLoading(false)
+    }
+  }, [Access, accesses])
+
+  const isAccessAllowed = (accessName) => {
+    const filteredAccess = accesses.filter((acc) => acc.view === true)
+    const access = filteredAccess.find((acces) => acces.name === accessName)
+    if (access) {
+      return access
+    }
+    return null
+  }
+
   return (
     <Routes>
       {/* <Route path="*" element={<Navigate to="/welcome" replace />} /> */}
       <Route path="/" element={<HomePage />} />
+      <Route
+        path="/user"
+        element={
+          <UserProvider>
+            {/* <User /> */}
+            {/* {isLoading ? null : isAccessAllowed(Access?.USER) ? <User /> : <NotFound />} */}
+            <User />
+          </UserProvider>
+        }
+      />
       {/* <Route
         path="/login"
         element={

@@ -100,17 +100,17 @@ function Login() {
             />
             <div className="z-40 flex min-w-[400px] flex-col gap-y-6">
               <div className="gap-y-2 column">
-                <p className="display-sm-semibold text-gray/900">
+                <p className="display-sm-semibold text-gray-900">
                   Selamat datang
                 </p>
-                <p className="text-md-regular text-gray/600">
+                <p className="text-md-regular text-gray-600">
                   Silahkan login terlebih dahulu.
                 </p>
               </div>
             </div>
             <div className="flex min-w-[400px] flex-col gap-y-5">
               <div className="gap-1 column">
-                <p className="text-sm-medium text-gray/700">Email / NIP</p>
+                <p className="text-sm-medium text-gray-700">Email / NIP</p>
                 <MyTextField
                   name="email"
                   // type="email"
@@ -125,7 +125,7 @@ function Login() {
               </div>
 
               <div className="gap-1 column">
-                <p className="text-sm-medium text-gray/700">Password</p>
+                <p className="text-sm-medium text-gray-700">Password</p>
 
                 <MyTextField
                   type={show ? 'text' : 'password'}
@@ -171,7 +171,7 @@ function Login() {
                   }}
                   checked={remember_me}
                 />
-                <p className="text-sm-medium text-gray-light/700">Ingat saya</p>
+                <p className="text-sm-medium text-gray-light-700">Ingat saya</p>
               </div> */}
               <MyButton
                 color="primary"

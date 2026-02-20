@@ -29,8 +29,8 @@ function ProfileSlider() {
         </button>
         <div className="flex flex-1 flex-col gap-6">
           <section className="flex flex-col gap-1">
-            <p className="text-xl-semibold text-gray-light/900">{title}</p>
-            <p className="text-sm-regular text-gray-light/600">
+            <p className="text-xl-semibold text-gray-light-900">{title}</p>
+            <p className="text-sm-regular text-gray-light-600">
               Perbaharui foto dan informasi pribadi disini.
             </p>
           </section>

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { Link, useLocation } from 'react-router-dom'
 import {
   AlertCircle,
+  BarChartSquare01,
   CheckDone01,
   LogOut01,
   LogOut04,
@@ -53,8 +54,8 @@ function PAction({ target }) {
         onClose={() => setConfirmModalOpen(false)}
         onConfirm={logout}
         message="Anda ingin keluar dari akun ini. Apakah anda yakin ingin melanjutkan?"
-        icon={<LogOut04 className="text-warning/600" />}
-        bgColor="bg-error/100"
+        icon={<LogOut04 className="text-warning-600" />}
+        bgColor="bg-error-100"
       />
       {/* <SecurityModal
         open={isSecurityModalOpen}
@@ -62,7 +63,7 @@ function PAction({ target }) {
         // onClose={() => setIsSecurityModalOpen(false)}
         showCloseButton={false}
         message="Demi keamanan, silakan ganti kata sandi Anda sebelum menggunakan akun ini untuk pertama kali."
-        icon={<AlertCircle className="text-warning/600" />}
+        icon={<AlertCircle className="text-warning-600" />}
         actions={
           <MyButton
             expanded
@@ -159,21 +160,42 @@ function Navigation({ childs }) {
   return (
     <>
       <main className="flex h-screen w-20 min-w-[90px] flex-col justify-between p-2">
-        <section className="flex h-full w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light/200 pt-5">
+        <section className="flex h-full w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light-200 pt-5">
           <div className="ml-2 flex items-center justify-center">
             <img src={Logo_Bank_Mandiri_Taspen_Official} alt="logomark" width={36} height={20} />
           </div>
           {/* TOP */}
           <div className="flex h-full flex-1 flex-col">
-            <Link to="/dashboard">
+            <Link to="/user">
+              <MyTooltip
+                placement="right"
+                target={
+                  <div
+                    className={`${
+                      location?.pathname.includes('/user')
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
+                    } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
+                      isAccessAllowed(Access?.USER) ? '' : 'hidden'
+                    }`}
+                  >
+                    <BarChartSquare01 />
+                  </div>
+                }
+              >
+                <p className="text-xs-semibold text-white">User management</p>
+              </MyTooltip>
+            </Link>
+
+            {/* <Link to="/dashboard">
               <MyTooltip
                 placement="right"
                 target={
                   <div
                     className={`${
                       location?.pathname.includes('/dashboard')
-                        ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                        : 'text-gray-light/500'
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                       isAccessAllowed(Access?.DASHBOARD) ? '' : 'hidden'
                     }`}
@@ -184,17 +206,17 @@ function Navigation({ childs }) {
               >
                 <span className="text-xs-semibold text-white">Dashboard</span>
               </MyTooltip>
-            </Link>
+            </Link> */}
 
-            <Link to="/customer">
+            {/* <Link to="/customer">
               <MyTooltip
                 placement="right"
                 target={
                   <div
                     className={`${
                       location?.pathname.includes('/customer')
-                        ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                        : 'text-gray-light/500'
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                       isAccessAllowed(Access?.NASABAH) ? '' : 'hidden'
                     }`}
@@ -215,17 +237,17 @@ function Navigation({ childs }) {
               >
                 <span className="text-xs-semibold text-white">Nasabah</span>
               </MyTooltip>
-            </Link>
+            </Link> */}
 
-            <Link to="/audit-trail">
+            {/* <Link to="/audit-trail">
               <MyTooltip
                 placement="right"
                 target={
                   <div
                     className={`${
                       location?.pathname.includes('/audit-trail')
-                        ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                        : 'text-gray-light/500'
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                       isAccessAllowed(Access?.AUDIT_TRAIL) ? '' : 'hidden'
                     }`}
@@ -236,17 +258,17 @@ function Navigation({ childs }) {
               >
                 <p className="text-xs-semibold text-white">Audit trail</p>
               </MyTooltip>
-            </Link>
+            </Link> */}
 
-            <Link to="/approval">
+            {/* <Link to="/approval">
               <MyTooltip
                 placement="right"
                 target={
                   <div
                     className={`${
                       location?.pathname.includes('/approval')
-                        ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                        : 'text-gray-light/500'
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                       isAccessAllowed(Access?.APPROVAL) ? '' : 'hidden'
                     }`}
@@ -257,21 +279,21 @@ function Navigation({ childs }) {
               >
                 <p className="text-xs-semibold text-white">Otorisasi</p>
               </MyTooltip>
-            </Link>
+            </Link> */}
           </div>
 
           {/* BOTTOM */}
           <div className="flex w-full flex-col items-center gap-y-6 pb-6">
             <div className="gap-y-2 column">
-              <Link to="/user">
+              {/* <Link to="/user">
                 <MyTooltip
                   placement="right"
                   target={
                     <div
                       className={`${
                         location?.pathname.includes('/user')
-                          ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                          : 'text-gray-light/500'
+                          ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                          : 'text-gray-light-500'
                       } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                         isAccessAllowed(Access?.USER) ? '' : 'hidden'
                       }`}
@@ -282,7 +304,7 @@ function Navigation({ childs }) {
                 >
                   <p className="text-xs-semibold text-white">User management</p>
                 </MyTooltip>
-              </Link>
+              </Link> */}
               <Link to="/settings">
                 <MyTooltip
                   placement="right"
@@ -290,8 +312,8 @@ function Navigation({ childs }) {
                     <div
                       className={`${
                         location?.pathname.includes('/settings')
-                          ? 'bg-gray/50 text-gray/700 drop-shadow-lg'
-                          : 'text-gray-light/500'
+                          ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                          : 'text-gray-light-500'
                       } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
                         isAccessAllowed(Access?.SETTING) ? '' : 'hidden'
                       }`}

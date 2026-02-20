@@ -68,7 +68,7 @@ function PasswordForm() {
           <div className="flex flex-col gap-y-4 rounded-xl bg-white px-5 py-5 pb-3 outline outline-1 outline-gray-200">
             {/* Current Pass */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Password sekarang
               </label>
               <MyTextField
@@ -107,7 +107,7 @@ function PasswordForm() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-2">
-                <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+                <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                   Password baru
                 </label>
                 <MyTextField
@@ -148,65 +148,65 @@ function PasswordForm() {
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.minimumLength ? 'bg-brand/600' : 'border border-gray/200'}`}>
+                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.minimumLength ? 'bg-brand-600' : 'border border-gray-200'}`}>
                     {
                       passwordChecks.minimumLength ? (
                         <Check className="size-4 h-[10px] w-[10px] text-white" />
                       ) : (
-                        <div className="size-4 h-[8px] w-[8px] bg-gray/300 rounded-full" />
+                        <div className="size-4 h-[8px] w-[8px] bg-gray-300 rounded-full" />
                       )
                     }
                   </div>
-                  <p className="text-sm-regular text-gray/500">
+                  <p className="text-sm-regular text-gray-500">
                     Minimal 8 karakter
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containUppercase && passwordChecks.containLowercase ? 'bg-brand/600' : 'border border-gray/200'}`}>
+                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containUppercase && passwordChecks.containLowercase ? 'bg-brand-600' : 'border border-gray-200'}`}>
                     {
                       passwordChecks.containUppercase && passwordChecks.containLowercase ? (
                         <Check className="size-4 h-[10px] w-[10px] text-white" />
                       ) : (
-                        <div className="size-4 h-[8px] w-[8px] bg-gray/300 rounded-full" />
+                        <div className="size-4 h-[8px] w-[8px] bg-gray-300 rounded-full" />
                       )
                     }
                   </div>
-                  <p className="text-sm-regular text-gray/500">
+                  <p className="text-sm-regular text-gray-500">
                     Mengandung huruf besar dan kecil
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containNumber ? 'bg-brand/600' : 'border border-gray/200'}`}>
+                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containNumber ? 'bg-brand-600' : 'border border-gray-200'}`}>
                     {
                       passwordChecks.containNumber ? (
                         <Check className="size-4 h-[10px] w-[10px] text-white" />
                       ) : (
-                        <div className="size-4 h-[8px] w-[8px] bg-gray/300 rounded-full" />
+                        <div className="size-4 h-[8px] w-[8px] bg-gray-300 rounded-full" />
                       )
                     }
                   </div>
-                  <p className="text-sm-regular text-gray/500">
+                  <p className="text-sm-regular text-gray-500">
                     Mengandung angka
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containSpecialCharacter ? 'bg-brand/600' : 'border border-gray/200'}`}>
+                  <div className={`flex items-center rounded-full p-[5px] ${passwordChecks.containSpecialCharacter ? 'bg-brand-600' : 'border border-gray-200'}`}>
                     {
                       passwordChecks.containSpecialCharacter ? (
                         <Check className="size-4 h-[10px] w-[10px] text-white" />
                       ) : (
-                        <div className="size-4 h-[8px] w-[8px] bg-gray/300 rounded-full" />
+                        <div className="size-4 h-[8px] w-[8px] bg-gray-300 rounded-full" />
                       )
                     }
                   </div>
-                  <p className="text-sm-regular text-gray/500">
+                  <p className="text-sm-regular text-gray-500">
                     Mengandung spesial karakter
                   </p>
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Konfirmasi password baru
               </label>
               <MyTextField
@@ -244,7 +244,7 @@ function PasswordForm() {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-4 border-t border-gray-light/200 bg-white pt-3">
+            <div className="flex items-center justify-end gap-4 border-t border-gray-light-200 bg-white pt-3">
               <MyButton
                 disabled={isSubmitting}
                 onClick={() => setIsProfileSliderOpen(false)}

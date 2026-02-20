@@ -87,7 +87,7 @@ function ProfileForm() {
           <div className="flex flex-col gap-y-4 rounded-xl bg-white px-5 py-5 pb-3 outline outline-1 outline-gray-200">
             {/* name */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Nama lengkap
               </label>
               <MyTextField
@@ -104,7 +104,7 @@ function ProfileForm() {
             </div>
             {/* WhatsApp */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Nomor telpon
               </label>
               <MyTextField
@@ -122,7 +122,7 @@ function ProfileForm() {
             </div>
             {/* Username */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Nip
               </label>
               <MyTextField
@@ -138,7 +138,7 @@ function ProfileForm() {
             </div>
             {/* email */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Email
               </label>
               <MyTextField
@@ -155,7 +155,7 @@ function ProfileForm() {
             </div>
             {/* Penempatan */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/600 after:content-['*']">
+              <label className="text-sm-medium text-gray-700 after:ml-0.5 after:text-brand-600 after:content-['*']">
                 Penempatan
               </label>
               <MyAsyncDropdown
@@ -179,10 +179,10 @@ function ProfileForm() {
             </div>
             {/* AVATAR PROFILE */}
             <section className="">
-              <p className="text-sm-semibold text-gray-light/700">
+              <p className="text-sm-semibold text-gray-light-700">
                 Photo profile
               </p>
-              <p className="text-sm-regular text-gray-light/600">
+              <p className="text-sm-regular text-gray-light-600">
                 This will be displayed on user profile picture.
               </p>
             </section>
@@ -198,7 +198,7 @@ function ProfileForm() {
                   variant="text"
                   // disabled={isArchived}
                 >
-                  <p className="text-sm-semibold text-error/500">Hapus</p>
+                  <p className="text-sm-semibold text-error-500">Hapus</p>
                 </MyButton>
                 <input
                   accept=".png,.jpeg,.jpg"
@@ -225,7 +225,7 @@ function ProfileForm() {
                 </MyButton>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-4 border-t border-gray-light/200 bg-white pt-3">
+            <div className="flex items-center justify-end gap-4 border-t border-gray-light-200 bg-white pt-3">
               <MyButton
                 disabled={isSubmitting}
                 onClick={() => setIsProfileSliderOpen(false)}

@@ -2,7 +2,7 @@ import './App.css'
 import { useCookies } from 'react-cookie'
 import { ToastContainer } from 'react-toastify'
 
-import { UnauthenticatedRoutes } from './routes/AppRoutes'
+import { AuthenticatedRoutes, UnauthenticatedRoutes } from './routes/AppRoutes'
 import Navigation from './pages/Navigation/Navigation'
 import { LoginProvider } from './pages/Login/Context'
 
@@ -23,10 +23,21 @@ export default function App() {
         pauseOnHover
         closeOnClick
       />
-      <LoginProvider>
-        <Navigation />
-      </LoginProvider>
-      <UnauthenticatedRoutes />
+      {!cookies['token-backoffice'] ? (
+        <div id="main-content" className="relative flex w-full">
+          <LoginProvider>
+            <Navigation />
+          </LoginProvider>
+
+          <div className="flex-1">
+            <AuthenticatedRoutes />
+          </div>
+        </div>
+      ) : (
+        <LoginProvider>
+          <UnauthenticatedRoutes />
+        </LoginProvider>
+      )}
     </>
   )
 }

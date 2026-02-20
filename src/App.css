@@ -1,5 +1,5 @@
 * {
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -32,7 +32,7 @@
 .display-3xl-semibold,
 .display-3xl-bold {
   font-size: 96px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 90px;
   letter-spacing: -2%;
   word-wrap: break-word;
@@ -56,7 +56,7 @@
 .display-2xl-semibold,
 .display-2xl-bold {
   font-size: 72px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 90px;
   word-wrap: break-word;
 }
@@ -79,7 +79,7 @@
 .display-xl-semibold,
 .display-xl-bold {
   font-size: 60px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 72px;
   word-wrap: break-word;
 }
@@ -102,7 +102,7 @@
 .display-lg-semibold,
 .display-lg-bold {
   font-size: 48px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 60px;
   word-wrap: break-word;
 }
@@ -125,7 +125,7 @@
 .display-md-semibold,
 .display-md-bold {
   font-size: 36px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 44px;
   word-wrap: break-word;
 }
@@ -148,7 +148,7 @@
 .display-sm-semibold,
 .display-sm-bold {
   font-size: 30px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 38px;
   word-wrap: break-word;
 }
@@ -171,7 +171,7 @@
 .display-xs-semibold,
 .display-xs-bold {
   font-size: 24px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 32px;
   word-wrap: break-word;
 }
@@ -194,7 +194,7 @@
 .text-xl-semibold,
 .text-xl-bold {
   font-size: 20px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 30px;
   word-wrap: break-word;
 }
@@ -217,7 +217,7 @@
 .text-lg-semibold,
 .text-lg-bold {
   font-size: 18px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 28px;
   word-wrap: break-word;
 }
@@ -240,7 +240,7 @@
 .text-md-semibold,
 .text-md-bold {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 24px;
   word-wrap: break-word;
 }
@@ -263,7 +263,7 @@
 .text-sm-semibold,
 .text-sm-bold {
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 20px;
   word-wrap: break-word;
 }
@@ -286,7 +286,7 @@
 .text-xs-semibold,
 .text-xs-bold {
   font-size: 12px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 18px;
   word-wrap: break-word;
 }
@@ -342,7 +342,7 @@
 
 .rdrWeekDay {
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 20px;
   word-wrap: break-word;
   font-weight: 500;
@@ -350,7 +350,7 @@
 
 .rdrDays {
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 20px;
   word-wrap: break-word;
   font-weight: 400;
@@ -462,9 +462,6 @@
   border-radius: 9999px;
   background: #55b3d9;
 } */
-.rdrCalendarWrapper .rdrDayToday .rdrDayNumber span:after {
-  background-color: #72b1de !important;
-}
 
 /* .leaflet-container {
   height: 100%;
@@ -503,66 +500,6 @@
   }
 } */
 
-/* Invisible scrollbar untuk MessageSideBar */
-.custom-invisible-scrollbar .simplebar-scrollbar::before {
-  background: transparent !important;
-}
-
-.custom-invisible-scrollbar .simplebar-track.simplebar-vertical {
-  background: transparent !important;
-  width: 0px !important;
-}
-
-/* ===== Scrollbar Customization for AutoGrowingTextArea ===== */
-.custom-scrollbar-AutoGrowingTextArea {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #d1d5db transparent;
-}
-
-/* Chrome, Edge, Safari */
-.custom-scrollbar-AutoGrowingTextArea::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar-AutoGrowingTextArea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar-AutoGrowingTextArea::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
-  border-radius: 4px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-}
-
-.custom-scrollbar-AutoGrowingTextArea::-webkit-scrollbar-thumb:hover {
-  background-color: #a3a3a3;
-}
-
-.receipt-hover-icon:hover .icon-normal {
-  display: none;
-}
-.icon-hover {
-  display: none;
-}
-.receipt-hover-icon:hover .icon-hover {
-  display: inline;
-}
-
-/* ─── wavesurfer overlay fix ─── */
-.ws-wrapper {
-  position: relative;
-  width: 100%;
-  height: 26px !important;
-}
-.ws-wrapper canvas {
-  position: absolute;
-  inset: 0;
-}
-
-/* Search highlight style - only highlights text content in yellow */
-.search-highlight-text p,
-.search-highlight-text span,
-.search-highlight-text div[class*="text-"] {
-  color: #eab308 !important; /* Yellow-500 color */
+.custom-bg-inactive-user {
+  background-color: rgba(254, 240, 199, 0.5);
 }

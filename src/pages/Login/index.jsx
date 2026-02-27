@@ -12,7 +12,7 @@ import {
 } from '@interstellar-component'
 
 import loginPhoto from '../../assets/Login/loginPhoto.png'
-import MantapLogoLogin from '../../assets/Login/mantapLogologin.png'
+import bipura_logo from '../../assets/Login/bipura_logo.png'
 
 import { useLogin } from './Context'
 import { checkErrorYup, handleError } from '../../services/Helper'
@@ -37,36 +37,36 @@ function Login() {
     resolver: yupResolver(LoginSchema),
   })
 
-  // useEffect(() => {
-  //   if (localRememberMe) {
-  //     const decrypted = CryptoJS.AES.decrypt(
-  //       localRememberMe,
-  //       import.meta.env.VITE_APP_SECRET_KEY
-  //     ).toString(CryptoJS.enc.Utf8)
+  useEffect(() => {
+    if (localRememberMe) {
+      const decrypted = CryptoJS.AES.decrypt(
+        localRememberMe,
+        import.meta.env.VITE_APP_SECRET_KEY
+      ).toString(CryptoJS.enc.Utf8)
 
-  //     // console.log('decrypted: ', decrypted)
+      // console.log('decrypted: ', decrypted)
 
-  //     if (decrypted) {
-  //       try {
-  //         const rememberMeData = JSON.parse(decrypted)
-  //         // console.log('pass: ', rememberMeData.password)
-  //         const decryptedpassword = CryptoJS.AES.decrypt(
-  //           rememberMeData.password,
-  //           import.meta.env.VITE_APP_SECRET_KEY
-  //         ).toString(CryptoJS.enc.Utf8)
-  //         // console.log('decryptedpassword; ', decryptedpassword)
+      if (decrypted) {
+        try {
+          const rememberMeData = JSON.parse(decrypted)
+          // console.log('pass: ', rememberMeData.password)
+          const decryptedpassword = CryptoJS.AES.decrypt(
+            rememberMeData.password,
+            import.meta.env.VITE_APP_SECRET_KEY
+          ).toString(CryptoJS.enc.Utf8)
+          // console.log('decryptedpassword; ', decryptedpassword)
 
-  //         setValue('email', rememberMeData?.email || '')
-  //         setValue('password', decryptedpassword || '')
-  //         setValue('remember_me', true)
-  //       } catch (error) {
-  //         console.error('Failed to parse JSON:', error)
-  //       }
-  //     }
-  //   } else {
-  //     setValue('remember_me', false)
-  //   }
-  // }, [localRememberMe, setValue])
+          setValue('email', rememberMeData?.email || '')
+          setValue('password', decryptedpassword || '')
+          setValue('remember_me', true)
+        } catch (error) {
+          console.error('Failed to parse JSON:', error)
+        }
+      }
+    } else {
+      setValue('remember_me', false)
+    }
+  }, [localRememberMe, setValue])
 
   const { email, password, remember_me } = watch()
 
@@ -80,9 +80,9 @@ function Login() {
         currentModal={currentModal}
       />
       <main className="flex h-screen z-50">
-        <div id="left" className="flex w-7/12 items-center justify-center max-md:w-full">
+        <div id="left" className="flex w-full items-center justify-center max-md:w-full">
           <form
-            className="items-center justify-center gap-6 rounded-xl p-10 column z-50"
+            className="items-center justify-center gap-6 w-full max-w-[480px] rounded-xl p-5 md:p-10 column z-50"
             onSubmit={onSubmit}
           >
             <div className="z-0">
@@ -95,20 +95,23 @@ function Login() {
               height={118}
               className="z-40"
             /> */}
-            <div className="z-40 flex min-w-[400px] flex-col gap-y-6">
-              <div className="gap-y-2 column">
-                <p className="display-sm-semibold text-gray-900">Selamat datang</p>
-                <p className="text-md-regular text-gray-600">Silahkan login terlebih dahulu.</p>
+            <div className="z-40 flex flex-col gap-6 items-center">
+              <img src={bipura_logo} alt="logo" width={42} height={21} />
+              <div className="gap-y-2 column items-center text-center">
+                <p className="display-sm-semibold text-gray-900">Log in to your account</p>
+                <p className="text-md-regular text-gray-600">
+                  Welcome back! Please enter your details.
+                </p>
               </div>
             </div>
-            <div className="z-40 relative flex min-w-[400px] flex-col gap-y-5">
+            <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
               <div className="gap-1 column">
-                <p className="text-sm-medium text-gray-700">Email / NIP</p>
+                <p className="text-sm-medium text-gray-700">Email</p>
                 <MyTextField
                   name="email"
                   // type="email"
                   trigger={trigger}
-                  placeholder="Masukkan email atau NIP anda"
+                  placeholder="Enter your email"
                   control={control}
                   value={email}
                   errors={errors?.email?.message}
@@ -123,7 +126,7 @@ function Login() {
                 <MyTextField
                   type={show ? 'text' : 'password'}
                   name="password"
-                  placeholder="Masukkan password anda"
+                  placeholder="Enter your password"
                   control={control}
                   value={password}
                   errors={errors?.password?.message}
@@ -150,8 +153,8 @@ function Login() {
                 />
               </div>
             </div>
-            <section className="z-40 relative flex min-w-[400px] items-center justify-end">
-              {/* <div className="flex flex-1 items-center gap-x-2">
+            <section className="z-40 relative flex w-full items-center justify-between">
+              <div className="flex flex-1 items-center gap-x-2">
                 <MyCheckbox
                   name="remember_me"
                   control={control}
@@ -160,13 +163,13 @@ function Login() {
                   }}
                   checked={remember_me}
                 />
-                <p className="text-sm-medium text-gray-light-700">Ingat saya</p>
-              </div> */}
+                <p className="text-sm-medium text-gray-700">Remember for 30 days</p>
+              </div>
               <MyButton color="primary" variant="text" onClick={() => nav('/forget-password')}>
-                <p className="text-sm-semibold">Lupa password</p>
+                <p className="text-sm-semibold">Forgot password</p>
               </MyButton>
             </section>
-            <div className="z-40 relative w-[400px]">
+            <div className="z-40 relative w-full">
               <MyButton
                 type="submit"
                 color="primary"
@@ -180,9 +183,9 @@ function Login() {
             </div>
           </form>
         </div>
-        <div id="right" className="w-5/12 overflow-hidden rounded-l-extraLarge max-md:hidden">
+        {/* <div id="right" className="w-5/12 overflow-hidden rounded-l-extraLarge max-md:hidden">
           <img src={loginPhoto} alt="Login Illustration" className="h-full w-full object-cover" />
-        </div>
+        </div> */}
       </main>
     </>
   )

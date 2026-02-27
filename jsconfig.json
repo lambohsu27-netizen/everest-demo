@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "paths": {
       //   "@merpati-component": ["./component"],
+      "@interstellar-component": ["./interstellar-component"],
       "@src/*": ["src/*"],
       "@assets/*": ["src/assets/*"],
       "@pages/*": ["src/pages/*"],

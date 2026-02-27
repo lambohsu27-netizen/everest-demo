@@ -1,23 +1,22 @@
 import {
-  MyArchiveButton,
   MyButton,
-  MyChildModalSlider,
   MyChip,
   MyColumn,
   MyConfirmModal,
   MyConfirmUnsavedModal,
   MyDataTable,
   MyFilterModal,
-  MyModalSlider,
   MyTextField,
   MyTooltip,
   MyButtonGroupV2,
+  MyAvatar,
+  MyModalSlider,
 } from '@interstellar-component'
 import {
   AlertCircle,
-  Download04,
+  CheckCircle,
   FilterLines,
-  Lock01,
+  Minus,
   Plus,
   RefreshCcw01,
   SearchLg,
@@ -28,12 +27,9 @@ import {
 import React, { useEffect, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import { debounce } from 'lodash'
+import moment from 'moment'
 import { useEnquiry } from './Context'
 import Formslider from './Sliders/FormSlider'
-import DetailSlider from './Sliders/DetailSlider'
-import DetailSliderEnroll from './Sliders/DetailSliderEnroll'
-import { useApp } from '../../AppContext'
-import { Access } from '../../services/Helper'
 
 function Enquiry() {
   // const { getAccess } = useApp()
@@ -41,12 +37,9 @@ function Enquiry() {
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
 
   const {
-    currentSlider,
     handleCurrentSlider,
     setParams,
-    enquiry,
     setEnquiry,
-    currentTabs,
     setCheck,
     deleteEnquiry,
     check,
@@ -55,9 +48,11 @@ function Enquiry() {
     downloadExport,
     currentModal,
     handleCurrentModal,
+    enquiry,
+    currentSlider,
     isChanged,
   } = useEnquiry()
-  // console.log('params', params)
+  // console.log('enquiry', enquiry)
 
   useEffect(() => {
     setParams((value) => ({
@@ -69,7 +64,7 @@ function Enquiry() {
 
   return (
     <>
-      {/* <MyModalSlider
+      <MyModalSlider
         open={currentSlider?.current === 'form-slider'}
         element={<Formslider />}
         onClose={() => {
@@ -80,7 +75,7 @@ function Enquiry() {
           }
         }}
       />
-      <MyModalSlider
+      {/* <MyModalSlider
         open={currentSlider?.current === 'details-slider'}
         element={<DetailSlider />}
         onClose={() => handleCurrentSlider(null)}
@@ -112,9 +107,9 @@ function Enquiry() {
           <div className="flex flex-col gap-6 px-8">
             <div className="flex items-center justify-between gap-1">
               <div>
-                <p className="display-xs-semibold text-gray-light-900">Application Enquiry</p>
-                <p className="text-md-regular text-gray-light-600">
-                  Manage and view all application enquiries.
+                <p className="display-xs-semibold text-gray-900">Application Enquiry</p>
+                <p className="text-md-regular text-gray-600">
+                  Manage and monitor customer credit enquiry requests.{' '}
                 </p>
               </div>
 
@@ -125,7 +120,7 @@ function Enquiry() {
                 size="md"
                 // disabled={!access?.add}
               >
-                <Share03 className="size-5 text-gray-400" />
+                <Share03 className="size-5 text-brand/300 pr-1" />
                 <p className="text-sm-semibold">Export</p>
               </MyButton>
             </div>
@@ -135,7 +130,7 @@ function Enquiry() {
                   <div className="flex items-center gap-4 px-4 pt-5">
                     <div className="flex-1 flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-lg-semibold text-gray-light-900">List of Enquiry</p>
+                        <p className="text-lg-semibold text-gray-900">List of Enquiry</p>
                         <MyChip
                           label={`${Enquiry?.meta?.total || '0'} item`}
                           // color="primary"
@@ -145,6 +140,9 @@ function Enquiry() {
                           customStyle=" bg-brand-200/30 border border-brand-200"
                         />
                       </div>
+                      <p className="text-sm-regular text-gray-600">
+                        View and manage all customer credit enquiry requests.
+                      </p>
                     </div>
                     <div className="flex items-start justify-start gap-3">
                       {/* {access?.edit_delete && ( */}
@@ -198,7 +196,7 @@ function Enquiry() {
                         // disabled={!access?.edit_delete}
                       >
                         <Send01 className="size-5" stroke="currentColor" />
-                        <p className="text-sm-semibold">Submit All</p>
+                        <p className="text-sm-semibold text-black">Submit All</p>
                       </MyButton>
 
                       <MyButton
@@ -240,11 +238,7 @@ function Enquiry() {
                         placeholder="Search"
                         id="input-search"
                         startAdornment={
-                          <SearchLg
-                            className="size-5"
-                            className="size-5 text-gray-light/600"
-                            stroke="currentColor"
-                          />
+                          <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
                         }
                         onChangeForm={debounce(
                           (e) =>
@@ -285,7 +279,7 @@ function Enquiry() {
                 </div>
                 <div>
                   <MyDataTable
-                    values={Enquiry}
+                    values={enquiry}
                     paginator
                     cursorPointer
                     // onDeleteAll={bulkDeleteTerminal}
@@ -306,61 +300,112 @@ function Enquiry() {
                     currentSortOrderFromParams={params.order}
                   >
                     <MyColumn
-                      field="name,nip"
+                      field="request_number,created_at"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const parts = sort.split(',')
+                        const direction = parts[parts.length - 1]
+                        const fields = ['request_number', 'created_at']
+
+                        if (direction === 'null') {
+                          // MyColumn reset → advance to next field or reset
+                          const idx = fields.indexOf(params.sort)
+                          if (idx !== -1 && idx < fields.length - 1) {
+                            setParams((prev) => ({
+                              ...prev,
+                              sort: fields[idx + 1],
+                              order: 'asc',
+                              page: 1,
+                            }))
+                          } else {
+                            setParams((prev) => ({ ...prev, sort: null, order: null, page: 1 }))
+                          }
+                        } else {
+                          // asc or desc — use params.sort if already in this column group, else start from fields[0]
+                          const sortField = fields.includes(params.sort) ? params.sort : fields[0]
+                          setParams((prev) => ({
+                            ...prev,
+                            sort: sortField,
+                            order: direction,
+                            page: 1,
+                          }))
+                        }
                       }}
                       header="Request Number & Date"
                       body={(value) => (
                         <div className="column">
-                          <p
-                            className="text-sm-medium text-brand-600 hover:cursor-pointer"
-                            // onClick={() =>
-                            //   handleCurrentSlider(
-                            //     { status: true, current: 'details-slider' },
-                            //     value.id
-                            //   )
-                            // }
-                          >
-                            {value?.name}
+                          <p className="text-sm-medium text-gray-900 hover:cursor-pointer">
+                            {value?.request_number}
                           </p>
-                          <p className="text-sm-regular text-gray-600">{value?.nip}</p>
+                          <p className="text-sm-regular text-gray-600">
+                            {moment(value?.created_at).format('DD/MM/YYYY HH:mm')}
+                          </p>
                         </div>
                       )}
                     />
 
                     <MyColumn
-                      field="role.name"
+                      field="name,nik"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const parts = sort.split(',')
+                        const direction = parts[parts.length - 1]
+                        const fields = ['name', 'nik']
+
+                        if (direction === 'null') {
+                          const idx = fields.indexOf(params.sort)
+                          if (idx !== -1 && idx < fields.length - 1) {
+                            setParams((prev) => ({
+                              ...prev,
+                              sort: fields[idx + 1],
+                              order: 'asc',
+                              page: 1,
+                            }))
+                          } else {
+                            setParams((prev) => ({ ...prev, sort: null, order: null, page: 1 }))
+                          }
+                        } else {
+                          const sortField = fields.includes(params.sort) ? params.sort : fields[0]
+                          setParams((prev) => ({
+                            ...prev,
+                            sort: sortField,
+                            order: direction,
+                            page: 1,
+                          }))
+                        }
                       }}
                       header="Name & NIK"
                       body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">
-                          {value?.role?.name || '-'}
-                        </p>
+                        <div className="column">
+                          <p className="text-sm-medium text-gray-900">{value?.name || '-'}</p>
+                          <p className="text-sm-regular text-gray-600">{value?.nik}</p>
+                        </div>
                       )}
                     />
 
                     <MyColumn
                       field="info"
+                      alignment="center"
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
                       header="General Info"
                       body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.info}</p>
+                        <div className="flex items-center justify-center">
+                          <CheckCircle className="text-success/600" />
+                        </div>
                       )}
                     />
 
                     <MyColumn
                       field="branch.name"
+                      alignment="center"
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
                       header="Selfie With KTP"
                       body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.idSelfie}</p>
+                        <div className="flex items-center justify-center">
+                          <CheckCircle className="text-success/600" />
+                        </div>
                       )}
                     />
 
@@ -370,15 +415,20 @@ function Enquiry() {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
                       header="Consent"
-                      body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.consent}</p>
-                      )}
+                      alignment="center"
+                      body={(value) => <Minus className="text-gray/600" />}
                     />
 
                     <MyColumn
                       field="status"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const [field, order] = sort.split(',')
+                        setParams((prev) => ({
+                          ...prev,
+                          sort: field === 'null' ? null : field,
+                          order: order === 'null' ? null : order,
+                          page: 1,
+                        }))
                       }}
                       header="Status"
                       body={(value) => (
@@ -387,13 +437,33 @@ function Enquiry() {
                     />
 
                     <MyColumn
-                      field="status"
+                      field="created_at"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const [field, order] = sort.split(',')
+                        setParams((prev) => ({
+                          ...prev,
+                          sort: field === 'null' ? null : field,
+                          order: order === 'null' ? null : order,
+                          page: 1,
+                        }))
                       }}
                       header="Created By & Last Update"
                       body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.status}</p>
+                        <div className="flex items-center gap-2">
+                          <MyAvatar
+                            size={32}
+                            photo={value?.createdBy?.photo_url}
+                            name={value?.createdBy?.name}
+                          />
+                          <div className="column">
+                            <p className="text-sm-medium text-gray-900">
+                              {value?.createdBy?.name || '-'}
+                            </p>
+                            <p className="text-sm-regular text-gray-600">
+                              {moment(value?.updated_at).format('DD/MM/YYYY HH:mm')}
+                            </p>
+                          </div>
+                        </div>
                       )}
                     />
 

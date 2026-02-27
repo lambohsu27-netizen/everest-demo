@@ -228,51 +228,10 @@ function EnquiryProvider({ children }) {
     []
   )
 
-  // useEffect(() => {
-  //   getEnquiry(params)
-  //   setCheck([])
-  // }, [getEnquiry, params])
-
-  // Utils
-  const generatePassword = useCallback((setValueCallback) => {
-    const length = 8
-    let password = ''
-
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz'
-    const numbers = '0123456789'
-    const specialCharacters = '!@#$%^&*+=-'
-
-    const allCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy0123456789!@#$%^&*+=-'
-
-    password += uppercase.charAt(Math.floor(Math.random() * uppercase.length))
-    password += lowercase.charAt(Math.floor(Math.random() * lowercase.length))
-    password += numbers.charAt(Math.floor(Math.random() * numbers.length))
-    password += specialCharacters.charAt(Math.floor(Math.random() * specialCharacters.length))
-
-    // Generate the rest of the password
-    for (let i = 4; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * allCharacters.length)
-      password += allCharacters.charAt(randomIndex)
-    }
-
-    setCreatedPassword(password)
-    if (setValueCallback) {
-      setValueCallback('password', password)
-    }
-  }, [])
-
-  const copyToClipboard = (text) => {
-    const textarea = document.createElement('textarea')
-    textarea.value = text
-    textarea.setAttribute('readonly', '')
-    textarea.style.position = 'absolute'
-    textarea.style.left = '-9999px'
-    document.body.appendChild(textarea)
-    textarea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textarea)
-  }
+  useEffect(() => {
+    getEnquiry()
+    // setCheck([])
+  }, [getEnquiry])
 
   const contextValue = useMemo(
     () => ({
@@ -303,10 +262,8 @@ function EnquiryProvider({ children }) {
       searchBranch,
       searchRole,
       createdPassword,
-      generatePassword,
       setCheck,
       check,
-      copyToClipboard,
       setIsChanged,
       isChanged,
       enableEnquiry,
@@ -335,8 +292,6 @@ function EnquiryProvider({ children }) {
       searchInstitution,
       searchBranch,
       searchRole,
-      createdPassword,
-      generatePassword,
       setCheck,
       check,
       setIsChanged,

@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import CryptoJS from 'crypto-js'
 
@@ -23,7 +17,7 @@ function LoginProvider({ children }) {
   const [currentModal, setCurrentModal] = useState({
     status: false,
     current: null,
-    error: null
+    error: null,
   })
 
   const handleCurrentModal = useCallback((modal) => {
@@ -57,10 +51,10 @@ function LoginProvider({ children }) {
       return await LoginService.login(formData)
         .then(myToaster)
         .then((result) => {
-          // console.log('result', result)
+          console.log('result', result)
           localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.user_id) // user_id
 
-          setCookie('token-backoffice', result.token, {
+          setCookie('token-backoffice', result?.data?.token, {
             path: '/',
           })
 
@@ -80,7 +74,7 @@ function LoginProvider({ children }) {
             localStorage.removeItem('rv5zzc9noTdU5AD2')
           }
         })
-        .catch(e => {
+        .catch((e) => {
           if (e.code) {
             setCurrentModal({
               status: true,
@@ -111,13 +105,13 @@ function LoginProvider({ children }) {
     formData.append('old_password', body.old_password)
     formData.append('new_password', body.new_password)
     return await LoginService.changePassword(formData)
-      .then(e => {
-        console.log("MASUK KE THEEN?")
+      .then((e) => {
+        console.log('MASUK KE THEEN?')
         myToaster(e)
         setIsProfileSliderOpen(false)
         getSession()
       })
-      .catch(e => {
+      .catch((e) => {
         myToaster(e)
         throw e
       })
@@ -157,7 +151,7 @@ function LoginProvider({ children }) {
       isProfileSliderOpen,
       setIsProfileSliderOpen,
       currentModal,
-      handleCurrentModal
+      handleCurrentModal,
     }),
     [
       login,
@@ -168,15 +162,11 @@ function LoginProvider({ children }) {
       isProfileSliderOpen,
       setIsProfileSliderOpen,
       currentModal,
-      handleCurrentModal
+      handleCurrentModal,
     ]
   )
 
-  return (
-    <LoginContext.Provider value={contextValue}>
-      {children}
-    </LoginContext.Provider>
-  )
+  return <LoginContext.Provider value={contextValue}>{children}</LoginContext.Provider>
 }
 
 const useLogin = () => {

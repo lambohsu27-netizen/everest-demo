@@ -47,33 +47,33 @@ function AppProvider({ children }) {
   //     [location.pathname]
   //   )
 
-  //   const logoutFunction = useCallback((user_id) => {
-  //     const formData = new FormData()
+  const logoutFunction = useCallback((user_id) => {
+    const formData = new FormData()
 
-  //     formData.append('user_id', user_id)
-  //     AppService.logout(formData)
-  //       .then((res) => {})
-  //       .catch((err) => {
-  //         console.warn(err)
-  //       })
-  //   }, [])
+    formData.append('user_id', user_id)
+    AppService.logout(formData)
+      .then((res) => {})
+      .catch((err) => {
+        console.warn(err)
+      })
+  }, [])
 
   //   const getAccess = useCallback(
   //     (accesName) => accesses?.find((acc) => acc.name === accesName),
   //     [accesses]
   //   )
 
-  //   const logout = useCallback(() => {
-  //     const user_id = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
-  //     logoutFunction(user_id)
-  //     localStorage.removeItem('user_id')
-  //     localStorage.removeItem('RrwF57&aRMoR5Eq23#Mi') // user_id
-  //     localStorage.removeItem('email_forget_password')
-  //     localStorage.removeItem('countdown_to_new_otp')
-  //     removeCookie('token-backoffice', {
-  //       path: '/',
-  //     })
-  //   }, [removeCookie])
+  const logout = useCallback(() => {
+    const user_id = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
+    logoutFunction(user_id)
+    localStorage.removeItem('user_id')
+    localStorage.removeItem('RrwF57&aRMoR5Eq23#Mi') // user_id
+    localStorage.removeItem('email_forget_password')
+    localStorage.removeItem('countdown_to_new_otp')
+    removeCookie('token-backoffice', {
+      path: '/',
+    })
+  }, [removeCookie])
 
   //   useEffect(() => {
   //     if (location.pathname !== '/login' && cookies['token-backoffice']) {
@@ -113,14 +113,16 @@ function AppProvider({ children }) {
       //   accesses,
       //   getAccess,
       //   getSession,
-      //   logout,
+      logout,
       //   shouldChangePassword,
       //   setShouldChangePassword,
     }),
     [
       user,
       slider,
-      //   accesses, getAccess, getSession, logout, shouldChangePassword
+      //   accesses, getAccess, getSession,
+      logout,
+      //  shouldChangePassword
     ]
   )
 

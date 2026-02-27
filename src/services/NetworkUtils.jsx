@@ -90,7 +90,7 @@ export const get = async (endpoint, params, type = 'json', timeout = 60000) => {
     const response = await instance.get(url, { headers, params, timeout })
     return response.data
   } catch (error) {
-    if (error.response?.status === 401) logout()
+    // if (error.response?.status === 401) logout()
     throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
   }
 }

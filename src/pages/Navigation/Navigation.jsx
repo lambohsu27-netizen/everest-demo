@@ -2,32 +2,19 @@
 import { useState, React, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Link, useLocation } from 'react-router-dom'
-import {
-  AlertCircle,
-  BarChartSquare01,
-  CheckDone01,
-  LogOut01,
-  LogOut04,
-  PieChart03,
-  Settings01,
-  Table,
-  User01,
-  Users01,
-} from '@untitled-ui/icons-react'
+import { LogOut01, LogOut04, Rows01, Settings01, User01 } from '@untitled-ui/icons-react'
 import {
   MyAvatar,
   MyTooltip,
   MyConfirmModal,
   MyPopper,
   MyModalSlider,
-  MyButton,
 } from '@interstellar-component'
 import ProfileSlider from '../Profile/ProfileSlider'
 import { useLogin } from '../Login/Context'
 import { useApp } from '../../AppContext'
 import { Access } from '../../services/Helper'
-import Nasabah from '../../assets/navbar/Nasabah.svg'
-import Logo_Bank_Mandiri_Taspen_Official from '../../assets/navbar/Logo_Bank_Mandiri_Taspen_Official.png'
+import bipura_logo from '../../assets/Login/bipura_logo.png'
 // import SecurityModal from '../../localComponents/ModalSecurity'
 
 function PAction({ target }) {
@@ -35,15 +22,6 @@ function PAction({ target }) {
   // const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
   const { isProfileSliderOpen, setIsProfileSliderOpen } = useLogin()
   const { logout, shouldChangePassword } = useApp()
-  const location = useLocation()
-
-  // useEffect(() => {
-  //   if (shouldChangePassword) {
-  //     setTimeout(() => {
-  //       setIsSecurityModalOpen(true)
-  //     }, 300)
-  //   }
-  // }, [shouldChangePassword, location.pathname])
 
   return (
     <>
@@ -162,7 +140,7 @@ function Navigation({ childs }) {
       <main className="flex h-screen w-20 min-w-[90px] flex-col justify-between p-2">
         <section className="flex h-full w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light-200 pt-5">
           <div className="ml-2 flex items-center justify-center">
-            <img src={Logo_Bank_Mandiri_Taspen_Official} alt="logomark" width={36} height={20} />
+            <img src={bipura_logo} alt="logomark" width={28} height={14} />
           </div>
           {/* TOP */}
           <div className="flex h-full flex-1 flex-col">
@@ -179,7 +157,7 @@ function Navigation({ childs }) {
                       isAccessAllowed(Access?.USER) ? '' : 'hidden'
                     }`}
                   >
-                    <BarChartSquare01 />
+                    <Rows01 className="text-gray-400" />
                   </div>
                 }
               >

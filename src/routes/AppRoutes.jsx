@@ -85,7 +85,6 @@ export function UnauthenticatedRoutes() {
   return (
     <Routes>
       <Route path="*" element={<Navigate to="/login" replace />} />
-      <Route path="/" element={<HomePage />} />
       <Route
         path="/login"
         element={

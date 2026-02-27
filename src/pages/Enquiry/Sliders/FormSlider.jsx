@@ -131,6 +131,16 @@ function Formslider() {
 
           setValue('alamat', data.address || '')
           setValue('telepon', data.phone || '')
+          setValue('email', data.email || '')
+          setValue('tempat_lahir', data.tempat_lahir || '')
+          setValue('kode_pos', data.kode_pos || '')
+          setValue('kelurahan', data.kelurahan || null)
+          setValue('kota', data.kota || null)
+          setValue('kecamatan', data.kecamatan || null)
+          setValue('nama_ibu', data.nama_ibu || '')
+          setValue('agreement', data.agreement || false)
+          setValue('tujuan_permintaan', data.tujuan_permintaan || null)
+          setValue('penjelasan', data.penjelasan || '')
 
           setValue('isActive', true)
 

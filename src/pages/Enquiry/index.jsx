@@ -434,13 +434,13 @@ function Enquiry() {
                         switch (status) {
                           case 'draft':
                             return (
-                              <MyChip label="Draft" size="md" color="modern" variant="outlined" />
+                              <MyChip label="Draft" size="sm" color="modern" variant="outlined" />
                             )
                           case 'in_progress':
                             return (
                               <MyChip
                                 label="In progress"
-                                size="md"
+                                size="sm"
                                 color="purple"
                                 variant="filled"
                               />
@@ -449,7 +449,7 @@ function Enquiry() {
                             return (
                               <MyChip
                                 label="Completed"
-                                size="md"
+                                size="sm"
                                 color="success"
                                 variant="filled"
                               />
@@ -458,7 +458,7 @@ function Enquiry() {
                             return (
                               <MyChip
                                 label="Data not found"
-                                size="md"
+                                size="sm"
                                 color="error"
                                 variant="filled"
                               />

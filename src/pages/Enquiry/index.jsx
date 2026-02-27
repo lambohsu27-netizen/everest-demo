@@ -75,23 +75,19 @@ function Enquiry() {
           }
         }}
       />
-      {/* <MyModalSlider
+      <MyModalSlider
         open={currentSlider?.current === 'details-slider'}
-        element={<DetailSlider />}
-        onClose={() => handleCurrentSlider(null)}
-      >
-        <MyChildModalSlider
-          open={currentTabs?.type === 'enroll'}
-          width={375}
-          element={<DetailSliderEnroll />}
-        />
-      </MyModalSlider> */}
+        element={<Formslider />}
+        onClose={() => {
+          handleCurrentSlider(null)
+        }}
+      />
       <MyConfirmModal
         open={isConfirmModalOpen}
         onClose={() => setConfirmModalOpen(false)}
         onConfirm={() => deleteEnquiry(check)}
         title={`Anda yakin menghapus ${check?.length} data?`}
-        message="Data yang dihapus akan masuk ke approval untuk ditinjau terlebih dahulu."
+        message="Data yang dihapus akan masuk ke sistem untuk ditinjau terlebih dahulu."
         icon={<AlertCircle className="text-warning-600" />}
         bgColor="bg-warning-100"
       />
@@ -292,9 +288,11 @@ function Enquiry() {
                       setParams((value) => ({ ...value, page }))
                     }}
                     onClick={(value) => {
-                      // if (!params.archive) {
-                      handleCurrentSlider({ status: true, current: 'details-slider' }, value.id)
-                      // }
+                      if (value.status === 'draft') {
+                        handleCurrentSlider({ status: true, current: 'form-slider' }, value.id)
+                      } else {
+                        handleCurrentSlider({ status: true, current: 'details-slider' }, value.id)
+                      }
                     }}
                     currentSortFieldFromParams={params.sort}
                     currentSortOrderFromParams={params.order}
@@ -431,9 +429,44 @@ function Enquiry() {
                         }))
                       }}
                       header="Status"
-                      body={(value) => (
-                        <p className="text-sm-regular text-gray-light-600">{value?.status}</p>
-                      )}
+                      body={(value) => {
+                        const status = value?.status
+                        switch (status) {
+                          case 'draft':
+                            return (
+                              <MyChip label="Draft" size="md" color="modern" variant="outlined" />
+                            )
+                          case 'in_progress':
+                            return (
+                              <MyChip
+                                label="In progress"
+                                size="md"
+                                color="purple"
+                                variant="filled"
+                              />
+                            )
+                          case 'completed':
+                            return (
+                              <MyChip
+                                label="Completed"
+                                size="md"
+                                color="success"
+                                variant="filled"
+                              />
+                            )
+                          case 'error':
+                            return (
+                              <MyChip
+                                label="Data not found"
+                                size="md"
+                                color="error"
+                                variant="filled"
+                              />
+                            )
+                          default:
+                            break
+                        }
+                      }}
                     />
 
                     <MyColumn

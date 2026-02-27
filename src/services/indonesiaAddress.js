@@ -8,7 +8,7 @@
  *   returns:  Promise<{ loading: boolean, data: Array }>
  */
 
-const BASE_URL = 'https://emsifa.github.io/api-wilayah-indonesia/api'
+const BASE_URL = '/api-wilayah'
 
 // Simple in-memory cache to avoid re-fetching static JSON files
 const cache = {}

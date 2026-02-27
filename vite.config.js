@@ -14,6 +14,13 @@ export default defineConfig({
     host: true,
     port: 3000,
     allowedHosts: ['*'],
+    proxy: {
+      '/api-wilayah': {
+        target: 'https://emsifa.github.io/api-wilayah-indonesia/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-wilayah/, ''),
+      },
+    },
   },
   build: {
     sourcemap: true, // <-- Enable source maps

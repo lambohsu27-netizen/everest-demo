@@ -107,20 +107,28 @@ function EnquiryProvider({ children }) {
 
   const createEnquiry = useCallback(
     async (body) => {
-      // console.log('body create: ', body)
-      const formData = new FormData()
-      formData.append('name', body.name)
-      formData.append('email', body.email)
-      formData.append('nip', body.nip)
-      formData.append('whatsapp', body.whatsapp)
-      formData.append('role_id', body.role.id)
-      formData.append('branch_id', body.branch.id)
-      formData.append('password', body.password)
-      if (body.photo) {
-        formData.append('photo', body.photo)
+      // Format birthDate to YYYY-MM-DD
+      let birthDate = ''
+      if (body.tanggal_lahir) {
+        const d = new Date(body.tanggal_lahir)
+        ;[birthDate] = d.toISOString().split('T')
       }
 
-      await Service.createEnquiry(formData)
+      // Map gender: Pria → L, Wanita → P
+      const gender = body.jenis_kelamin === 'Pria' ? 'L' : 'P'
+
+      const payload = {
+        name: body.name,
+        nik: body.nik,
+        birthDate,
+        gender,
+        address: body.alamat,
+        phone: body.telepon,
+      }
+
+      const serviceCall = body.isDraft ? Service.saveDraft(payload) : Service.createEnquiry(payload)
+
+      await serviceCall
         .then(myToaster)
         .then(() => handleCurrentSlider({ status: false, current: null }))
         .then(getEnquiry)
@@ -131,22 +139,44 @@ function EnquiryProvider({ children }) {
 
   const updateEnquiry = useCallback(
     async (body) => {
-      // console.log('edit body: ', body)
+      console.log('body update: ', body)
       const formData = new FormData()
       formData.append('name', body.name)
-      formData.append('email', body.email)
-      formData.append('nip', body.nip)
-      formData.append('whatsapp', body.whatsapp)
-      formData.append('role_id', body.role.id)
-      formData.append('branch_id', body.branch.id)
-      if (body.password) {
-        formData.append('password', body.password)
-      } // make password not sent when body.password is empty
-      if (!body?.delete_photo) {
-        formData.append('delete_photo', false)
+      formData.append('nik', body.nik)
+
+      // Format birthDate to YYYY-MM-DD
+      if (body.tanggal_lahir) {
+        const d = new Date(body.tanggal_lahir)
+        const [birthDate] = d.toISOString().split('T')
+        formData.append('birthDate', birthDate)
       }
-      if (body.photo) formData.append('photo', body.photo)
-      formData.append('delete_photo', body.delete_photo)
+
+      // Map gender: Pria → L, Wanita → P
+      formData.append('gender', body.jenis_kelamin === 'Pria' ? 'L' : 'P')
+
+      formData.append('address', body.alamat)
+      formData.append('phone', body.telepon)
+      formData.append('email', body.email)
+      formData.append('tempat_lahir', body.tempat_lahir)
+      formData.append('kode_pos', body.kode_pos)
+      if (body.kelurahan) {
+        formData.append('kelurahan_id', body.kelurahan.id)
+        formData.append('kelurahan_name', body.kelurahan.name)
+      }
+      if (body.kota) {
+        formData.append('kota_id', body.kota.id)
+        formData.append('kota_name', body.kota.name)
+      }
+      if (body.kecamatan) {
+        formData.append('kecamatan_id', body.kecamatan.id)
+        formData.append('kecamatan_name', body.kecamatan.name)
+      }
+      formData.append('nama_ibu', body.nama_ibu)
+      formData.append('agreement', body.agreement)
+      if (body.tujuan_permintaan) {
+        formData.append('tujuan_permintaan', body.tujuan_permintaan.value)
+      }
+      formData.append('penjelasan', body.penjelasan || '')
 
       await Service.updateEnquiry(currentSlider?.id, formData)
         .then(myToaster)

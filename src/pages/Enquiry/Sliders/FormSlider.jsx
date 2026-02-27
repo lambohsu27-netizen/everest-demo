@@ -54,6 +54,7 @@ function Formslider() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
+      isDraft: false,
       email: '',
       name: '',
       nik: '',
@@ -111,18 +112,27 @@ function Formslider() {
       showEnquiry(currentSlider.id)
         .then((data) => {
           if (!isMounted) return
-          setTitle(data.name)
-          setValue('email', data.email || '')
+          setTitle(data.name || 'Edit Draft')
+          setValue('isDraft', data.status === 'draft')
           setValue('name', data.name || '')
-          setValue('nip', data.nip || '')
-          setValue('whatsapp', data.whatsapp || '')
-          setValue('role', data.role || null)
-          setValue('branch', data.branch || null)
-          setValue('photo', data.photo_url || null)
-          setValue('delete_photo', false)
-          setValue('password', '')
-          setValue('deleted_at', data.deleted_at || null)
-          setValue('isActive', !data.deleted_at)
+          setValue('nik', data.nik || '')
+
+          if (data.dob) {
+            // BE stores YYYY-MM-DD
+            setValue('tanggal_lahir', new Date(data.dob))
+          } else {
+            setValue('tanggal_lahir', null)
+          }
+
+          // Map L/P back to Pria/Wanita
+          if (data.gender === 'P') setValue('jenis_kelamin', 'Wanita')
+          else if (data.gender === 'L') setValue('jenis_kelamin', 'Pria')
+          else setValue('jenis_kelamin', '')
+
+          setValue('alamat', data.address || '')
+          setValue('telepon', data.phone || '')
+
+          setValue('isActive', true)
 
           setTimeout(() => {
             if (isMounted) {
@@ -144,6 +154,7 @@ function Formslider() {
       // --- ADD MODE ---
       setTitle('New Request')
       reset({
+        isDraft: false,
         email: '',
         name: '',
         nik: '',
@@ -278,8 +289,16 @@ function Formslider() {
           setConfirmModalOpen(false)
           onSubmit()
         }}
-        title={`Anda yakin ingin ${currentSlider?.id ? 'mengubah' : 'menambahkan'} data enquiry?`}
-        message="Data yang dibuat akan masuk ke approval untuk ditinjau terlebih dahulu."
+        title={
+          watchedValues.isDraft
+            ? `Anda yakin ingin menyimpan draft data enquiry?`
+            : `Anda yakin ingin ${currentSlider?.id ? 'mengubah' : 'menambahkan'} data enquiry?`
+        }
+        message={
+          watchedValues.isDraft
+            ? 'Data yang disimpan sebagai draft dapat dilanjutkan nanti dan belum akan diproses.'
+            : 'Data yang dibuat akan masuk ke enquiry untuk ditinjau terlebih dahulu.'
+        }
         bgColor="bg-warning-100"
       />
       <div className="flex h-screen w-[400px] flex-col">
@@ -343,8 +362,6 @@ function Formslider() {
                       control={control}
                       placeholder="Input name"
                       errors={errors?.name?.message}
-                      focusColor="#0A2349"
-                      focusShadow="#DCE3F1"
                     />
                   </div>
 
@@ -363,8 +380,6 @@ function Formslider() {
                       control={control}
                       placeholder="Input email"
                       errors={errors?.email?.message}
-                      focusColor="#0A2349"
-                      focusShadow="#DCE3F1"
                     />
                     <p className="text-sm-regular text-gray-600">
                       Email ini akan digunakan sebagai alamat pengiriman hasil Credit Report.
@@ -387,8 +402,6 @@ function Formslider() {
                       control={control}
                       placeholder="Input NIK"
                       errors={errors?.nik?.message}
-                      focusColor="#0A2349"
-                      focusShadow="#DCE3F1"
                     />
                   </div>
 
@@ -431,8 +444,6 @@ function Formslider() {
                         control={control}
                         placeholder="Input nomor telepon"
                         errors={errors?.telepon?.message}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                       />
                     </div>
                   </div>
@@ -454,8 +465,6 @@ function Formslider() {
                         control={control}
                         placeholder="Input tempat lahir"
                         errors={errors?.tempat_lahir?.message}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                       />
                     </div>
 
@@ -511,8 +520,6 @@ function Formslider() {
                         control={control}
                         placeholder="Input kode pos"
                         errors={errors?.kode_pos?.message}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                       />
                     </div>
 
@@ -534,8 +541,6 @@ function Formslider() {
                         isOptionEqualToValue={(option, value) => option?.id === value?.id}
                         getOptionLabel={(e) => e?.name || ''}
                         value={kelurahan}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                         asyncFunction={searchKelurahan}
                         extraData={{ district_id: kecamatan?.id }}
                         onChange={(_e, value) =>
@@ -563,8 +568,6 @@ function Formslider() {
                         isOptionEqualToValue={(option, value) => option?.id === value?.id}
                         getOptionLabel={(e) => e?.name || ''}
                         value={kota}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                         asyncFunction={searchKota}
                         onChange={(_e, value) => {
                           setValue('kota', value, { shouldDirty: true })
@@ -591,8 +594,6 @@ function Formslider() {
                         isOptionEqualToValue={(option, value) => option?.id === value?.id}
                         getOptionLabel={(e) => e?.name || ''}
                         value={kecamatan}
-                        focusColor="#0A2349"
-                        focusShadow="#DCE3F1"
                         asyncFunction={searchKecamatan}
                         extraData={{ regency_id: kota?.id }}
                         onChange={(_e, value) => {
@@ -618,7 +619,7 @@ function Formslider() {
                       name="alamat"
                       control={control}
                       placeholder="Input alamat sesuai identitas"
-                      errors={errors}
+                      errors={errors?.alamat?.message}
                       disabled={Boolean(deleted_at)}
                     />
                   </div>
@@ -638,30 +639,33 @@ function Formslider() {
                       control={control}
                       placeholder="Input nama ibu gadis kandung"
                       errors={errors?.nama_ibu?.message}
-                      focusColor="#0A2349"
-                      focusShadow="#DCE3F1"
                     />
                   </div>
 
                   {/* Agreement Checkbox */}
-                  <div className="flex items-start gap-x-2">
-                    <MyCheckbox
-                      name="agreement"
-                      value
-                      control={control}
-                      disabled={Boolean(deleted_at)}
-                    />
-                    <button
-                      type="button"
-                      disabled={Boolean(deleted_at)}
-                      className="text-sm-regular cursor-pointer text-left text-gray-700 disabled:cursor-not-allowed"
-                      onClick={() =>
-                        setValue('agreement', !watch('agreement'), { shouldDirty: true })
-                      }
-                    >
-                      Mengajukan permohonan Informasi Debitur yang tersimpan dalam informasi biro
-                      Kredit PT CLIK.
-                    </button>
+                  <div className="flex flex-col gap-y-1">
+                    <div className="flex items-start gap-x-2">
+                      <MyCheckbox
+                        name="agreement"
+                        value
+                        control={control}
+                        disabled={Boolean(deleted_at)}
+                      />
+                      <button
+                        type="button"
+                        disabled={Boolean(deleted_at)}
+                        className="text-sm-regular cursor-pointer text-left text-gray-700 disabled:cursor-not-allowed"
+                        onClick={() =>
+                          setValue('agreement', !watch('agreement'), { shouldDirty: true })
+                        }
+                      >
+                        Mengajukan permohonan Informasi Debitur yang tersimpan dalam informasi biro
+                        Kredit PT CLIK.
+                      </button>
+                    </div>
+                    {errors?.agreement?.message && (
+                      <p className="text-sm-regular text-error/600">{errors.agreement.message}</p>
+                    )}
                   </div>
 
                   {/* Tujuan Permintaan */}
@@ -685,8 +689,6 @@ function Formslider() {
                       isOptionEqualToValue={(option, value) => option?.value === value?.value}
                       getOptionLabel={(e) => e?.label || ''}
                       value={tujuan_permintaan}
-                      focusColor="#0A2349"
-                      focusShadow="#DCE3F1"
                       onChange={(_e, value) =>
                         setValue('tujuan_permintaan', value, { shouldDirty: true })
                       }
@@ -708,7 +710,7 @@ function Formslider() {
                       name="penjelasan"
                       control={control}
                       placeholder="Input penjelasan"
-                      errors={errors}
+                      errors={errors?.penjelasan?.message}
                       disabled={Boolean(deleted_at)}
                     />
                   </div>

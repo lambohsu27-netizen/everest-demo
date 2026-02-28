@@ -107,26 +107,58 @@ function EnquiryProvider({ children }) {
 
   const createEnquiry = useCallback(
     async (body) => {
+      const formData = new FormData()
+      formData.append('name', body.name || '')
+      formData.append('nik', body.nik || '')
+
       // Format birthDate to YYYY-MM-DD
-      let birthDate = ''
       if (body.tanggal_lahir) {
         const d = new Date(body.tanggal_lahir)
-        ;[birthDate] = d.toISOString().split('T')
+        const [birthDate] = d.toISOString().split('T')
+        formData.append('birthDate', birthDate)
       }
 
       // Map gender: Pria → L, Wanita → P
-      const gender = body.jenis_kelamin === 'Pria' ? 'L' : 'P'
-
-      const payload = {
-        name: body.name,
-        nik: body.nik,
-        birthDate,
-        gender,
-        address: body.alamat,
-        phone: body.telepon,
+      if (body.jenis_kelamin) {
+        formData.append('gender', body.jenis_kelamin === 'Pria' ? 'L' : 'P')
       }
 
-      const serviceCall = body.isDraft ? Service.saveDraft(payload) : Service.createEnquiry(payload)
+      formData.append('address', body.alamat || '')
+      formData.append('phone', body.telepon || '')
+      if (body.email) formData.append('email', body.email)
+      if (body.tempat_lahir) formData.append('tempat_lahir', body.tempat_lahir)
+      if (body.kode_pos) formData.append('kode_pos', body.kode_pos)
+      if (body.kelurahan) {
+        formData.append('kelurahan_id', body.kelurahan.id)
+        formData.append('kelurahan_name', body.kelurahan.name)
+      }
+      if (body.kota) {
+        formData.append('kota_id', body.kota.id)
+        formData.append('kota_name', body.kota.name)
+      }
+      if (body.kecamatan) {
+        formData.append('kecamatan_id', body.kecamatan.id)
+        formData.append('kecamatan_name', body.kecamatan.name)
+      }
+      if (body.nama_ibu) formData.append('nama_ibu', body.nama_ibu)
+      formData.append('agreement', body.agreement || false)
+      if (body.tujuan_permintaan) {
+        formData.append('tujuan_permintaan', body.tujuan_permintaan.value)
+      }
+      formData.append('penjelasan', body.penjelasan || '')
+      if (body.photo) {
+        formData.append('photo', body.photo)
+      }
+      if (body.photo_selfie) {
+        formData.append('photo_selfie', body.photo_selfie)
+      }
+      if (body.signature) {
+        formData.append('signature', body.signature)
+      }
+
+      const serviceCall = body.isDraft
+        ? Service.saveDraft(formData)
+        : Service.createEnquiry(formData)
 
       await serviceCall
         .then(myToaster)
@@ -177,6 +209,15 @@ function EnquiryProvider({ children }) {
         formData.append('tujuan_permintaan', body.tujuan_permintaan.value)
       }
       formData.append('penjelasan', body.penjelasan || '')
+      if (body.photo) {
+        formData.append('photo', body.photo)
+      }
+      if (body.photo_selfie) {
+        formData.append('photo_selfie', body.photo_selfie)
+      }
+      if (body.signature) {
+        formData.append('signature', body.signature)
+      }
 
       await Service.updateEnquiry(currentSlider?.id, formData)
         .then(myToaster)

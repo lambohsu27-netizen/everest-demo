@@ -23,6 +23,9 @@ const fullSchema = Yup.object().shape({
   nama_ibu: Yup.string().required('Nama ibu gadis kandung harus diisi'),
   agreement: Yup.boolean().oneOf([true], 'Persetujuan harus dicentang'),
   tujuan_permintaan: Yup.object().nullable().required('Tujuan permintaan harus diisi'),
+  photo: Yup.mixed().nullable().required('KTP harus diunggah'),
+  photo_selfie: Yup.mixed().nullable().required('Selfie KTP harus diunggah'),
+  signature: Yup.mixed().nullable().required('Tanda tangan harus disi'),
 })
 
 const draftSchema = Yup.object().shape({
@@ -43,6 +46,9 @@ const draftSchema = Yup.object().shape({
   nama_ibu: Yup.string().nullable(),
   agreement: Yup.boolean(),
   tujuan_permintaan: Yup.object().nullable(),
+  photo: Yup.mixed().nullable(),
+  photo_selfie: Yup.mixed().nullable(),
+  signature: Yup.mixed().nullable(),
 })
 
 export const schema = Yup.lazy((values) => (values?.isDraft ? draftSchema : fullSchema))

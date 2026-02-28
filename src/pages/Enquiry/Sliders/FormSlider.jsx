@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { format } from 'date-fns'
 // UI Icons
-import { XClose, Plus, Edit01, HelpCircle, Calendar } from '@untitled-ui/icons-react'
+import { XClose, Plus, Edit01, HelpCircle, Calendar, Trash01 } from '@untitled-ui/icons-react'
 // Shared Components
 import {
   MyTextField,
@@ -18,7 +18,12 @@ import {
   MyCheckbox,
   MyTextArea,
   MyCalendar,
+  MyDropzone,
 } from '@interstellar-component'
+import SignatureCanvas from 'react-signature-canvas'
+import { QRCodeSVG } from 'qrcode.react'
+import io from 'socket.io-client'
+import ModalTermsCondition from './components/ModalTermsCondition'
 // Context
 import { useEnquiry } from '../Context'
 // Schema
@@ -72,6 +77,9 @@ function Formslider() {
       tujuan_permintaan: null,
       penjelasan: '',
       delete_photo: false,
+      photo: null,
+      photo_selfie: null,
+      signature: null,
       isActive: true,
     },
   })
@@ -91,9 +99,68 @@ function Formslider() {
   const [title, setTitle] = useState('New Request')
   const [clickedCopy, setClickedCopy] = useState(false)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false)
   const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false)
+  const [currentStep, setCurrentStep] = useState(1)
   const initialValues = useRef({})
   const watchedValues = watch()
+  const sigPad = useRef(null)
+
+  const [roomId, setRoomId] = useState('')
+  const [isMobileSigning, setIsMobileSigning] = useState(false)
+
+  const dataURLtoFile = (dataurl, filename) => {
+    const arr = dataurl.split(',')
+    const mime = arr[0].match(/:(.*?);/)[1]
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n > 0) {
+      n -= 1
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+    return new File([u8arr], filename, { type: mime })
+  }
+
+  useEffect(() => {
+    if (currentStep === 4) {
+      if (!roomId) {
+        setRoomId(Math.random().toString(36).substring(2, 15))
+      }
+    }
+  }, [currentStep, roomId])
+
+  useEffect(() => {
+    if (currentStep === 4 && roomId) {
+      const baseURL = import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL.replace('/backoffice', '')
+        : 'http://localhost:4000'
+      const newSocket = io(baseURL, {
+        transports: ['websocket'],
+      })
+
+      newSocket.on('connect', () => {
+        newSocket.emit('join-signature-room', roomId)
+      })
+
+      newSocket.on('signature-received', (dataUrl) => {
+        const file = dataURLtoFile(dataUrl, 'signature.png')
+        setValue('signature', file, { shouldDirty: true, shouldValidate: true })
+        setIsMobileSigning(false)
+
+        // Wait for the SignatureCanvas component to remount after isMobileSigning becomes false
+        setTimeout(() => {
+          if (sigPad.current) {
+            sigPad.current.fromDataURL(dataUrl)
+          }
+        }, 150)
+      })
+
+      return () => {
+        newSocket.disconnect()
+      }
+    }
+  }, [currentStep, roomId, setValue])
 
   // const handleGeneratePassword = useCallback(() => {
   //   generatePassword((field, value) => {
@@ -141,6 +208,9 @@ function Formslider() {
           setValue('agreement', data.agreement || false)
           setValue('tujuan_permintaan', data.tujuan_permintaan || null)
           setValue('penjelasan', data.penjelasan || '')
+          setValue('photo', data.photo || null)
+          setValue('photo_selfie', data.photo_selfie || null)
+          setValue('signature', data.signature || null)
 
           setValue('isActive', true)
 
@@ -182,6 +252,9 @@ function Formslider() {
         tujuan_permintaan: null,
         penjelasan: '',
         delete_photo: false,
+        photo: null,
+        photo_selfie: null,
+        signature: null,
         isActive: true,
       })
       // handleGeneratePassword()
@@ -260,6 +333,20 @@ function Formslider() {
             hasChanges = true
             break
           }
+        } else if (key === 'photo_selfie') {
+          // A new file was selected
+          if (watchedValue instanceof File) {
+            hasChanges = true
+            break
+          }
+          if (
+            typeof normalizedInitial === 'string' &&
+            normalizedInitial !== normalizedWatched &&
+            !(watchedValue instanceof File)
+          ) {
+            hasChanges = true
+            break
+          }
         } else if (key === 'delete_photo') {
           // This flag change is handled within the 'photo' check above
           continue
@@ -292,6 +379,7 @@ function Formslider() {
 
   return (
     <>
+      <ModalTermsCondition open={isTermsModalOpen} onClose={() => setIsTermsModalOpen(false)} />
       <MyConfirmModal
         open={isConfirmModalOpen}
         onClose={() => setConfirmModalOpen(false)}
@@ -354,7 +442,7 @@ function Formslider() {
             {/* Use SimpleBar only if content might overflow */}
             <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
               <div className="flex h-full flex-col gap-6 px-4">
-                <div className="flex flex-1 flex-col gap-4 py-6">
+                <div className={currentStep === 1 ? 'flex flex-1 flex-col gap-4 py-6' : 'hidden'}>
                   <p className="text-sm-semibold text-gray-900">General Information</p>
 
                   {/* Name */}
@@ -725,10 +813,221 @@ function Formslider() {
                     />
                   </div>
                 </div>
+
+                {currentStep === 2 && (
+                  <div className="flex flex-1 flex-col gap-4 py-6">
+                    <p className="text-sm-semibold text-gray-900">Kartu Tanda Penduduk</p>
+
+                    <div className="flex flex-col gap-y-1.5">
+                      <MyDropzone
+                        colorBg="bg-white"
+                        multiple={false}
+                        accept={['.jpeg', '.png', '.jpg']}
+                        maxSize={5242880}
+                        showImage
+                        onChange={(files) => {
+                          setValue('photo', files && files.length > 0 ? files[0] : null, {
+                            shouldDirty: true,
+                          })
+                        }}
+                        errors={errors?.photo?.message}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="flex flex-1 flex-col gap-4 py-6">
+                    <p className="text-sm-semibold text-gray-900">Selfie With KTP</p>
+
+                    <div className="flex flex-col gap-y-1.5">
+                      <MyDropzone
+                        colorBg="bg-white"
+                        multiple={false}
+                        accept={['.jpeg', '.png', '.jpg']}
+                        maxSize={5242880}
+                        showImage
+                        onChange={(files) => {
+                          setValue('photo_selfie', files && files.length > 0 ? files[0] : null, {
+                            shouldDirty: true,
+                          })
+                        }}
+                        errors={errors?.photo_selfie?.message}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 4 && (
+                  <div className="flex flex-1 flex-col gap-4 py-6">
+                    <p className="text-sm-semibold text-gray-900">Customer Signature</p>
+
+                    <div className="flex flex-col gap-y-1.5">
+                      {!isMobileSigning ? (
+                        <>
+                          <div className="relative overflow-hidden rounded-lg border border-dashed border-gray-300 bg-white">
+                            <SignatureCanvas
+                              ref={sigPad}
+                              penColor="black"
+                              canvasProps={{ className: 'w-full h-64' }}
+                              onEnd={() => {
+                                if (sigPad.current && !sigPad.current.isEmpty()) {
+                                  const dataUrl = sigPad.current.toDataURL('image/png')
+                                  const file = dataURLtoFile(dataUrl, 'signature.png')
+                                  setValue('signature', file, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-error-600 shadow-sm hover:bg-gray-50"
+                              onClick={() => {
+                                if (sigPad.current) {
+                                  sigPad.current.clear()
+                                  setValue('signature', null, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                }
+                              }}
+                            >
+                              <Trash01 className="size-5" />
+                            </button>
+                          </div>
+
+                          <div className="mt-2 flex items-center justify-center">
+                            <button
+                              type="button"
+                              className="text-sm-medium text-brand-600 underline hover:text-brand-700"
+                              onClick={() => setIsMobileSigning(true)}
+                            >
+                              Gambar dari perangkat seluler Anda
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white py-8 shadow-sm">
+                          <QRCodeSVG
+                            value={`${window.location.origin}/mobile-signature/${roomId}`}
+                            size={200}
+                            fgColor="#000000"
+                            bgColor="#ffffff"
+                            level="H"
+                            includeMargin
+                          />
+                          <p className="mt-4 text-center text-sm-medium text-brand-600">
+                            Gambar dari
+                            <br />
+                            perangkat seluler
+                            <br />
+                            Anda
+                          </p>
+                          <button
+                            type="button"
+                            className="mt-6 text-sm-medium text-gray-600 underline hover:text-gray-900"
+                            onClick={() => setIsMobileSigning(false)}
+                          >
+                            Kembali ke tanda tangan langsung
+                          </button>
+                        </div>
+                      )}
+
+                      {errors?.signature?.message && (
+                        <p className="text-sm-regular text-error/600">{errors.signature.message}</p>
+                      )}
+                    </div>
+
+                    <p className="text-sm-regular text-gray-700 mt-2">
+                      Dengan menandatangani ini, Anda menyatakan telah membaca dan menyetujui{' '}
+                      <button
+                        type="button"
+                        className="text-brand/600 font-medium cursor-pointer"
+                        onClick={() => setIsTermsModalOpen(true)}
+                      >
+                        Terms & Conditions
+                      </button>{' '}
+                      yang berlaku.
+                    </p>
+                  </div>
+                )}
               </div>
             </SimpleBar>
           </section>
           <footer className="flex items-center justify-end gap-4 border-t border-gray-200 px-4 py-4">
+            {import.meta.env.VITE_MODE === 'DEVELOPMENT' && currentStep === 1 && !deleted_at && (
+              <MyButton
+                disabled={isSubmitting}
+                type="button"
+                color="secondary"
+                variant="outlined"
+                size="md"
+                onClick={() => {
+                  setValue('name', 'John Doe Dummy', { shouldValidate: true, shouldDirty: true })
+                  setValue('email', 'john.doe@example.com', {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                  setValue('nik', '3171234567890123', { shouldValidate: true, shouldDirty: true })
+                  setValue('telepon', '081234567890', { shouldValidate: true, shouldDirty: true })
+                  setValue('tempat_lahir', 'Jakarta', { shouldValidate: true, shouldDirty: true })
+                  setValue('tanggal_lahir', new Date('1990-01-01'), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                  setValue('kode_pos', '12345', { shouldValidate: true, shouldDirty: true })
+                  setValue(
+                    'kota',
+                    { id: '3171', name: 'KOTA ADM. JAKARTA PUSAT' },
+                    { shouldValidate: true, shouldDirty: true }
+                  )
+                  setValue(
+                    'kecamatan',
+                    { id: '3171010', name: 'GAMBIR' },
+                    { shouldValidate: true, shouldDirty: true }
+                  )
+                  setValue(
+                    'kelurahan',
+                    { id: '3171010001', name: 'GAMBIR' },
+                    { shouldValidate: true, shouldDirty: true }
+                  )
+                  setValue('alamat', 'Jl. Dummy No. 123', {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                  setValue('nama_ibu', 'Ibu Dummy', { shouldValidate: true, shouldDirty: true })
+                  setValue('agreement', true, { shouldValidate: true, shouldDirty: true })
+                  setValue(
+                    'tujuan_permintaan',
+                    { label: 'Others', value: 'others' },
+                    { shouldValidate: true, shouldDirty: true }
+                  )
+                  setValue('penjelasan', 'Dummy explanation for testing', {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                  setIsChanged(true)
+                }}
+              >
+                <p className="text-sm-semibold">Fill Dummy</p>
+              </MyButton>
+            )}
+
+            {currentStep > 1 && !deleted_at && (
+              <MyButton
+                disabled={isSubmitting}
+                type="button"
+                color="secondary"
+                variant="outlined"
+                size="md"
+                onClick={() => setCurrentStep(currentStep - 1)}
+              >
+                <p className="text-sm-semibold">Previous</p>
+              </MyButton>
+            )}
+
             {!deleted_at && (
               <MyButton
                 disabled={isSubmitting}
@@ -749,15 +1048,62 @@ function Formslider() {
             {!deleted_at && (
               <MyButton
                 disabled={isSubmitting || (currentSlider?.id && !isChanged)}
-                onClick={() => {
-                  setValue('isDraft', false, { shouldDirty: false })
-                  setConfirmModalOpen(true)
+                onClick={async () => {
+                  if (currentStep === 1) {
+                    console.log('jalan 1')
+
+                    setValue('isDraft', false, { shouldDirty: false })
+                    const isValid = await trigger(
+                      [
+                        'name',
+                        'email',
+                        'nik',
+                        'jenis_kelamin',
+                        'telepon',
+                        'tempat_lahir',
+                        'tanggal_lahir',
+                        'kode_pos',
+                        'kota',
+                        'kecamatan',
+                        'kelurahan',
+                        'alamat',
+                        'nama_ibu',
+                        'agreement',
+                        'tujuan_permintaan',
+                        'penjelasan',
+                      ],
+                      { shouldFocus: true }
+                    )
+
+                    if (isValid) {
+                      setCurrentStep(2)
+                    }
+                  } else if (currentStep === 2) {
+                    console.log('jalan 2')
+                    setValue('isDraft', false, { shouldDirty: false })
+                    const isPhotoValid = await trigger(['photo'], { shouldFocus: true })
+                    if (isPhotoValid) {
+                      setCurrentStep(3)
+                    }
+                  } else if (currentStep === 3) {
+                    console.log('jalan 3')
+                    setValue('isDraft', false, { shouldDirty: false })
+                    const isSelfieValid = await trigger(['photo_selfie'], { shouldFocus: true })
+                    if (isSelfieValid) {
+                      setCurrentStep(4)
+                    }
+                  } else {
+                    console.log('jalan 4')
+
+                    setValue('isDraft', false, { shouldDirty: false })
+                    setConfirmModalOpen(true)
+                  }
                 }}
                 color="primary"
                 variant="filled"
                 size="md"
               >
-                <p className="text-sm-semibold">Next</p>
+                <p className="text-sm-semibold">{currentStep < 4 ? 'Next' : 'Submit'}</p>
               </MyButton>
             )}
           </footer>

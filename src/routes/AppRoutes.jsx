@@ -12,6 +12,7 @@ import Enquiry from '@src/pages/Enquiry'
 import { EnquiryProvider } from '@src/pages/Enquiry/Context'
 import Login from '@src/pages/Login'
 import { LoginProvider } from '@src/pages/Login/Context'
+import MobileSignature from '@src/pages/MobileSignature'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -105,6 +106,7 @@ export function UnauthenticatedRoutes() {
       <Route path="/version" element={<VersionPage />} />
       <Route path="/component-review" element={<ComponentReview />} />
       <Route path="/ui-template" element={<UITemplate />} />
+      <Route path="/mobile-signature/:roomId" element={<MobileSignature />} />
     </Routes>
   )
 }

@@ -29,23 +29,23 @@ function AppProvider({ children }) {
   const location = useLocation()
   const timerRef = useRef(null)
 
-  //   const getSession = useCallback(
-  //     () =>
-  //       AppService.getSession()
-  //         .then((res) => {
-  //           setUser({
-  //             ...res?.data,
-  //             photo_url: `${res.data.photo_url}?time=${new Date().getTime()}`,
-  //           })
-  //           setShouldChangePassword(!!res?.data?.should_change_password)
-  //         })
-  //         .catch((err) => {
-  //           if (location.pathname !== '/login') {
-  //             myToaster(err)
-  //           }
-  //         }),
-  //     [location.pathname]
-  //   )
+  const getSession = useCallback(
+    () =>
+      AppService.getSession()
+        .then((res) => {
+          setUser({
+            ...res?.data,
+            photo_url: `${res.data.photo_url}?time=${new Date().getTime()}`,
+          })
+          // setShouldChangePassword(!!res?.data?.should_change_password)
+        })
+        .catch((err) => {
+          if (location.pathname !== '/login') {
+            myToaster(err)
+          }
+        }),
+    [location.pathname]
+  )
 
   const logoutFunction = useCallback((user_id) => {
     const formData = new FormData()
@@ -75,11 +75,11 @@ function AppProvider({ children }) {
     })
   }, [removeCookie])
 
-  //   useEffect(() => {
-  //     if (location.pathname !== '/login' && cookies['token-backoffice']) {
-  //       getSession()
-  //     }
-  //   }, [cookies, getSession, location.pathname])
+  useEffect(() => {
+    if (location.pathname !== '/login' && cookies['token-backoffice']) {
+      getSession()
+    }
+  }, [cookies, getSession, location.pathname])
 
   //   useEffect(() => {
   //     const ttl = user?.general?.settings?.logout_timer
@@ -112,7 +112,7 @@ function AppProvider({ children }) {
       //   setAccesses,
       //   accesses,
       //   getAccess,
-      //   getSession,
+      getSession,
       logout,
       //   shouldChangePassword,
       //   setShouldChangePassword,
@@ -120,7 +120,8 @@ function AppProvider({ children }) {
     [
       user,
       slider,
-      //   accesses, getAccess, getSession,
+      //   accesses, getAccess,
+      getSession,
       logout,
       //  shouldChangePassword
     ]

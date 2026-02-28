@@ -2,7 +2,15 @@
 import { useState, React, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Link, useLocation } from 'react-router-dom'
-import { LogOut01, LogOut04, Rows01, Settings01, User01 } from '@untitled-ui/icons-react'
+import {
+  LogOut01,
+  LogOut04,
+  Rows01,
+  Settings01,
+  User01,
+  Menu01,
+  XClose,
+} from '@untitled-ui/icons-react'
 import {
   MyAvatar,
   MyTooltip,
@@ -10,7 +18,7 @@ import {
   MyPopper,
   MyModalSlider,
 } from '@interstellar-component'
-import ProfileSlider from '../Profile/ProfileSlider'
+// import ProfileSlider from '../Profile/ProfileSlider'
 import { useLogin } from '../Login/Context'
 import { useApp } from '../../AppContext'
 import { Access } from '../../services/Helper'
@@ -57,13 +65,13 @@ function PAction({ target }) {
           </MyButton>
         }
       /> */}
-      <MyModalSlider
+      {/* <MyModalSlider
         open={isProfileSliderOpen}
         element={<ProfileSlider />}
         onClose={() => {
           if (!shouldChangePassword) setIsProfileSliderOpen(false)
         }}
-      />
+      /> */}
       <MyPopper target={target} placement="right-start">
         {(open, anchorEl, handleOpen, handleClose) => (
           <div className="flex w-[200px] flex-col rounded-md bg-white shadow-md">
@@ -114,6 +122,8 @@ function Navigation({ childs }) {
   // }
   // return accesses.some((acces) => acces.name === 'Semua menu')
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   // console.log('user', user)
 
   useEffect(() => {
@@ -137,14 +147,31 @@ function Navigation({ childs }) {
 
   return (
     <>
-      <main className="flex h-screen w-20 min-w-[90px] flex-col justify-between p-2">
+      {/* Mobile Top Navigation */}
+      <div className="flex w-full items-center justify-between p-4 md:hidden absolute z-50">
+        <div className="flex items-center justify-center">
+          <img src={bipura_logo} alt="logomark" width={28} height={14} />
+        </div>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="text-gray-light-500 hover:text-gray-700"
+        >
+          {isMobileMenuOpen ? <XClose /> : <Menu01 />}
+        </button>
+      </div>
+
+      <main
+        className={`fixed md:relative z-40 flex h-screen w-20 min-w-[90px] flex-col justify-between p-2 pt-16 md:pt-2 transition-transform duration-300 ease-in-out bg-white ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
         <section className="flex h-full w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light-200 pt-5">
-          <div className="ml-2 flex items-center justify-center">
+          <div className="ml-2 hidden md:flex items-center justify-center">
             <img src={bipura_logo} alt="logomark" width={28} height={14} />
           </div>
           {/* TOP */}
           <div className="flex h-full flex-1 flex-col">
-            <Link to="/enquiry">
+            <Link to="/enquiry" onClick={() => setIsMobileMenuOpen(false)}>
               <MyTooltip
                 placement="right"
                 target={
@@ -283,7 +310,7 @@ function Navigation({ childs }) {
                   <p className="text-xs-semibold text-white">User management</p>
                 </MyTooltip>
               </Link> */}
-              <Link to="/settings">
+              <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
                 <MyTooltip
                   placement="right"
                   target={
@@ -304,7 +331,7 @@ function Navigation({ childs }) {
                 </MyTooltip>
               </Link>
             </div>
-            <PAction
+            {/* <PAction
               target={(open, handleOpen) => (
                 <MyTooltip
                   placement="right"
@@ -334,7 +361,38 @@ function Navigation({ childs }) {
                   <span className="text-xs-semibold text-white">My Profile</span>
                 </MyTooltip>
               )}
-            />
+            /> */}
+            <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+              <MyTooltip
+                placement="right"
+                target={
+                  <div
+                    className={`${
+                      location?.pathname.includes('/profile')
+                        ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
+                        : 'text-gray-light-500'
+                    } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
+                      isAccessAllowed(Access?.SETTING) ? '' : 'hidden'
+                    }`}
+                  >
+                    <MyAvatar
+                      key={user?.photo_url || 'no-photo-avatar'}
+                      size={48}
+                      iconSize={24}
+                      stroke="currentColor"
+                      photo={
+                        user?.photo_url
+                          ? `${user?.photo_url}?time=${new Date().getTime()}`
+                          : // user?.photo_url
+                            null
+                      }
+                    />
+                  </div>
+                }
+              >
+                <span className="text-xs-semibold text-white">Profile</span>
+              </MyTooltip>
+            </Link>
           </div>
         </section>
       </main>

@@ -13,6 +13,8 @@ import { EnquiryProvider } from '@src/pages/Enquiry/Context'
 import Login from '@src/pages/Login'
 import { LoginProvider } from '@src/pages/Login/Context'
 import MobileSignature from '@src/pages/MobileSignature'
+import Profile from '@src/pages/Profile'
+import { ProfileProvider } from '@src/pages/Profile/context'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -42,6 +44,14 @@ export function AuthenticatedRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route
+        path="/profile"
+        element={
+          <ProfileProvider>
+            {isLoading ? null : isAccessAllowed(Access?.USER) ? <Profile /> : <NotFound />}
+          </ProfileProvider>
+        }
+      />
       <Route
         path="/enquiry"
         element={

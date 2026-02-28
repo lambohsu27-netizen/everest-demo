@@ -99,9 +99,9 @@ function Enquiry() {
       />
 
       <SimpleBar forceVisible="y" className="flex-1" style={{ height: '100vh' }}>
-        <main className="flex flex-col gap-8 pb-12 pt-8">
-          <div className="flex flex-col gap-6 px-8">
-            <div className="flex items-center justify-between gap-1">
+        <main className="flex flex-col gap-4 md:gap-8 pb-12 pt-4 md:pt-8 w-full">
+          <div className="flex flex-col gap-4 md:gap-6 px-4 md:px-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-1">
               <div>
                 <p className="display-xs-semibold text-gray-900">Application Enquiry</p>
                 <p className="text-md-regular text-gray-600">
@@ -109,114 +109,168 @@ function Enquiry() {
                 </p>
               </div>
 
-              <MyButton
-                onClick={downloadExport}
-                color="primary"
-                variant="filled"
-                size="md"
-                // disabled={!access?.add}
-              >
-                <Share03 className="size-5 text-brand/300 pr-1" />
-                <p className="text-sm-semibold">Export</p>
-              </MyButton>
+              <div className="flex w-fit md:w-auto">
+                <MyButton
+                  onClick={downloadExport}
+                  color="primary"
+                  variant="filled"
+                  size="md"
+                  // disabled={!access?.add}
+                >
+                  <Share03 className="size-5 text-brand/300 pr-1" />
+                  <p className="text-sm-semibold">Export</p>
+                </MyButton>
+              </div>
             </div>
             <div className="w-full">
-              <div className="w-full rounded-xl border border-gray-light-200 shadow-shadows/shadow-xs">
-                <div className="flex flex-col gap-5">
-                  <div className="flex items-center gap-4 px-4 pt-5">
-                    <div className="flex-1 flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-lg-semibold text-gray-900">List of Enquiry</p>
-                        <MyChip
-                          label={`${Enquiry?.meta?.total || '0'} item`}
-                          // color="primary"
-                          variant="outlined"
-                          size="sm"
-                          rounded="xl"
-                          customStyle=" bg-brand-200/30 border border-brand-200"
-                        />
-                      </div>
-                      <p className="text-sm-regular text-gray-600">
-                        View and manage all customer credit enquiry requests.
-                      </p>
-                    </div>
-                    <div className="flex items-start justify-start gap-3">
-                      {/* {access?.edit_delete && ( */}
-                      {check?.length > 0 ? (
-                        params.archive === 1 ? (
-                          <MyButton
-                            color="secondary"
-                            variant="outlined"
-                            size="sm"
-                            onClick={() => restoreEnquiry(check)}
-                            // disabled={!access?.edit_delete}
-                          >
-                            <RefreshCcw01 className="size-5" stroke="currentColor" />
-                            <p className="text-sm-semibold">Restore</p>
-                          </MyButton>
-                        ) : (
-                          <MyButton
-                            color="error"
-                            variant="outlined"
-                            size="sm"
-                            onClick={() => setConfirmModalOpen(true)}
-                            // disabled={!access?.edit_delete}
-                          >
-                            <Trash01 className="size-5" stroke="currentColor" />
-                            <p className="text-sm-semibold">Hapus</p>
-                          </MyButton>
-                        )
-                      ) : null}
-                      {/* )} */}
-                      <MyButton
-                        // onClick={downloadExport}
-                        color="error"
-                        variant="text"
-                        size="md"
-                        // disabled={!access?.add}
-                      >
-                        {/* <Trash01 className="size-5 text-gray-400" /> */}
-                        <p className="text-sm-semibold">Delete All</p>
-                      </MyButton>
-                      {/* {access?.edit_delete && ( */}
-                      <MyButton
-                        onClick={() =>
-                          handleCurrentSlider({
-                            status: true,
-                            current: 'form-slider',
-                          })
-                        }
-                        color="primary"
+              <div className="w-full md:rounded-xl md:border border-gray-light-200 md:shadow-shadows/shadow-xs flex flex-col">
+                <div className="flex flex-1 flex-col gap-1 px-0 md:px-4 pt-4 md:pt-5 order-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg-semibold text-gray-900">List of Enquiry</p>
+                    <div className="hidden md:block">
+                      <MyChip
+                        label={`${Enquiry?.meta?.total || '0'} item`}
+                        // color="primary"
                         variant="outlined"
-                        size="md"
-                        // disabled={!access?.edit_delete}
-                      >
-                        <Send01 className="size-5" stroke="currentColor" />
-                        <p className="text-sm-semibold text-black">Submit All</p>
-                      </MyButton>
-
-                      <MyButton
-                        onClick={() =>
-                          handleCurrentSlider({
-                            status: true,
-                            current: 'form-slider',
-                          })
-                        }
-                        color="primary"
-                        variant="filled"
-                        size="md"
-                        // disabled={!access?.edit_delete}
-                      >
-                        <Plus className="size-5" stroke="currentColor" />
-                        <p className="text-sm-semibold">New Request</p>
-                      </MyButton>
-                      {/* )} */}
+                        size="sm"
+                        rounded="xl"
+                        customStyle=" bg-brand-200/30 border border-brand-200"
+                      />
                     </div>
                   </div>
-                  <hr className="border-gray-light-200" />
+                  <p className="text-sm-regular text-gray-600">
+                    View and manage all customer credit enquiry requests.
+                  </p>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 border-b border-gray-light/200 px-4 py-3">
+                <div className="flex flex-col md:hidden order-2 px-0 py-4 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <MyTextField
+                        placeholder="Search"
+                        id="input-search-mobile"
+                        startAdornment={
+                          <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                        }
+                        onChangeForm={debounce(
+                          (e) =>
+                            setParams((value) => ({
+                              ...value,
+                              search: e.target.value,
+                              page: 1,
+                            })),
+                          1000
+                        )}
+                      />
+                    </div>
+                    <MyFilterModal
+                      id="filter-ticketing-mobile"
+                      // currentFilters={ticketList?.filter}
+                      onChange={(filter) => {
+                        setParams((prev) => ({
+                          ...prev,
+                          filter,
+                          page: 1,
+                          search: '',
+                        }))
+                      }}
+                      target={(open, handleClick) => (
+                        <MyButton
+                          removeWhite
+                          onClick={handleClick}
+                          color="secondary"
+                          variant="outlined"
+                          size="md"
+                          customStyle="px-2"
+                        >
+                          <FilterLines className="size-5" stroke="currentColor" />
+                        </MyButton>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-start md:justify-end gap-3 px-0 md:px-4 pt-0 md:pt-0 order-3 md:order-2 w-full overflow-x-auto pb-4 md:pb-0">
+                  {/* {access?.edit_delete && ( */}
+                  {check?.length > 0 ? (
+                    params.archive === 1 ? (
+                      <MyButton
+                        color="secondary"
+                        variant="outlined"
+                        size="sm"
+                        onClick={() => restoreEnquiry(check)}
+                        // disabled={!access?.edit_delete}
+                      >
+                        <RefreshCcw01 className="size-5" stroke="currentColor" />
+                        <p className="text-sm-semibold">Restore</p>
+                      </MyButton>
+                    ) : (
+                      <MyButton
+                        color="error"
+                        variant="outlined"
+                        size="sm"
+                        onClick={() => setConfirmModalOpen(true)}
+                        // disabled={!access?.edit_delete}
+                      >
+                        <Trash01 className="size-5" stroke="currentColor" />
+                        <p className="text-sm-semibold">Hapus</p>
+                      </MyButton>
+                    )
+                  ) : null}
+                  {/* )} */}
+                  {/* Desktop Text Button */}
+                  <div className="hidden md:block">
+                    <MyButton
+                      // onClick={downloadExport}
+                      color="error"
+                      variant="text"
+                      size="md"
+                      // disabled={!access?.add}
+                    >
+                      <p className="text-sm-semibold">Delete All</p>
+                    </MyButton>
+                  </div>
+
+                  {/* {access?.edit_delete && ( */}
+                  <MyButton
+                    onClick={() =>
+                      handleCurrentSlider({
+                        status: true,
+                        current: 'form-slider',
+                      })
+                    }
+                    color="primary"
+                    variant="outlined"
+                    size="md"
+                    // disabled={!access?.edit_delete}
+                  >
+                    <Send01 className="size-5" stroke="currentColor" />
+                    <p className="text-sm-semibold text-brand-700 md:text-black whitespace-nowrap">
+                      Submit All
+                    </p>
+                  </MyButton>
+
+                  <MyButton
+                    onClick={() =>
+                      handleCurrentSlider({
+                        status: true,
+                        current: 'form-slider',
+                      })
+                    }
+                    color="primary"
+                    variant="filled"
+                    size="md"
+                    // disabled={!access?.edit_delete}
+                  >
+                    <Plus className="size-5" stroke="currentColor" />
+                    <p className="text-sm-semibold whitespace-nowrap">New Request</p>
+                  </MyButton>
+                  {/* )} */}
+                </div>
+
+                <hr className="border-gray-light-200 hidden md:block w-full order-3 md:mt-5" />
+
+                <div className="hidden md:flex items-center justify-between gap-3 border-b border-gray-light/200 px-4 py-3 order-4">
                   <MyButtonGroupV2
                     buttons={[
                       { label: 'View all', value: 'view all' },
@@ -273,7 +327,8 @@ function Enquiry() {
                     />
                   </div>
                 </div>
-                <div>
+
+                <div className="order-5">
                   <MyDataTable
                     values={enquiry}
                     paginator

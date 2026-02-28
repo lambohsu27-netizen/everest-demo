@@ -29,7 +29,7 @@ export default function App() {
             <Navigation />
           </LoginProvider>
 
-          <div className="flex-1">
+          <div className="flex-1 h-[100vh] mt-16 md:mt-0 overflow-y-auto">
             <AuthenticatedRoutes />
           </div>
         </div>

@@ -399,8 +399,8 @@ function Formslider() {
         }
         bgColor="bg-warning-100"
       />
-      <div className="flex h-screen w-[400px] flex-col">
-        <header className="relative mb-6 flex items-start gap-x-4 px-4 pt-6">
+      <div className="flex h-screen w-[100vw] md:w-[400px] flex-col pt-[72px] md:pt-0 bg-white">
+        <header className="relative mb-6 flex items-start gap-x-3 md:gap-x-4 px-4 pt-6">
           <button
             onClick={() => {
               if (isChanged) {
@@ -413,17 +413,17 @@ function Formslider() {
           >
             <XClose size={24} stroke="currentColor" />
           </button>
-          <div className="rounded-lg border border-gray-300 p-[10px] shadow-shadows/shadow-lg">
+          <div className="rounded-lg border border-gray-300 p-[10px] shadow-shadows/shadow-lg shrink-0">
             {currentSlider?.id ? (
               <Edit01 className="size-5 text-gray-700" />
             ) : (
               <Plus className="size-5 text-gray-700" />
             )}
           </div>
-          <div className="flex flex-1 flex-col gap-6">
-            <section className="flex flex-col gap-1">
-              <p className="text-xl-semibold text-gray-900">{title}</p>
-              <p className="text-sm-regular text-gray-600 max-w-[300px]">
+          <div className="flex flex-1 flex-col gap-6 w-full pr-8 md:pr-0">
+            <section className="flex flex-col gap-1 w-full">
+              <p className="text-xl-semibold text-gray-900 break-words">{title}</p>
+              <p className="text-sm-regular text-gray-600 w-full max-w-[300px]">
                 Please complete the following field to continue the process.
               </p>
             </section>

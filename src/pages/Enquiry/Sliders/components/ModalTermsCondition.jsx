@@ -16,7 +16,7 @@ export default ModalTermsCondition
 
 function ModalTermsConditionView({ onClose }) {
   return (
-    <div className="flex w-[800px] max-w-[90vw] flex-col gap-5 overflow-hidden rounded-xl bg-base-white">
+    <div className="flex w-[calc(100vw-32px)] md:w-[800px] max-w-[90vw] flex-col gap-5 overflow-hidden rounded-xl bg-base-white">
       <header className="relative flex items-start gap-x-4 pt-6">
         <button
           onClick={onClose}

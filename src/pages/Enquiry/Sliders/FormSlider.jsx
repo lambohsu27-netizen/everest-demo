@@ -5,7 +5,15 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { format } from 'date-fns'
 // UI Icons
-import { XClose, Plus, Edit01, HelpCircle, Calendar, Trash01 } from '@untitled-ui/icons-react'
+import {
+  XClose,
+  Plus,
+  Edit01,
+  HelpCircle,
+  Calendar,
+  Trash01,
+  Maximize01,
+} from '@untitled-ui/icons-react'
 // Shared Components
 import {
   MyTextField,
@@ -32,6 +40,14 @@ import { schema } from '../schema'
 import { handleError, checkErrorYup } from '../../../services/Helper'
 import { searchKota, searchKecamatan, searchKelurahan } from '../../../services/indonesiaAddress'
 
+const TUJUAN_PERMINTAAN_OPTIONS = [
+  { label: 'Others', value: 'others' },
+  { label: 'Kredit Perumahan', value: 'kredit_perumahan' },
+  { label: 'Kredit Kendaraan', value: 'kredit_kendaraan' },
+  { label: 'Kredit Usaha', value: 'kredit_usaha' },
+  { label: 'Kartu Kredit', value: 'kartu_kredit' },
+]
+
 function Formslider() {
   // const { getAccess } = useApp()
   // const access = getAccess(Access?.Enquiry) // Note: 'access' variable is declared but not used later
@@ -46,6 +62,8 @@ function Formslider() {
     setIsChanged,
     isChanged,
     handleCurrentModal,
+    setIsSignatureModalOpen,
+    signatureModalHandlerRef,
   } = useEnquiry()
 
   const {
@@ -81,6 +99,7 @@ function Formslider() {
       photo_selfie: null,
       signature: null,
       isActive: true,
+      tnc: false,
     },
   })
 
@@ -93,6 +112,9 @@ function Formslider() {
     kecamatan,
     tujuan_permintaan,
     delete_photo,
+    photo,
+    photo_selfie,
+    signature,
   } = watch()
   // console.log('photo', photo)
 
@@ -121,6 +143,23 @@ function Formslider() {
     }
     return new File([u8arr], filename, { type: mime })
   }
+
+  // Register signature modal handler so parent (index) can forward onSign from SignatureModal
+  useEffect(() => {
+    signatureModalHandlerRef.current = (dataUrl) => {
+      if (sigPad.current) {
+        sigPad.current.fromDataURL(dataUrl)
+      }
+      const file = dataURLtoFile(dataUrl, 'signature.png')
+      setValue('signature', file, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+    return () => {
+      signatureModalHandlerRef.current = null
+    }
+  }, [signatureModalHandlerRef, setValue])
 
   useEffect(() => {
     if (currentStep === 4) {
@@ -206,11 +245,21 @@ function Formslider() {
           setValue('kecamatan', data.kecamatan || null)
           setValue('nama_ibu', data.nama_ibu || '')
           setValue('agreement', data.agreement || false)
-          setValue('tujuan_permintaan', data.tujuan_permintaan || null)
+          setValue(
+            'tujuan_permintaan',
+            (() => {
+              const raw = data.tujuan_permintaan
+              if (!raw) return null
+              if (typeof raw === 'object' && raw?.value != null) return raw
+              const value = typeof raw === 'string' ? raw : raw?.value
+              return TUJUAN_PERMINTAAN_OPTIONS.find((opt) => opt.value === value) || null
+            })()
+          )
           setValue('penjelasan', data.penjelasan || '')
-          setValue('photo', data.photo || null)
-          setValue('photo_selfie', data.photo_selfie || null)
-          setValue('signature', data.signature || null)
+          setValue('photo', data.photo_ktp_url || null)
+          setValue('photo_selfie', data.selfie_with_ktp_url || null)
+          setValue('signature', data.signature_url || null)
+          setValue('tnc', data.agreement_tnc ?? false)
 
           setValue('isActive', true)
 
@@ -255,6 +304,7 @@ function Formslider() {
         photo: null,
         photo_selfie: null,
         signature: null,
+        tnc: false,
         isActive: true,
       })
       // handleGeneratePassword()
@@ -368,7 +418,16 @@ function Formslider() {
   }, [watchedValues, isInitialDataLoaded, setIsChanged]) // Dependencies: run when watched values change or loading finishes
 
   const onSubmit = handleSubmit(
-    handleError(currentSlider?.id ? updateEnquiry : createEnquiry, control),
+    handleError(
+      (data) => {
+        // Submit (final) → always POST /inquiry to process. Save as Draft → PATCH if editing draft, else POST /draft.
+        if (data.isDraft) {
+          return currentSlider?.id ? updateEnquiry(data) : createEnquiry(data)
+        }
+        return createEnquiry(data)
+      },
+      control
+    ),
     checkErrorYup
   )
 
@@ -777,13 +836,7 @@ function Formslider() {
                       placeholder="Pilih tujuan permintaan"
                       control={control}
                       error={errors?.tujuan_permintaan?.message}
-                      options={[
-                        { label: 'Others', value: 'others' },
-                        { label: 'Kredit Perumahan', value: 'kredit_perumahan' },
-                        { label: 'Kredit Kendaraan', value: 'kredit_kendaraan' },
-                        { label: 'Kredit Usaha', value: 'kredit_usaha' },
-                        { label: 'Kartu Kredit', value: 'kartu_kredit' },
-                      ]}
+                      options={TUJUAN_PERMINTAAN_OPTIONS}
                       isOptionEqualToValue={(option, value) => option?.value === value?.value}
                       getOptionLabel={(e) => e?.label || ''}
                       value={tujuan_permintaan}
@@ -819,19 +872,41 @@ function Formslider() {
                     <p className="text-sm-semibold text-gray-900">Kartu Tanda Penduduk</p>
 
                     <div className="flex flex-col gap-y-1.5">
-                      <MyDropzone
-                        colorBg="bg-white"
-                        multiple={false}
-                        accept={['.jpeg', '.png', '.jpg']}
-                        maxSize={5242880}
-                        showImage
-                        onChange={(files) => {
-                          setValue('photo', files && files.length > 0 ? files[0] : null, {
-                            shouldDirty: true,
-                          })
-                        }}
-                        errors={errors?.photo?.message}
-                      />
+                      {photo && typeof photo === 'string' ? (
+                        <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white">
+                          <img
+                            src={photo}
+                            alt="Foto KTP"
+                            className="h-auto w-full max-h-80 object-contain"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
+                            onClick={() =>
+                              setValue('photo', null, { shouldDirty: true })
+                            }
+                          >
+                            <Trash01 className="size-5" />
+                          </button>
+                          <p className="px-3 py-2 text-xs text-gray-500">
+                            Foto KTP tersimpan. Klik ikon sampah untuk ganti.
+                          </p>
+                        </div>
+                      ) : (
+                        <MyDropzone
+                          colorBg="bg-white"
+                          multiple={false}
+                          accept={['.jpeg', '.png', '.jpg']}
+                          maxSize={5242880}
+                          showImage
+                          onChange={(files) => {
+                            setValue('photo', files && files.length > 0 ? files[0] : null, {
+                              shouldDirty: true,
+                            })
+                          }}
+                          errors={errors?.photo?.message}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
@@ -841,19 +916,41 @@ function Formslider() {
                     <p className="text-sm-semibold text-gray-900">Selfie With KTP</p>
 
                     <div className="flex flex-col gap-y-1.5">
-                      <MyDropzone
-                        colorBg="bg-white"
-                        multiple={false}
-                        accept={['.jpeg', '.png', '.jpg']}
-                        maxSize={5242880}
-                        showImage
-                        onChange={(files) => {
-                          setValue('photo_selfie', files && files.length > 0 ? files[0] : null, {
-                            shouldDirty: true,
-                          })
-                        }}
-                        errors={errors?.photo_selfie?.message}
-                      />
+                      {photo_selfie && typeof photo_selfie === 'string' ? (
+                        <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white">
+                          <img
+                            src={photo_selfie}
+                            alt="Selfie dengan KTP"
+                            className="h-auto w-full max-h-80 object-contain"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
+                            onClick={() =>
+                              setValue('photo_selfie', null, { shouldDirty: true })
+                            }
+                          >
+                            <Trash01 className="size-5" />
+                          </button>
+                          <p className="px-3 py-2 text-xs text-gray-500">
+                            Selfie dengan KTP tersimpan. Klik ikon sampah untuk ganti.
+                          </p>
+                        </div>
+                      ) : (
+                        <MyDropzone
+                          colorBg="bg-white"
+                          multiple={false}
+                          accept={['.jpeg', '.png', '.jpg']}
+                          maxSize={5242880}
+                          showImage
+                          onChange={(files) => {
+                            setValue('photo_selfie', files && files.length > 0 ? files[0] : null, {
+                              shouldDirty: true,
+                            })
+                          }}
+                          errors={errors?.photo_selfie?.message}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
@@ -863,7 +960,30 @@ function Formslider() {
                     <p className="text-sm-semibold text-gray-900">Customer Signature</p>
 
                     <div className="flex flex-col gap-y-1.5">
-                      {!isMobileSigning ? (
+                      {signature && typeof signature === 'string' ? (
+                        <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white">
+                          <img
+                            src={signature}
+                            alt="Tanda tangan"
+                            className="h-auto w-full max-h-64 object-contain bg-white"
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
+                            onClick={() => {
+                              setValue('signature', null, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }}
+                          >
+                            <Trash01 className="size-5" />
+                          </button>
+                          <p className="px-3 py-2 text-xs text-gray-500">
+                            Tanda tangan tersimpan. Klik ikon sampah untuk ganti.
+                          </p>
+                        </div>
+                      ) : !isMobileSigning ? (
                         <>
                           <div className="relative overflow-hidden rounded-lg border border-dashed border-gray-300 bg-white">
                             <SignatureCanvas
@@ -895,6 +1015,13 @@ function Formslider() {
                               }}
                             >
                               <Trash01 className="size-5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="absolute right-2 bottom-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
+                              onClick={() => setIsSignatureModalOpen(true)}
+                            >
+                              <Maximize01 className="size-5" />
                             </button>
                           </div>
 
@@ -940,17 +1067,25 @@ function Formslider() {
                       )}
                     </div>
 
-                    <p className="text-sm-regular text-gray-700 mt-2">
-                      Dengan menandatangani ini, Anda menyatakan telah membaca dan menyetujui{' '}
-                      <button
-                        type="button"
-                        className="text-brand/600 font-medium cursor-pointer"
-                        onClick={() => setIsTermsModalOpen(true)}
-                      >
-                        Terms & Conditions
-                      </button>{' '}
-                      yang berlaku.
-                    </p>
+                    <div className="flex gap-2">
+                      <MyCheckbox
+                        name="tnc"
+                        value
+                        control={control}
+                        disabled={Boolean(deleted_at)}
+                      />
+                      <p className="text-sm-regular text-gray-700">
+                        Dengan menandatangani ini, Anda menyatakan telah membaca dan menyetujui{' '}
+                        <button
+                          type="button"
+                          className="text-brand/600 font-medium cursor-pointer"
+                          onClick={() => setIsTermsModalOpen(true)}
+                        >
+                          <p className="text-sm-regular text-brand/700">Terms & Conditions</p>
+                        </button>{' '}
+                        yang berlaku.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1047,7 +1182,10 @@ function Formslider() {
 
             {!deleted_at && (
               <MyButton
-                disabled={isSubmitting || (currentSlider?.id && !isChanged)}
+                disabled={
+                  isSubmitting ||
+                  (currentStep === 4 && currentSlider?.id && !isChanged)
+                }
                 onClick={async () => {
                   if (currentStep === 1) {
                     console.log('jalan 1')

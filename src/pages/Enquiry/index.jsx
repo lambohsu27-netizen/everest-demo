@@ -31,6 +31,7 @@ import moment from 'moment'
 import { useEnquiry } from './Context'
 import Formslider from './Sliders/FormSlider'
 import DetailsSlider from './Sliders/DetailSlider'
+import SignatureModal from './Sliders/components/SignatureModal'
 
 function Enquiry() {
   // const { getAccess } = useApp()
@@ -52,6 +53,9 @@ function Enquiry() {
     enquiry,
     currentSlider,
     isChanged,
+    isSignatureModalOpen,
+    setIsSignatureModalOpen,
+    signatureModalHandlerRef,
   } = useEnquiry()
   // console.log('enquiry', enquiry)
 
@@ -97,6 +101,11 @@ function Enquiry() {
         handleCurrentModal={handleCurrentModal}
         handleCurrentSlider={handleCurrentSlider}
         currentModal={currentModal}
+      />
+      <SignatureModal
+        isOpen={isSignatureModalOpen}
+        onClose={() => setIsSignatureModalOpen(false)}
+        onSign={(dataUrl) => signatureModalHandlerRef.current?.(dataUrl)}
       />
 
       <SimpleBar forceVisible="y" className="flex-1" style={{ height: '100vh' }}>

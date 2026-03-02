@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback, useMemo, useContext } from 'react'
+import { createContext, useState, useEffect, useCallback, useMemo, useContext, useRef } from 'react'
 import { myToaster } from '@interstellar-component'
 import Service from './service'
 import { useApp } from '../../AppContext'
@@ -38,6 +38,9 @@ function EnquiryProvider({ children }) {
     page: 1,
     filter: [],
   })
+
+  const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false)
+  const signatureModalHandlerRef = useRef(null)
 
   useEffect(() => {
     setSlider(currentSlider.status)
@@ -142,17 +145,20 @@ function EnquiryProvider({ children }) {
       }
       if (body.nama_ibu) formData.append('nama_ibu', body.nama_ibu)
       formData.append('agreement', body.agreement || false)
+      if (body.tnc !== undefined && body.tnc !== null) {
+        formData.append('agreement_tnc', body.tnc)
+      }
       if (body.tujuan_permintaan) {
         formData.append('tujuan_permintaan', body.tujuan_permintaan.value)
       }
       formData.append('penjelasan', body.penjelasan || '')
-      if (body.photo) {
+      if (body.photo && body.photo instanceof File) {
         formData.append('photo', body.photo)
       }
-      if (body.photo_selfie) {
+      if (body.photo_selfie && body.photo_selfie instanceof File) {
         formData.append('photo_selfie', body.photo_selfie)
       }
-      if (body.signature) {
+      if (body.signature && body.signature instanceof File) {
         formData.append('signature', body.signature)
       }
 
@@ -205,17 +211,20 @@ function EnquiryProvider({ children }) {
       }
       formData.append('nama_ibu', body.nama_ibu)
       formData.append('agreement', body.agreement)
+      if (body.tnc !== undefined && body.tnc !== null) {
+        formData.append('agreement_tnc', body.tnc)
+      }
       if (body.tujuan_permintaan) {
         formData.append('tujuan_permintaan', body.tujuan_permintaan.value)
       }
       formData.append('penjelasan', body.penjelasan || '')
-      if (body.photo) {
+      if (body.photo && body.photo instanceof File) {
         formData.append('photo', body.photo)
       }
-      if (body.photo_selfie) {
+      if (body.photo_selfie && body.photo_selfie instanceof File) {
         formData.append('photo_selfie', body.photo_selfie)
       }
-      if (body.signature) {
+      if (body.signature && body.signature instanceof File) {
         formData.append('signature', body.signature)
       }
 
@@ -338,6 +347,9 @@ function EnquiryProvider({ children }) {
       setIsChanged,
       isChanged,
       enableEnquiry,
+      isSignatureModalOpen,
+      setIsSignatureModalOpen,
+      signatureModalHandlerRef,
     }),
     [
       createEnquiry,
@@ -368,6 +380,7 @@ function EnquiryProvider({ children }) {
       setIsChanged,
       isChanged,
       enableEnquiry,
+      isSignatureModalOpen,
     ]
   )
 

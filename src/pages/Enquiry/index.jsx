@@ -24,7 +24,7 @@ import {
   Share03,
   Trash01,
 } from '@untitled-ui/icons-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import { debounce } from 'lodash'
 import moment from 'moment'
@@ -37,6 +37,7 @@ function Enquiry() {
   // const { getAccess } = useApp()
   // const access = getAccess(Access?.Enquiry)
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [isSubmitModalOpen, setSubmitModalOpen] = useState(false)
 
   const {
     handleCurrentSlider,
@@ -44,6 +45,7 @@ function Enquiry() {
     setEnquiry,
     setCheck,
     deleteEnquiry,
+    bulkSubmitEnquiry,
     check,
     restoreEnquiry,
     params,
@@ -66,6 +68,57 @@ function Enquiry() {
       order: null,
     }))
   }, [params.archive])
+
+  // Required for submit (must match BE): name, NIK, birth date, Foto KTP, Selfie with KTP, TNC, Signature
+  const isDraftSubmittable = (r) => {
+    const name = (r?.name ?? '').trim()
+    const nik = (r?.nik ?? '').trim().replace(/\s/g, '')
+    const dob = r?.dob
+    const dobStr =
+      dob instanceof Date ? dob.toISOString().slice(0, 10) : (dob && String(dob).trim())
+    const hasPhotoKtp = !!(
+      (r?.photo_ktp && String(r.photo_ktp).trim()) ||
+      r?.photo_ktp_url
+    )
+    const hasSelfie = !!(
+      (r?.selfie_with_ktp && String(r.selfie_with_ktp).trim()) ||
+      r?.selfie_with_ktp_url
+    )
+    const hasTnc = r?.agreement_tnc === true
+    const hasSignature = !!(r?.signature && String(r.signature).trim()) || !!r?.signature_url
+    return (
+      name.length > 0 &&
+      nik.length === 16 &&
+      /^\d+$/.test(nik) &&
+      dobStr &&
+      /^\d{4}-\d{2}-\d{2}$/.test(dobStr) &&
+      hasPhotoKtp &&
+      hasSelfie &&
+      hasTnc &&
+      hasSignature
+    )
+  }
+
+  // Only checked drafts that have required fields (name, NIK, birth date); others ignored
+  const submittableDraftIds = useMemo(
+    () =>
+      enquiry?.data?.filter(
+        (r) =>
+          check?.includes(r.id) &&
+          r.status === 'draft' &&
+          isDraftSubmittable(r)
+      ).map((r) => r.id) ?? [],
+    [enquiry?.data, check]
+  )
+
+  // All checked drafts (for modal message when some are not submittable)
+  const draftOnlyIds = useMemo(
+    () =>
+      enquiry?.data?.filter(
+        (r) => check?.includes(r.id) && r.status === 'draft'
+      ).map((r) => r.id) ?? [],
+    [enquiry?.data, check]
+  )
 
   return (
     <>
@@ -95,6 +148,34 @@ function Enquiry() {
         message="Data yang dihapus akan masuk ke sistem untuk ditinjau terlebih dahulu."
         icon={<AlertCircle className="text-warning-600" />}
         bgColor="bg-warning-100"
+      />
+      <MyConfirmModal
+        open={isSubmitModalOpen}
+        onClose={() => setSubmitModalOpen(false)}
+        onConfirm={() => {
+          if (submittableDraftIds.length > 0) {
+            bulkSubmitEnquiry(submittableDraftIds)
+            setSubmitModalOpen(false)
+          }
+        }}
+        title={
+          draftOnlyIds.length === 0
+            ? 'Tidak ada draft yang dipilih'
+            : submittableDraftIds.length === 0
+              ? 'Draft tidak memenuhi syarat'
+              : `Anda yakin submit ${submittableDraftIds.length} draft?`
+        }
+        message={
+          draftOnlyIds.length === 0
+            ? 'Pilih minimal satu draft untuk submit.'
+            : submittableDraftIds.length === 0
+              ? 'Draft harus lengkap: Name, NIK (16 digit), Tanggal Lahir, Foto KTP, Selfie with KTP, TNC dicentang, dan Signature. Lengkapi data lalu coba lagi.'
+              : draftOnlyIds.length > submittableDraftIds.length
+                ? `${submittableDraftIds.length} draft memenuhi syarat. ${draftOnlyIds.length - submittableDraftIds.length} draft diabaikan karena data belum lengkap (Name, NIK, Tanggal Lahir, Foto KTP, Selfie, TNC, Signature).`
+                : 'Draft yang dipilih akan dikirim ke CLIK.'
+        }
+        icon={<CheckCircle className="text-success-600" />}
+        bgColor="bg-success-100"
       />
       <MyConfirmUnsavedModal
         open={currentModal?.current === 'unsaved-modal'}
@@ -140,7 +221,7 @@ function Enquiry() {
                       <p className="text-lg-semibold text-gray-900">List of Enquiry</p>
                       <div className="hidden md:block">
                         <MyChip
-                          label={`${Enquiry?.meta?.total || '0'} item`}
+                          label={`${enquiry?.meta?.total || '0'} item`}
                           // color="primary"
                           variant="outlined"
                           size="sm"
@@ -170,19 +251,21 @@ function Enquiry() {
                       ) : (
                         <MyButton
                           color="error"
-                          variant="outlined"
+                          variant="text"
                           size="sm"
                           onClick={() => setConfirmModalOpen(true)}
                           // disabled={!access?.edit_delete}
                         >
-                          <Trash01 className="size-5" stroke="currentColor" />
-                          <p className="text-sm-semibold">Hapus</p>
+                          {/* <Trash01 className="size-5" stroke="currentColor" /> */}
+                          <p className="text-sm-semibold">
+                            {check?.length === 1 ? 'Delete' : 'Delete All'}
+                          </p>
                         </MyButton>
                       )
                     ) : null}
                     {/* )} */}
                     {/* Desktop Text Button */}
-                    <div className="hidden md:block">
+                    {/* <div className="hidden md:block">
                       <MyButton
                         // onClick={downloadExport}
                         color="error"
@@ -192,26 +275,23 @@ function Enquiry() {
                       >
                         <p className="text-sm-semibold whitespace-nowrap">Delete All</p>
                       </MyButton>
-                    </div>
+                    </div> */}
 
-                    {/* {access?.edit_delete && ( */}
-                    <MyButton
-                      onClick={() =>
-                        handleCurrentSlider({
-                          status: true,
-                          current: 'form-slider',
-                        })
-                      }
-                      color="secondary"
-                      variant="outlined"
-                      size="md"
-                      // disabled={!access?.edit_delete}
-                    >
-                      <Send01 className="size-5" stroke="currentColor" />
-                      <p className="text-sm-semibold text-brand-700 md:text-black whitespace-nowrap">
-                        Submit All
-                      </p>
-                    </MyButton>
+                    {check?.length > 0 && (
+                      <MyButton
+                        onClick={() => setSubmitModalOpen(true)}
+                        color="secondary"
+                        variant="outlined"
+                        size="md"
+                        disabled={draftOnlyIds.length === 0}
+                        // disabled={!access?.edit_delete}
+                      >
+                        <Send01 className="size-5" stroke="currentColor" />
+                        <p className="text-sm-semibold text-brand-700 md:text-black whitespace-nowrap">
+                          {check?.length === 1 ? 'Submit' : 'Submit All'}
+                        </p>
+                      </MyButton>
+                    )}
 
                     <MyButton
                       onClick={() =>
@@ -314,7 +394,7 @@ function Enquiry() {
                     </div>
                     <MyFilterModal
                       id="filter-ticketing"
-                      // currentFilters={ticketList?.filter}
+                      currentFilters={enquiry?.filter}
                       onChange={(filter) => {
                         setParams((prev) => ({
                           ...prev,

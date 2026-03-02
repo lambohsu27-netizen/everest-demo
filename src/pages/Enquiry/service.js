@@ -11,6 +11,7 @@ const Service = {
   enableEnquiry: async (id) => await patch(`/v1/inquiry/${id}/enable`),
   deleteEnquiry: async (body) => await remove('/v1/inquiry', body),
   restoreEnquiry: async (body) => patch('/v1/inquiry/restore', body),
+  bulkSubmitEnquiry: async (body) => post('/v1/inquiry/submit-draft', body),
   downloadExport: (params) => download('/v1/inquiry/export', params),
 
   // option

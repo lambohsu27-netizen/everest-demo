@@ -418,16 +418,13 @@ function Formslider() {
   }, [watchedValues, isInitialDataLoaded, setIsChanged]) // Dependencies: run when watched values change or loading finishes
 
   const onSubmit = handleSubmit(
-    handleError(
-      (data) => {
-        // Submit (final) → always POST /inquiry to process. Save as Draft → PATCH if editing draft, else POST /draft.
-        if (data.isDraft) {
-          return currentSlider?.id ? updateEnquiry(data) : createEnquiry(data)
-        }
-        return createEnquiry(data)
-      },
-      control
-    ),
+    handleError((data) => {
+      // Submit (final) → always POST /inquiry to process. Save as Draft → PATCH if editing draft, else POST /draft.
+      if (data.isDraft) {
+        return currentSlider?.id ? updateEnquiry(data) : createEnquiry(data)
+      }
+      return createEnquiry(data)
+    }, control),
     checkErrorYup
   )
 
@@ -652,7 +649,7 @@ function Formslider() {
                         )}
                       />
                       {errors?.tanggal_lahir?.message && (
-                        <p className="text-sm-regular text-error-600">
+                        <p className="text-sm-regular text-error/600">
                           {errors.tanggal_lahir.message}
                         </p>
                       )}
@@ -882,9 +879,7 @@ function Formslider() {
                           <button
                             type="button"
                             className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
-                            onClick={() =>
-                              setValue('photo', null, { shouldDirty: true })
-                            }
+                            onClick={() => setValue('photo', null, { shouldDirty: true })}
                           >
                             <Trash01 className="size-5" />
                           </button>
@@ -926,9 +921,7 @@ function Formslider() {
                           <button
                             type="button"
                             className="absolute right-2 top-2 z-10 rounded-lg border border-gray-200 bg-white p-2 text-gray-700 shadow-sm hover:bg-gray-50"
-                            onClick={() =>
-                              setValue('photo_selfie', null, { shouldDirty: true })
-                            }
+                            onClick={() => setValue('photo_selfie', null, { shouldDirty: true })}
                           >
                             <Trash01 className="size-5" />
                           </button>
@@ -1100,46 +1093,49 @@ function Formslider() {
                 variant="outlined"
                 size="md"
                 onClick={() => {
-                  setValue('name', 'John Doe Dummy', { shouldValidate: true, shouldDirty: true })
-                  setValue('email', 'john.doe@example.com', {
+                  // Dummy data from photo: NOAH UBAIDAH, L, 25/07/61, NIK 3141555322417520, address, 081259728897
+                  setValue('name', 'NOAH UBAIDAH', { shouldValidate: true, shouldDirty: true })
+                  setValue('email', 'UBAIDAH@GMAIL.COM', {
                     shouldValidate: true,
                     shouldDirty: true,
                   })
-                  setValue('nik', '3171234567890123', { shouldValidate: true, shouldDirty: true })
-                  setValue('telepon', '081234567890', { shouldValidate: true, shouldDirty: true })
-                  setValue('tempat_lahir', 'Jakarta', { shouldValidate: true, shouldDirty: true })
-                  setValue('tanggal_lahir', new Date('1990-01-01'), {
+                  setValue('nik', '3141555322417520', { shouldValidate: true, shouldDirty: true })
+                  setValue('telepon', '081259728897', { shouldValidate: true, shouldDirty: true })
+                  setValue('jenis_kelamin', 'Pria', { shouldValidate: true, shouldDirty: true })
+                  setValue('tempat_lahir', 'BOGOR', { shouldValidate: true, shouldDirty: true })
+                  setValue('tanggal_lahir', new Date('1961-07-25'), {
                     shouldValidate: true,
                     shouldDirty: true,
                   })
-                  setValue('kode_pos', '12345', { shouldValidate: true, shouldDirty: true })
+                  setValue('kode_pos', '13960', { shouldValidate: true, shouldDirty: true })
                   setValue(
                     'kota',
-                    { id: '3171', name: 'KOTA ADM. JAKARTA PUSAT' },
+                    { id: '3172', name: 'KOTA ADM. JAKARTA TIMUR' },
                     { shouldValidate: true, shouldDirty: true }
                   )
                   setValue(
                     'kecamatan',
-                    { id: '3171010', name: 'GAMBIR' },
+                    { id: '3172030', name: 'CAKUNG' },
                     { shouldValidate: true, shouldDirty: true }
                   )
                   setValue(
                     'kelurahan',
-                    { id: '3171010001', name: 'GAMBIR' },
+                    { id: '3172030001', name: 'UJUNG MENTENG' },
                     { shouldValidate: true, shouldDirty: true }
                   )
-                  setValue('alamat', 'Jl. Dummy No. 123', {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                  setValue('nama_ibu', 'Ibu Dummy', { shouldValidate: true, shouldDirty: true })
+                  setValue(
+                    'alamat',
+                    'JALAN UJUNG MENTENG UJUNG MENTENG CAKUNG 0395 13960',
+                    { shouldValidate: true, shouldDirty: true }
+                  )
+                  setValue('nama_ibu', 'DAMAYANTI', { shouldValidate: true, shouldDirty: true })
                   setValue('agreement', true, { shouldValidate: true, shouldDirty: true })
                   setValue(
                     'tujuan_permintaan',
                     { label: 'Others', value: 'others' },
                     { shouldValidate: true, shouldDirty: true }
                   )
-                  setValue('penjelasan', 'Dummy explanation for testing', {
+                  setValue('penjelasan', 'Dummy data for testing (NOAH UBAIDAH)', {
                     shouldValidate: true,
                     shouldDirty: true,
                   })
@@ -1182,10 +1178,7 @@ function Formslider() {
 
             {!deleted_at && (
               <MyButton
-                disabled={
-                  isSubmitting ||
-                  (currentStep === 4 && currentSlider?.id && !isChanged)
-                }
+                disabled={isSubmitting || (currentStep === 4 && currentSlider?.id && !isChanged)}
                 onClick={async () => {
                   if (currentStep === 1) {
                     console.log('jalan 1')

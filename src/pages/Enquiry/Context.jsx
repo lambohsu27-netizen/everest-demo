@@ -20,6 +20,7 @@ function EnquiryProvider({ children }) {
     active: true,
     sort: null,
     order: null,
+    status: 'view all',
   })
   const [check, setCheck] = useState([])
   const [isChanged, setIsChanged] = useState(false)
@@ -110,6 +111,29 @@ function EnquiryProvider({ children }) {
 
   const createEnquiry = useCallback(
     async (body) => {
+      // Log body (non-file fields) for debugging
+      const bodyLog = {
+        name: body.name,
+        nik: body.nik,
+        email: body.email,
+        alamat: body.alamat,
+        telepon: body.telepon,
+        tanggal_lahir: body.tanggal_lahir,
+        jenis_kelamin: body.jenis_kelamin,
+        tempat_lahir: body.tempat_lahir,
+        kode_pos: body.kode_pos,
+        kelurahan: body.kelurahan,
+        kota: body.kota,
+        kecamatan: body.kecamatan,
+        nama_ibu: body.nama_ibu,
+        agreement: body.agreement,
+        tnc: body.tnc,
+        tujuan_permintaan: body.tujuan_permintaan,
+        penjelasan: body.penjelasan,
+        isDraft: body.isDraft,
+      }
+      console.log('[Enquiry] createEnquiry body:', bodyLog)
+
       const formData = new FormData()
       formData.append('name', body.name || '')
       formData.append('nik', body.nik || '')
@@ -128,7 +152,7 @@ function EnquiryProvider({ children }) {
 
       formData.append('address', body.alamat || '')
       formData.append('phone', body.telepon || '')
-      if (body.email) formData.append('email', body.email)
+      formData.append('email', body.email || '')
       if (body.tempat_lahir) formData.append('tempat_lahir', body.tempat_lahir)
       if (body.kode_pos) formData.append('kode_pos', body.kode_pos)
       if (body.kelurahan) {
@@ -254,7 +278,22 @@ function EnquiryProvider({ children }) {
       await Service.deleteEnquiry({ ids: data })
         .then(myToaster)
         .then(getEnquiry)
-        .then(setCheck(null))
+        .then(() => setCheck([]))
+        .catch(myToaster)
+    },
+    [getEnquiry]
+  )
+
+  const bulkSubmitEnquiry = useCallback(
+    async (ids) => {
+      if (!ids?.length) {
+        myToaster({ message: 'No draft enquiries to submit' })
+        return
+      }
+      await Service.bulkSubmitEnquiry({ ids })
+        .then(myToaster)
+        .then(getEnquiry)
+        .then(() => setCheck([]))
         .catch(myToaster)
     },
     [getEnquiry]
@@ -329,6 +368,7 @@ function EnquiryProvider({ children }) {
       createEnquiry,
       updateEnquiry,
       deleteEnquiry,
+      bulkSubmitEnquiry,
       restoreEnquiry,
       importEnquiry,
       downloadTemplateImport,
@@ -355,6 +395,7 @@ function EnquiryProvider({ children }) {
       createEnquiry,
       currentSlider,
       deleteEnquiry,
+      bulkSubmitEnquiry,
       downloadExport,
       downloadTemplateImport,
       getEnquiryDetail,

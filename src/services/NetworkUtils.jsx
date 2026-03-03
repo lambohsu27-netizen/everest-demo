@@ -193,7 +193,15 @@ export const remove = async (endpoint, data, timeout = 60000) => {
 export const download = (endpoint, params) => {
   let url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
   const where = {
-    ...pick(params, ['page', 'search', 'type', 'start_date', 'end_date', 'status']),
+    ...pick(params, [
+      'page',
+      'search',
+      'type',
+      'start_date',
+      'end_date',
+      'status',
+      'archive',
+    ]),
   }
 
   if (params && where) {

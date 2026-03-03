@@ -91,7 +91,14 @@ function DetailsSlider() {
               })()}
             </div>
             <p className="text-sm-regular text-gray-600 italic">
-              Credit Report telah berhasil diterbitkan dan dikirim ke email yang terdaftar.
+              {{
+                draft: 'Enquiry masih dalam status draft. Submit untuk memproses permintaan.',
+                in_progress: 'Credit Report sedang diproses.',
+                completed:
+                  'Credit Report telah berhasil diterbitkan dan dikirim ke email yang terdaftar.',
+                error: 'Data tidak ditemukan.',
+              }[enquiryDetails?.data?.raw?.status] ??
+                '—'}
             </p>
           </div>
 

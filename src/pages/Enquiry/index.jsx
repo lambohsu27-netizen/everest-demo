@@ -23,6 +23,7 @@ import {
   Send01,
   Share03,
   Trash01,
+  XCircle,
 } from '@untitled-ui/icons-react'
 import React, { useEffect, useMemo, useState } from 'react'
 import SimpleBar from 'simplebar-react'
@@ -74,12 +75,8 @@ function Enquiry() {
     const name = (r?.name ?? '').trim()
     const nik = (r?.nik ?? '').trim().replace(/\s/g, '')
     const dob = r?.dob
-    const dobStr =
-      dob instanceof Date ? dob.toISOString().slice(0, 10) : (dob && String(dob).trim())
-    const hasPhotoKtp = !!(
-      (r?.photo_ktp && String(r.photo_ktp).trim()) ||
-      r?.photo_ktp_url
-    )
+    const dobStr = dob instanceof Date ? dob.toISOString().slice(0, 10) : dob && String(dob).trim()
+    const hasPhotoKtp = !!((r?.photo_ktp && String(r.photo_ktp).trim()) || r?.photo_ktp_url)
     const hasSelfie = !!(
       (r?.selfie_with_ktp && String(r.selfie_with_ktp).trim()) ||
       r?.selfie_with_ktp_url
@@ -102,21 +99,18 @@ function Enquiry() {
   // Only checked drafts that have required fields (name, NIK, birth date); others ignored
   const submittableDraftIds = useMemo(
     () =>
-      enquiry?.data?.filter(
-        (r) =>
-          check?.includes(r.id) &&
-          r.status === 'draft' &&
-          isDraftSubmittable(r)
-      ).map((r) => r.id) ?? [],
+      enquiry?.data
+        ?.filter((r) => check?.includes(r.id) && r.status === 'draft' && isDraftSubmittable(r))
+        .map((r) => r.id) ?? [],
     [enquiry?.data, check]
   )
 
   // All checked drafts (for modal message when some are not submittable)
   const draftOnlyIds = useMemo(
     () =>
-      enquiry?.data?.filter(
-        (r) => check?.includes(r.id) && r.status === 'draft'
-      ).map((r) => r.id) ?? [],
+      enquiry?.data
+        ?.filter((r) => check?.includes(r.id) && r.status === 'draft')
+        .map((r) => r.id) ?? [],
     [enquiry?.data, check]
   )
 
@@ -334,7 +328,7 @@ function Enquiry() {
                     </div>
                     <MyFilterModal
                       id="filter-ticketing-mobile"
-                      // currentFilters={ticketList?.filter}
+                      currentFilters={enquiry?.filter}
                       onChange={(filter) => {
                         setParams((prev) => ({
                           ...prev,
@@ -532,25 +526,50 @@ function Enquiry() {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
                       header="General Info"
-                      body={(value) => (
-                        <div className="flex items-center justify-center">
-                          <CheckCircle className="text-success/600" />
-                        </div>
-                      )}
+                      body={(value) => {
+                        const hasPhotoKtp =
+                          !!(value?.photo_ktp && String(value.photo_ktp).trim()) ||
+                          !!value?.photo_ktp_url
+                        const hasSelfie =
+                          !!(value?.selfie_with_ktp && String(value.selfie_with_ktp).trim()) ||
+                          !!value?.selfie_with_ktp_url
+                        const hasSignature =
+                          !!(value?.signature && String(value.signature).trim()) ||
+                          !!value?.signature_url
+                        const allPhotosProvided = hasPhotoKtp && hasSelfie && hasSignature
+                        return (
+                          <div className="flex items-center justify-center">
+                            {allPhotosProvided ? (
+                              <CheckCircle className="text-success/600" />
+                            ) : (
+                              <XCircle className="text-error/600" />
+                            )}
+                          </div>
+                        )
+                      }}
                     />
 
                     <MyColumn
-                      field="branch.name"
+                      field="photo_ktp"
                       alignment="center"
                       onSort={(sort) => {
                         setParams((prev) => ({ ...prev, ...sort }))
                       }}
                       header="Selfie With KTP"
-                      body={(value) => (
-                        <div className="flex items-center justify-center">
-                          <CheckCircle className="text-success/600" />
-                        </div>
-                      )}
+                      body={(value) => {
+                        const hasSelfie =
+                          (value?.selfie_with_ktp && String(value.selfie_with_ktp).trim()) ||
+                          value?.selfie_with_ktp_url
+                        return (
+                          <div className="flex items-center justify-center">
+                            {hasSelfie ? (
+                              <CheckCircle className="text-success/600" />
+                            ) : (
+                              <XCircle className="text-error/600" />
+                            )}
+                          </div>
+                        )
+                      }}
                     />
 
                     <MyColumn
@@ -560,7 +579,18 @@ function Enquiry() {
                       }}
                       header="Consent"
                       alignment="center"
-                      body={(value) => <Minus className="text-gray/600" />}
+                      body={(value) => {
+                        const hasSelfie = value?.agreement_tnc
+                        return (
+                          <div className="flex items-center justify-center">
+                            {hasSelfie ? (
+                              <CheckCircle className="text-success/600" />
+                            ) : (
+                              <XCircle className="text-error/600" />
+                            )}
+                          </div>
+                        )
+                      }}
                     />
 
                     <MyColumn

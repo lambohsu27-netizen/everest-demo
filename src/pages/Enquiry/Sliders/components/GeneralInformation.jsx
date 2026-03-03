@@ -46,11 +46,22 @@ function GeneralInformation({ enquiryDetails }) {
               </div>
             </div> */}
             <MyDetailView
-              datas={
-                enquiryDetails?.data?.general_information
-                  ? enquiryDetails?.data?.general_information
-                  : {}
-              }
+              datas={(() => {
+                const raw = enquiryDetails?.data?.general_information
+                if (!raw) return {}
+                return Object.fromEntries(
+                  Object.entries(raw).map(([k, v]) => [
+                    k,
+                    v &&
+                    typeof v === 'object' &&
+                    v !== null &&
+                    !Array.isArray(v) &&
+                    'name' in v
+                      ? v.name
+                      : v,
+                  ])
+                )
+              })()}
               func={{
                 'Approval of Request': (value) =>
                   value ? (

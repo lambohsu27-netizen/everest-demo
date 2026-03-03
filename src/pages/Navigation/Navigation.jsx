@@ -17,101 +17,105 @@ import {
   MyConfirmModal,
   MyPopper,
   MyModalSlider,
+  MyButton,
 } from '@interstellar-component'
 // import ProfileSlider from '../Profile/ProfileSlider'
+import { useCookies } from 'react-cookie'
 import { useLogin } from '../Login/Context'
 import { useApp } from '../../AppContext'
 import { Access } from '../../services/Helper'
 import bipura_logo from '../../assets/Login/bipura_logo.png'
 // import SecurityModal from '../../localComponents/ModalSecurity'
 
-function PAction({ target }) {
-  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
-  // const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
-  const { isProfileSliderOpen, setIsProfileSliderOpen } = useLogin()
-  const { logout, shouldChangePassword } = useApp()
+// function PAction({ target }) {
+//   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false)
+//   // const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false)
+//   const { isProfileSliderOpen, setIsProfileSliderOpen } = useLogin()
+//   const { logout, shouldChangePassword } = useApp()
 
-  return (
-    <>
-      {/* <SecurityModal  /> */}
-      <MyConfirmModal
-        open={isConfirmModalOpen}
-        title="Konfirmasi keluar"
-        onClose={() => setConfirmModalOpen(false)}
-        onConfirm={logout}
-        message="Anda ingin keluar dari akun ini. Apakah anda yakin ingin melanjutkan?"
-        icon={<LogOut04 className="text-warning-600" />}
-        bgColor="bg-error-100"
-      />
-      {/* <SecurityModal
-        open={isSecurityModalOpen}
-        title={'Kemanan password'}
-        // onClose={() => setIsSecurityModalOpen(false)}
-        showCloseButton={false}
-        message="Demi keamanan, silakan ganti kata sandi Anda sebelum menggunakan akun ini untuk pertama kali."
-        icon={<AlertCircle className="text-warning-600" />}
-        actions={
-          <MyButton
-            expanded
-            color="primary"
-            variant="filled"
-            size="lg"
-            onClick={() => {
-              setIsSecurityModalOpen(false)
-              setIsProfileSliderOpen(true)
-            }}
-          >
-            <p className="text-sm-semibold">Ganti password</p>
-          </MyButton>
-        }
-      /> */}
-      {/* <MyModalSlider
-        open={isProfileSliderOpen}
-        element={<ProfileSlider />}
-        onClose={() => {
-          if (!shouldChangePassword) setIsProfileSliderOpen(false)
-        }}
-      /> */}
-      <MyPopper target={target} placement="right-start">
-        {(open, anchorEl, handleOpen, handleClose) => (
-          <div className="flex w-[200px] flex-col rounded-md bg-white shadow-md">
-            {/* Container with adjusted width */}
-            <div className="rounded-xl border border-gray-200 bg-gray-50 shadow-sm">
-              <div className="flex flex-col rounded-xl bg-gray-100 outline outline-1 outline-gray-200">
-                {/* View Profile button */}
-                <button
-                  onClick={() => {
-                    setIsProfileSliderOpen(true)
-                    handleClose()
-                  }}
-                  className="flex items-center gap-3 rounded-md px-4 py-2 text-gray-700 transition-colors duration-200 ease-in-out hover:bg-white hover:text-gray-900"
-                >
-                  <User01 />
-                  <p className="text-sm-medium">Lihat profil</p>
-                </button>
+//   return (
+//     <>
+//       {/* <SecurityModal  /> */}
+//       <MyConfirmModal
+//         open={isConfirmModalOpen}
+//         title="Konfirmasi keluar"
+//         onClose={() => setConfirmModalOpen(false)}
+//         onConfirm={logout}
+//         message="Anda ingin keluar dari akun ini. Apakah anda yakin ingin melanjutkan?"
+//         icon={<LogOut04 className="text-warning-600" />}
+//         bgColor="bg-error-100"
+//       />
+//       {/* <SecurityModal
+//         open={isSecurityModalOpen}
+//         title={'Kemanan password'}
+//         // onClose={() => setIsSecurityModalOpen(false)}
+//         showCloseButton={false}
+//         message="Demi keamanan, silakan ganti kata sandi Anda sebelum menggunakan akun ini untuk pertama kali."
+//         icon={<AlertCircle className="text-warning-600" />}
+//         actions={
+//           <MyButton
+//             expanded
+//             color="primary"
+//             variant="filled"
+//             size="lg"
+//             onClick={() => {
+//               setIsSecurityModalOpen(false)
+//               setIsProfileSliderOpen(true)
+//             }}
+//           >
+//             <p className="text-sm-semibold">Ganti password</p>
+//           </MyButton>
+//         }
+//       /> */}
+//       {/* <MyModalSlider
+//         open={isProfileSliderOpen}
+//         element={<ProfileSlider />}
+//         onClose={() => {
+//           if (!shouldChangePassword) setIsProfileSliderOpen(false)
+//         }}
+//       /> */}
+//       <MyPopper target={target} placement="right-start">
+//         {(open, anchorEl, handleOpen, handleClose) => (
+//           <div className="flex w-[200px] flex-col rounded-md bg-white shadow-md">
+//             {/* Container with adjusted width */}
+//             <div className="rounded-xl border border-gray-200 bg-gray-50 shadow-sm">
+//               <div className="flex flex-col rounded-xl bg-gray-100 outline outline-1 outline-gray-200">
+//                 {/* View Profile button */}
+//                 <button
+//                   onClick={() => {
+//                     setIsProfileSliderOpen(true)
+//                     handleClose()
+//                   }}
+//                   className="flex items-center gap-3 rounded-md px-4 py-2 text-gray-700 transition-colors duration-200 ease-in-out hover:bg-white hover:text-gray-900"
+//                 >
+//                   <User01 />
+//                   <p className="text-sm-medium">Lihat profil</p>
+//                 </button>
 
-                {/* Sign out button */}
-                <button
-                  onClick={() => {
-                    setConfirmModalOpen(true)
-                    handleClose()
-                  }}
-                  className="flex items-center gap-3 rounded-md px-4 py-2 pr-[90px] text-red-700 transition-colors duration-200 ease-in-out hover:bg-white hover:text-red-900"
-                >
-                  <LogOut01 />
-                  <p className="text-sm-medium">Keluar</p>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </MyPopper>
-    </>
-  )
-}
+//                 {/* Sign out button */}
+//                 <button
+//                   onClick={() => {
+//                     setConfirmModalOpen(true)
+//                     handleClose()
+//                   }}
+//                   className="flex items-center gap-3 rounded-md px-4 py-2 pr-[90px] text-red-700 transition-colors duration-200 ease-in-out hover:bg-white hover:text-red-900"
+//                 >
+//                   <LogOut01 />
+//                   <p className="text-sm-medium">Keluar</p>
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//       </MyPopper>
+//     </>
+//   )
+// }
 
 function Navigation({ childs }) {
   const { user, accesses, setAccesses } = useApp()
+  const [cookies, setCookie, removeCookie] = useCookies(['token-backoffice'])
+
   const location = useLocation()
   // console.log('accesses', accesses)
 
@@ -123,6 +127,7 @@ function Navigation({ childs }) {
   // return accesses.some((acces) => acces.name === 'Semua menu')
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLogoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   // console.log('user', user)
 
@@ -145,8 +150,27 @@ function Navigation({ childs }) {
     }
   }, [user])
 
+  const logout = () => {
+    localStorage.removeItem('user_id')
+    localStorage.removeItem('email_forget_password')
+    localStorage.removeItem('countdown_to_new_otp')
+    removeCookie('token-backoffice', { path: '/' })
+  }
+
   return (
     <>
+      <MyConfirmModal
+        open={isLogoutConfirmOpen}
+        title="Konfirmasi keluar"
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          setLogoutConfirmOpen(false)
+          logout()
+        }}
+        message="Anda yakin ingin logout?"
+        icon={<LogOut04 className="text-warning/600" />}
+        bgColor="bg-error/100"
+      />
       {/* Mobile Top Navigation */}
       <div className="flex w-full items-center justify-between p-4 md:hidden absolute z-50">
         <div className="flex items-center justify-center">
@@ -310,7 +334,7 @@ function Navigation({ childs }) {
                   <p className="text-xs-semibold text-white">User management</p>
                 </MyTooltip>
               </Link> */}
-              <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+              {/* <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
                 <MyTooltip
                   placement="right"
                   target={
@@ -329,7 +353,7 @@ function Navigation({ childs }) {
                 >
                   <span className="text-xs-semibold text-white">Settings</span>
                 </MyTooltip>
-              </Link>
+              </Link> */}
             </div>
             {/* <PAction
               target={(open, handleOpen) => (
@@ -362,6 +386,22 @@ function Navigation({ childs }) {
                 </MyTooltip>
               )}
             /> */}
+
+            <MyTooltip
+              placement="right"
+              target={
+                <div
+                  className={`${'text-gray-light/500'} cursor-pointer rounded-md w-12 min-w-[48px] h-12 flex items-center justify-center`}
+                >
+                  <MyButton onClick={() => setLogoutConfirmOpen(true)}>
+                    <LogOut04 data-test="btn-nav-setting" size={24} stroke="currentColor" />
+                  </MyButton>
+                </div>
+              }
+            >
+              <p className="text-white text-xs-semibold">Log Out</p>
+            </MyTooltip>
+
             <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
               <MyTooltip
                 placement="right"

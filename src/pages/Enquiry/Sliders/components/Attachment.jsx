@@ -31,7 +31,7 @@ function Attachment({ enquiryDetails, setCurrentModal }) {
                     <p className="text-sm-medium text-gray-900">{key}</p>
                     {isBool ? (
                       item ? (
-                        <CheckCircle className="size-5 text-success-600" />
+                        <CheckCircle className="size-5 text-success/600" />
                       ) : (
                         <Minus className="size-5 text-gray-400" />
                       )

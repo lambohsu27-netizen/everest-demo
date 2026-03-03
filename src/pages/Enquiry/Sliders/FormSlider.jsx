@@ -201,12 +201,6 @@ function Formslider() {
     }
   }, [currentStep, roomId, setValue])
 
-  // const handleGeneratePassword = useCallback(() => {
-  //   generatePassword((field, value) => {
-  //     setValue(field, value, { shouldDirty: true })
-  //   })
-  // }, [generatePassword, setValue])
-
   useEffect(() => {
     let isMounted = true
     setIsInitialDataLoaded(false)
@@ -433,6 +427,55 @@ function Formslider() {
     setClickedCopy(false)
   }, [createdPassword])
 
+  const fillDummyData = () => {
+    // Dummy data from photo: NOAH UBAIDAH, L, 25/07/61, NIK 3141555322417520, address, 081259728897
+    setValue('name', 'NOAH UBAIDAH', { shouldValidate: true, shouldDirty: true })
+    setValue('email', 'UBAIDAH@GMAIL.COM', {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setValue('nik', '3141555322417520', { shouldValidate: true, shouldDirty: true })
+    setValue('telepon', '081259728897', { shouldValidate: true, shouldDirty: true })
+    setValue('jenis_kelamin', 'Pria', { shouldValidate: true, shouldDirty: true })
+    setValue('tempat_lahir', 'BOGOR', { shouldValidate: true, shouldDirty: true })
+    setValue('tanggal_lahir', new Date('1961-07-25'), {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setValue('kode_pos', '13960', { shouldValidate: true, shouldDirty: true })
+    setValue(
+      'kota',
+      { id: '3172', name: 'KOTA ADM. JAKARTA TIMUR' },
+      { shouldValidate: true, shouldDirty: true }
+    )
+    setValue(
+      'kecamatan',
+      { id: '3172030', name: 'CAKUNG' },
+      { shouldValidate: true, shouldDirty: true }
+    )
+    setValue(
+      'kelurahan',
+      { id: '3172030001', name: 'UJUNG MENTENG' },
+      { shouldValidate: true, shouldDirty: true }
+    )
+    setValue('alamat', 'JALAN UJUNG MENTENG UJUNG MENTENG CAKUNG 0395 13960', {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setValue('nama_ibu', 'DAMAYANTI', { shouldValidate: true, shouldDirty: true })
+    setValue('agreement', true, { shouldValidate: true, shouldDirty: true })
+    setValue(
+      'tujuan_permintaan',
+      { label: 'Others', value: 'others' },
+      { shouldValidate: true, shouldDirty: true }
+    )
+    setValue('penjelasan', 'Dummy data for testing (NOAH UBAIDAH)', {
+      shouldValidate: true,
+      shouldDirty: true,
+    })
+    setIsChanged(true)
+  }
+
   return (
     <>
       <ModalTermsCondition open={isTermsModalOpen} onClose={() => setIsTermsModalOpen(false)} />
@@ -629,6 +672,7 @@ function Formslider() {
                       </label>
                       <MyCalendar
                         value={tanggal_lahir}
+                        maxYearOffset={17}
                         onChange={(date) => setValue('tanggal_lahir', date, { shouldDirty: true })}
                         target={(open, show) => (
                           <button
@@ -1039,11 +1083,7 @@ function Formslider() {
                             includeMargin
                           />
                           <p className="mt-4 text-center text-sm-medium text-brand-600">
-                            Gambar dari
-                            <br />
-                            perangkat seluler
-                            <br />
-                            Anda
+                            Scan QR ini di perangkat seluler anda untuk tanda tangan
                           </p>
                           <button
                             type="button"
@@ -1092,55 +1132,7 @@ function Formslider() {
                 color="secondary"
                 variant="outlined"
                 size="md"
-                onClick={() => {
-                  // Dummy data from photo: NOAH UBAIDAH, L, 25/07/61, NIK 3141555322417520, address, 081259728897
-                  setValue('name', 'NOAH UBAIDAH', { shouldValidate: true, shouldDirty: true })
-                  setValue('email', 'UBAIDAH@GMAIL.COM', {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                  setValue('nik', '3141555322417520', { shouldValidate: true, shouldDirty: true })
-                  setValue('telepon', '081259728897', { shouldValidate: true, shouldDirty: true })
-                  setValue('jenis_kelamin', 'Pria', { shouldValidate: true, shouldDirty: true })
-                  setValue('tempat_lahir', 'BOGOR', { shouldValidate: true, shouldDirty: true })
-                  setValue('tanggal_lahir', new Date('1961-07-25'), {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                  setValue('kode_pos', '13960', { shouldValidate: true, shouldDirty: true })
-                  setValue(
-                    'kota',
-                    { id: '3172', name: 'KOTA ADM. JAKARTA TIMUR' },
-                    { shouldValidate: true, shouldDirty: true }
-                  )
-                  setValue(
-                    'kecamatan',
-                    { id: '3172030', name: 'CAKUNG' },
-                    { shouldValidate: true, shouldDirty: true }
-                  )
-                  setValue(
-                    'kelurahan',
-                    { id: '3172030001', name: 'UJUNG MENTENG' },
-                    { shouldValidate: true, shouldDirty: true }
-                  )
-                  setValue(
-                    'alamat',
-                    'JALAN UJUNG MENTENG UJUNG MENTENG CAKUNG 0395 13960',
-                    { shouldValidate: true, shouldDirty: true }
-                  )
-                  setValue('nama_ibu', 'DAMAYANTI', { shouldValidate: true, shouldDirty: true })
-                  setValue('agreement', true, { shouldValidate: true, shouldDirty: true })
-                  setValue(
-                    'tujuan_permintaan',
-                    { label: 'Others', value: 'others' },
-                    { shouldValidate: true, shouldDirty: true }
-                  )
-                  setValue('penjelasan', 'Dummy data for testing (NOAH UBAIDAH)', {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
-                  setIsChanged(true)
-                }}
+                onClick={fillDummyData}
               >
                 <p className="text-sm-semibold">Fill Dummy</p>
               </MyButton>

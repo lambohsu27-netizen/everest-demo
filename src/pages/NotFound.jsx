@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MyButton } from '@interstellar-component'
-import logo from '../assets/Welcome/Logo_Bank_Mandiri_Taspen_Official.svg'
+import logo from '../assets/Login/bipura_logo.png'
 
 function NotFound() {
   const nav = useNavigate()
@@ -29,7 +29,7 @@ function NotFound() {
 
       {/* 🔹 Footer Section */}
       <footer className="text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} Mandiri Taspen. All rights reserved.
+        &copy; {new Date().getFullYear()} Bipura. All rights reserved.
       </footer>
     </div>
   )

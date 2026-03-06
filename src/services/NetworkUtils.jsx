@@ -70,9 +70,10 @@ const getHeader = (type) => {
       break
     }
     case 'form-data': {
+      // Do NOT set Content-Type for FormData – axios sets multipart/form-data with boundary automatically.
+      // Setting application/x-www-form-urlencoded breaks file uploads (multer cannot parse the file).
       headers = {
         ...headers,
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Accept-Language': 'en',
         'Time-Zone': timezone,
       }

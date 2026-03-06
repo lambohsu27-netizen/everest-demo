@@ -31,8 +31,19 @@ function Profile() {
   } = useForm({
     resolver: yupResolver(ProfileSchema),
   })
-  const { photo, name } = watch()
+  const watched = watch()
+  const { photo, name } = watched
   const [role, setRole] = useState(null)
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false)
+
+  const hasChanges =
+    isProfileLoaded &&
+    ((watched.name ?? '').trim() !== (initialValues.name ?? '').trim() ||
+      (watched.email ?? '').trim() !== (initialValues.email ?? '').trim() ||
+      (watched.username ?? '').trim() !== (initialValues.username ?? '').trim() ||
+      (watched.whatsapp ?? '').trim() !== (initialValues.whatsapp ?? '').trim() ||
+      watched.photo instanceof File ||
+      watched.delete_photo === true)
   // console.log('error', errors)
 
   const onSubmit = handleSubmit(handleError(updateProfile, control), checkErrorYup)
@@ -54,6 +65,7 @@ function Profile() {
       setValue('photo', data?.photo_url)
       setValue('role', data?.role?.name)
       setRole(data?.role?.name)
+      setIsProfileLoaded(true)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -62,6 +74,7 @@ function Profile() {
     Object.keys(initialValues).forEach((key) => {
       setValue(key, initialValues[key])
     })
+    setValue('delete_photo', false)
   }
 
   return (
@@ -161,7 +174,7 @@ function Profile() {
                 variant="filled"
                 size="sm"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !hasChanges}
               >
                 <p className="text-sm-semibold">Save changes</p>
               </MyButton>

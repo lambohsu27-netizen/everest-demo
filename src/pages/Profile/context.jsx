@@ -15,9 +15,10 @@ function ProfileProvider(props) {
       .catch(myToaster)
 
   const updateProfile = async (body) => {
-    // console.log(body.delete_photo)
     const formData = new FormData()
-    formData.append('photo', body.photo)
+    if (body.photo instanceof File) {
+      formData.append('photo', body.photo)
+    }
     if (body.delete_photo) formData.append('delete_photo', body.delete_photo)
     formData.append('name', body.name)
     formData.append('username', body.username)

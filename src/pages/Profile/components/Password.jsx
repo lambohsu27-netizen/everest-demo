@@ -41,7 +41,14 @@ function Password() {
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { newPassword } = watch()
+  const watched = watch()
+  const { old_password, newPassword, ConfirmPassword } = watched
+
+  const hasPasswordChanges =
+    !!old_password?.trim() &&
+    !!newPassword?.trim() &&
+    !!ConfirmPassword?.trim() &&
+    newPassword === ConfirmPassword
 
   const passwordChecks = {
     containUppercase: newPassword?.length ? /[A-Z]/.test(newPassword) : false,
@@ -234,7 +241,7 @@ function Password() {
               variant="filled"
               size="sm"
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !hasPasswordChanges}
             >
               <p className="text-sm-semibold">Update password</p>
             </MyButton>

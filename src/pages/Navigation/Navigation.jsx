@@ -173,28 +173,28 @@ function Navigation({ childs }) {
       />
       {/* Mobile Top Navigation */}
       <div className="flex w-full items-center justify-between p-4 md:hidden absolute z-50">
-        <div className="flex items-center justify-center">
-          <img src={bipura_logo} alt="logomark" width={28} height={14} />
-        </div>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="text-gray-light-500 hover:text-gray-700"
         >
           {isMobileMenuOpen ? <XClose /> : <Menu01 />}
         </button>
+        <div className="flex items-center justify-center">
+          <img src={bipura_logo} alt="logomark" width={28} height={14} />
+        </div>
       </div>
 
       <main
-        className={`fixed md:relative z-40 flex h-screen w-20 min-w-[90px] flex-col justify-between p-2 pt-16 md:pt-2 transition-transform duration-300 ease-in-out bg-white ${
+        className={`fixed md:relative z-40 flex h-screen w-20 min-w-[90px] flex-col justify-between p-2 pt-16 md:pt-2 transition-transform duration-300 ease-in-out bg-white overflow-hidden md:overflow-visible ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <section className="flex h-full w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light-200 pt-5">
+        <section className="flex h-full min-h-0 w-full flex-col items-center gap-y-6 rounded-xl border border-gray-light-200 pt-5">
           <div className="ml-2 hidden md:flex items-center justify-center">
             <img src={bipura_logo} alt="logomark" width={28} height={14} />
           </div>
           {/* TOP */}
-          <div className="flex h-full flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
             <Link to="/enquiry" onClick={() => setIsMobileMenuOpen(false)}>
               <MyTooltip
                 placement="right"
@@ -312,7 +312,7 @@ function Navigation({ childs }) {
           </div>
 
           {/* BOTTOM */}
-          <div className="flex w-full flex-col items-center gap-y-6 pb-6">
+          <div className="flex w-full shrink-0 flex-col items-center gap-y-6 pb-6">
             <div className="gap-y-2 column">
               {/* <Link to="/enquiry">
                 <MyTooltip
@@ -412,7 +412,7 @@ function Navigation({ childs }) {
                         ? 'bg-gray-50 text-gray-700 drop-shadow-lg'
                         : 'text-gray-light-500'
                     } flex h-12 w-12 min-w-[48px] cursor-pointer items-center justify-center rounded-md ${
-                      isAccessAllowed(Access?.SETTING) ? '' : 'hidden'
+                      isAccessAllowed(Access?.USER) ? '' : 'hidden'
                     }`}
                   >
                     <MyAvatar

@@ -81,18 +81,18 @@ function CheckYourEmail() {
   }, [countdown])
 
   return (
-    <div className="container mx-auto mt-36 w-full md:w-3/4">
+    <div className="mx-auto w-full md:mt-36 md:w-3/4">
       <div>
         {/* bg */}
         {/* Content */}
-        <div className="mb-8 flex flex-col items-center justify-center">
-          <div className="mb-5">
+        <div className="mb-6 flex flex-col items-center justify-center md:mb-8">
+          <div className="mb-4 md:mb-5">
             <MyBgPatternDecorativeCube />
           </div>
-          <div className="z-0 mb-6 rounded-xl border-2 p-3">
+          <div className="z-0 mb-4 rounded-xl border-2 p-3 md:mb-6">
             <Mail01 />
           </div>
-          <div className="z-0">
+          <div className="z-0 px-2 md:px-0">
             <p className="text-xl-semibold mb-3 text-center text-gray-light/900">
               Check your email
             </p>
@@ -103,7 +103,7 @@ function CheckYourEmail() {
         </div>
 
         <div className="flex flex-col flex-wrap items-center justify-center">
-          <div className="mb-8 flex h-16 w-auto items-center justify-center gap-4 lg:w-16">
+          <div className="mb-6 flex h-14 w-full max-w-[360px] items-center justify-center gap-1.5 md:mb-8 md:h-16 md:gap-4">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -116,11 +116,11 @@ function CheckYourEmail() {
                 }
                 className={`border ${
                   digit ? 'border-brand/600' : ''
-                } text-lg-bold z-0 block h-auto w-20 appearance-none rounded-md p-3 text-center text-brand/600 focus:border-2 focus:outline-none`}
+                } text-lg-bold z-0 block h-12 w-9 shrink-0 appearance-none rounded-md p-2 text-center text-brand/600 focus:border-2 focus:outline-none md:h-auto md:w-20 md:p-3`}
               />
             ))}
           </div>
-          <div className="z-10 w-[360px]">
+          <div className="z-10 w-full max-w-[360px]">
             <MyButton
               type="submit"
               color="primary"
@@ -133,7 +133,7 @@ function CheckYourEmail() {
               <p className="text-md-semibold">Verify email</p>
             </MyButton>
           </div>
-          <div className="mt-8 flex items-center justify-center gap-1 text-center">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-1 text-center md:mt-8">
             <p className="text-md-regular text-gray-light/600">
               Didn’t receive the email?
             </p>
@@ -157,7 +157,7 @@ function CheckYourEmail() {
               }`}
             >{`(${minutes}:${seconds})`}</p>
           </div>
-          <div className="z-0 mt-8 flex items-center justify-center">
+          <div className="z-0 mt-6 flex items-center justify-center md:mt-8">
             <MyButton onClick={() => navigate('/login')}>
               <ArrowLeft size="15" />
               <p className="text-sm-semibold z-0 text-center text-gray-600">

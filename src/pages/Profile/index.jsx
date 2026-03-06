@@ -67,26 +67,26 @@ function Profile() {
   return (
     <SimpleBar forceVisible="y" style={{ height: '100%' }}>
       <div className="relative -top-28 mb-12 bg-brand/600">
-        <div className="relative top-28 mx-10 mt-20 flex gap-6 max-sm:flex-col max-sm:items-center">
+        <div className="relative top-28 mx-4 mt-16 flex gap-6 px-2 md:mx-10 md:mt-20 md:px-0 max-sm:flex-col max-sm:items-center">
           <div className="rounded-full p-1 ring-4 ring-inset ring-white max-sm:ring-transparent">
             <MyAvatar size={160} iconSize={48} photo={photo} />
           </div>
-          <div className="flex flex-col justify-center">
-            <p className="text-lg-semibold mt-10 text-gray-light/900">{name ?? ''}</p>
+          <div className="flex flex-col justify-center max-sm:items-center max-sm:text-center">
+            <p className="text-lg-semibold mt-10 text-gray-light/900 max-sm:mt-4">{name ?? ''}</p>
             <p className="text-sm-regular">{role ?? ''}</p>
           </div>
         </div>
         <hr className="h-3 border-t-0 bg-brand/900" />
       </div>
 
-      <div className="px-8">
-        <form className="flex gap-8 max-sm:flex-col" onSubmit={onSubmit}>
-          <div className="w-[340px]">
+      <div className="px-4 md:px-8">
+        <form className="flex flex-col gap-6 md:flex-row md:gap-8" onSubmit={onSubmit}>
+          <div className="w-full shrink-0 md:w-[340px]">
             <p className="text-md-semibold">Personal Info</p>
             <p className="text-sm-regular">Update your photo and personal details.</p>
           </div>
-          <div className="flex w-full flex-col rounded-xl border-2">
-            <div className="flex flex-col gap-y-6 border-b-2 p-6">
+          <div className="flex min-w-0 w-full flex-col rounded-xl border-2">
+            <div className="flex flex-col gap-y-6 border-b-2 p-4 md:p-6">
               <div>
                 {/* name */}
                 <label htmlFor="name" className="text-sm-medium text-gray-light/700">
@@ -113,10 +113,10 @@ function Profile() {
                 />
               </div>
 
-              <div className="flex flex-1 items-end">
+              <div className="flex flex-col gap-4 max-sm:items-start md:flex-row md:flex-1 md:items-end">
                 <label htmlFor="fileInput" />
                 <MyAvatar id="newLogo" size={64} photo={photo} />
-                <div className="ml-5 flex flex-1 justify-start gap-5">
+                <div className="flex flex-wrap justify-start gap-3 md:ml-5 md:flex-1 md:gap-5">
                   <MyButton
                     color="gray"
                     variant="text"
@@ -152,7 +152,7 @@ function Profile() {
               </div>
             </div>
 
-            <footer className="flex justify-end gap-3 px-6 py-4">
+            <footer className="flex flex-wrap justify-end gap-3 px-4 py-4 md:px-6">
               <MyButton color="secondary" variant="outlined" size="sm" onClick={handleCancel}>
                 <p className="text-sm-semibold">Cancel</p>
               </MyButton>

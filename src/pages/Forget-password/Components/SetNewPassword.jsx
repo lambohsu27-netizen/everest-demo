@@ -51,19 +51,19 @@ function SetNewPassword() {
   )
 
   return (
-    <div className="container mx-auto mt-1 w-full md:w-3/4">
-      <div className="mx-4 md:mx-0">
+    <div className="mx-auto w-full md:mt-1 md:w-3/4">
+      <div className="md:mx-0">
         {/* bg */}
         {/* Content */}
         <div>
-          <div className="mb-8 flex flex-col items-center justify-center">
-            <div className="mb-5">
+          <div className="mb-6 flex flex-col items-center justify-center md:mb-8">
+            <div className="mb-4 md:mb-5">
               <MyBgPatternDecorativeCube />
             </div>
-            <div className="z-10 mb-6 rounded-xl border-2 p-3">
+            <div className="z-10 mb-4 rounded-xl border-2 p-3 md:mb-6">
               <Lock01 />
             </div>
-            <div className="z-10 w-[360px]">
+            <div className="z-10 w-full max-w-[360px] px-2 md:px-0">
               <p className="text-xl-semibold mb-3 text-center text-gray-light/900">
                 Set new password
               </p>
@@ -75,7 +75,7 @@ function SetNewPassword() {
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <form className="w-[360px]" onSubmit={onSubmit}>
+            <form className="w-full max-w-[360px]" onSubmit={onSubmit}>
               <section className="mb-4 flex flex-col gap-y-1.5">
                 <label
                   htmlFor="password"
@@ -210,7 +210,7 @@ function SetNewPassword() {
                 <p className="text-md-semibold">Reset password</p>
               </MyButton>
             </form>
-            <div className="mb-6 mt-4 flex items-center justify-center">
+            <div className="mb-6 mt-4 flex items-center justify-center md:mt-6">
               <MyButton onClick={() => navigate('/login')}>
                 <ArrowLeft size="15" />
                 <p className="text-sm-semibold text-center text-gray-600">

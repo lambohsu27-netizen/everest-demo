@@ -5,19 +5,19 @@ import { useForgetPassword } from '../context'
 function PasswordReset() {
   const { navigate } = useForgetPassword()
   return (
-    <div className="container mx-auto mt-36 w-full md:w-3/4">
-      <div className="mx-4 md:mx-0">
+    <div className="mx-auto w-full md:mt-36 md:w-3/4">
+      <div className="md:mx-0">
         {/* bg */}
         {/* Content */}
         <div>
-          <div className="mb-8 flex flex-col items-center justify-center">
-            <div className="mb-5">
+          <div className="mb-6 flex flex-col items-center justify-center md:mb-8">
+            <div className="mb-4 md:mb-5">
               <MyBgPatternDecorativeCube />
             </div>
-            <div className="z-10 mb-6 rounded-xl border-2 p-3">
+            <div className="z-10 mb-4 rounded-xl border-2 p-3 md:mb-6">
               <CheckCircle />
             </div>
-            <div className="z-10 w-[360px]">
+            <div className="z-10 w-full max-w-[360px] px-2 md:px-0">
               <p className="text-xl-semibold mb-3 text-center text-gray-light/900">
                 Password reset
               </p>
@@ -29,7 +29,7 @@ function PasswordReset() {
           </div>
 
           <div className="z-10 flex flex-col items-center justify-center">
-            <div className="z-10 w-[360px]">
+            <div className="z-10 w-full max-w-[360px]">
               <MyButton
                 type="submit"
                 color="primary"
@@ -41,7 +41,7 @@ function PasswordReset() {
                 <p className="text-md-semibold">Continue</p>
               </MyButton>
             </div>
-            <div className="z-10 mt-8 flex items-center justify-center">
+            <div className="z-10 mt-6 flex items-center justify-center md:mt-8">
               <MyButton onClick={() => navigate('/login')}>
                 <ArrowLeft size="15" />
                 <p className="text-sm-semibold text-center text-gray-600">

@@ -59,14 +59,14 @@ function Password() {
 
   return (
     <div>
-      <div className="flex gap-8 max-sm:flex-col">
-        <div className="w-[340px]">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-8">
+        <div className="w-full shrink-0 md:w-[340px]">
           <p className="text-md-semibold">Password</p>
           <p className="text-sm-regular">Update your password.</p>
         </div>
 
-        <form className="mb-12 flex w-full flex-col rounded-xl border-2" onSubmit={onSubmit}>
-          <section className="flex flex-col gap-y-6 border-b-2 px-8 py-6">
+        <form className="mb-12 flex min-w-0 w-full flex-col rounded-xl border-2" onSubmit={onSubmit}>
+          <section className="flex flex-col gap-y-6 border-b-2 px-4 py-6 md:px-8">
             <div className="flex flex-col gap-6">
               <div className="border-b-2 pb-5">
                 <p className="text-lg-semibold">Password</p>
@@ -75,10 +75,10 @@ function Password() {
                 </p>
               </div>
 
-              <div className="flex gap-8">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-8">
                 <label
                   htmlFor="old_password"
-                  className="text-sm-medium w-[280px] text-gray-light/700"
+                  className="text-sm-medium w-full shrink-0 text-gray-light/700 md:w-[280px]"
                 >
                   Current password
                 </label>
@@ -105,10 +105,10 @@ function Password() {
 
               <hr />
 
-              <div className="flex gap-8">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-8">
                 <label
                   htmlFor="newPassword"
-                  className="text-sm-medium w-[280px] text-gray-light/700"
+                  className="text-sm-medium w-full shrink-0 text-gray-light/700 md:w-[280px]"
                 >
                   New password
                 </label>
@@ -133,10 +133,10 @@ function Password() {
                 />
               </div>
 
-              <div className="flex gap-8">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-8">
                 <label
                   htmlFor="ConfirmPassword"
-                  className="text-sm-medium w-[280px] text-gray-light/700"
+                  className="text-sm-medium w-full shrink-0 text-gray-light/700 md:w-[280px]"
                 >
                   Confirm new password
                 </label>
@@ -161,8 +161,8 @@ function Password() {
                 />
               </div>
             </div>
-            <div className="flex gap-8">
-              <div className="w-[280px]" />
+            <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+              <div className="hidden w-[280px] shrink-0 md:block" />
               <div className="mb-6 flex flex-col gap-y-2">
                 <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
                   {/* {passwordChecks.minimumLength !== true ? (
@@ -225,7 +225,7 @@ function Password() {
             </div>
           </section>
 
-          <footer className="flex justify-end gap-3 px-6 py-4">
+          <footer className="flex flex-wrap justify-end gap-3 px-4 py-4 md:px-6">
             <MyButton color="secondary" variant="outlined" size="sm" onClick={reset}>
               <p className="text-sm-semibold">Cancel</p>
             </MyButton>

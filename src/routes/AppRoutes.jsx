@@ -15,6 +15,8 @@ import { LoginProvider } from '@src/pages/Login/Context'
 import MobileSignature from '@src/pages/MobileSignature'
 import Profile from '@src/pages/Profile'
 import { ProfileProvider } from '@src/pages/Profile/context'
+import ForgetPassword from '@src/pages/Forget-password'
+import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -104,14 +106,14 @@ export function UnauthenticatedRoutes() {
           </LoginProvider>
         }
       />
-      {/* <Route
+      <Route
         path="/forget-password"
         element={
           <ForgetPasswordProvider>
             <ForgetPassword />
           </ForgetPasswordProvider>
         }
-      /> */}
+      />
       <Route path="/welcome" element={<WelcomePageBoilerPlate />} />
       <Route path="/version" element={<VersionPage />} />
       <Route path="/component-review" element={<ComponentReview />} />

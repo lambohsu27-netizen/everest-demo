@@ -2,6 +2,17 @@
   font-family: 'Inter', sans-serif;
 }
 
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Prevent iOS horizontal “rubber band” showing blank space */
+#main-content {
+  overscroll-behavior-x: none;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -307,6 +318,28 @@
 #default.Toastify .Toastify__toast-container {
   padding: 0;
   width: 400px;
+}
+
+#default.Toastify .Toastify__toast-container {
+  /* Keep desktop width, but never overflow viewport */
+  max-width: calc(100vw - 24px);
+}
+
+@media (max-width: 768px) {
+  #default.Toastify .Toastify__toast-container {
+    /* Mobile: centered, full-width feel, safe-area aware */
+    width: calc(100vw - 24px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    margin-top: max(8px, env(safe-area-inset-top));
+  }
+
+  #default.Toastify .Toastify__toast-container--top-right,
+  #default.Toastify .Toastify__toast-container--top-left,
+  #default.Toastify .Toastify__toast-container--top-center {
+    top: 0;
+  }
 }
 
 #default.Toastify .Toastify__toast-container .Toastify__toast {

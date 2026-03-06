@@ -34,6 +34,8 @@ import Formslider from './Sliders/FormSlider'
 import DetailsSlider from './Sliders/DetailSlider'
 import SignatureModal from './Sliders/components/SignatureModal'
 
+const CLIENT_SORT_FIELDS = ['info', 'photo_ktp', 'consent']
+
 function Enquiry() {
   // const { getAccess } = useApp()
   // const access = getAccess(Access?.Enquiry)
@@ -113,6 +115,40 @@ function Enquiry() {
         .map((r) => r.id) ?? [],
     [enquiry?.data, check]
   )
+
+  // Client-side sort for boolean columns (BE does not support these sort fields)
+  const getSortValue = (row, field) => {
+    if (field === 'info') {
+      const hasPhotoKtp = !!((row?.photo_ktp && String(row.photo_ktp).trim()) || row?.photo_ktp_url)
+      const hasSelfie =
+        !!((row?.selfie_with_ktp && String(row.selfie_with_ktp).trim()) || row?.selfie_with_ktp_url)
+      const hasSignature =
+        !!((row?.signature && String(row.signature).trim()) || row?.signature_url)
+      return hasPhotoKtp && hasSelfie && hasSignature ? 1 : 0
+    }
+    if (field === 'photo_ktp') {
+      const hasSelfie =
+        !!((row?.selfie_with_ktp && String(row.selfie_with_ktp).trim()) || row?.selfie_with_ktp_url)
+      return hasSelfie ? 1 : 0
+    }
+    if (field === 'consent') {
+      return row?.agreement_tnc === true ? 1 : 0
+    }
+    return 0
+  }
+  const displayEnquiry = useMemo(() => {
+    const { sort: sortField, order } = params
+    if (!enquiry?.data || !sortField || !CLIENT_SORT_FIELDS.includes(sortField) || !order) {
+      return enquiry
+    }
+    const sorted = [...enquiry.data].sort((a, b) => {
+      const va = getSortValue(a, sortField)
+      const vb = getSortValue(b, sortField)
+      if (va !== vb) return order === 'asc' ? va - vb : vb - va
+      return 0
+    })
+    return { ...enquiry, data: sorted }
+  }, [enquiry, params])
 
   return (
     <>
@@ -415,7 +451,7 @@ function Enquiry() {
 
                 <div className="order-5">
                   <MyDataTable
-                    values={enquiry}
+                    values={displayEnquiry}
                     paginator
                     cursorPointer
                     // onDeleteAll={bulkDeleteTerminal}
@@ -523,7 +559,13 @@ function Enquiry() {
                       field="info"
                       alignment="center"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const [field, order] = sort.split(',')
+                        setParams((prev) => ({
+                          ...prev,
+                          sort: field === 'null' ? null : field,
+                          order: order === 'null' ? null : order,
+                          page: 1,
+                        }))
                       }}
                       header="General Info"
                       body={(value) => {
@@ -553,7 +595,13 @@ function Enquiry() {
                       field="photo_ktp"
                       alignment="center"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const [field, order] = sort.split(',')
+                        setParams((prev) => ({
+                          ...prev,
+                          sort: field === 'null' ? null : field,
+                          order: order === 'null' ? null : order,
+                          page: 1,
+                        }))
                       }}
                       header="Selfie With KTP"
                       body={(value) => {
@@ -575,7 +623,13 @@ function Enquiry() {
                     <MyColumn
                       field="consent"
                       onSort={(sort) => {
-                        setParams((prev) => ({ ...prev, ...sort }))
+                        const [field, order] = sort.split(',')
+                        setParams((prev) => ({
+                          ...prev,
+                          sort: field === 'null' ? null : field,
+                          order: order === 'null' ? null : order,
+                          page: 1,
+                        }))
                       }}
                       header="Consent"
                       alignment="center"
@@ -640,7 +694,7 @@ function Enquiry() {
                               />
                             )
                           default:
-                            break
+                            return null
                         }
                       }}
                     />

@@ -498,8 +498,8 @@ function Formslider() {
         }
         bgColor="bg-warning-100"
       />
-      <div className="flex h-screen w-[100vw] md:w-[400px] flex-col pt-[72px] md:pt-0 bg-white">
-        <header className="relative mb-6 flex items-start gap-x-3 md:gap-x-4 px-4 pt-6">
+      <div className="flex h-screen max-h-[100dvh] md:max-h-none w-[100vw] md:w-[400px] flex-col pt-[72px] md:pt-0 bg-white overflow-hidden">
+        <header className="sticky top-0 z-10 shrink-0 bg-white relative mb-6 flex items-start gap-x-3 md:gap-x-4 px-4 pt-3 md:pt-6">
           <button
             onClick={() => {
               if (isChanged) {
@@ -535,9 +535,9 @@ function Formslider() {
           // NoValidate prevents browser default validation interfering with RHF/Yup
           noValidate
           onSubmit={onSubmit}
-          className="flex flex-1 flex-col overflow-hidden"
+          className="flex flex-1 flex-col min-h-0 overflow-hidden"
         >
-          <section className="flex-1 overflow-hidden">
+          <section className="flex-1 min-h-0 overflow-hidden">
             {/* Use SimpleBar only if content might overflow */}
             <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
               <div className="flex h-full flex-col gap-6 px-4">
@@ -548,7 +548,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="name"
-                      className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                     >
                       Name
                     </label>
@@ -566,7 +566,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="email"
-                      className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                     >
                       Email
                     </label>
@@ -587,7 +587,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="nik"
-                      className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                     >
                       NIK
                     </label>
@@ -606,7 +606,7 @@ function Formslider() {
                   <div className="flex gap-x-3">
                     {/* Jenis Kelamin */}
                     <div className="flex flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                         Jenis Kelamin
                       </label>
                       <MyButtonGroupV2
@@ -629,7 +629,7 @@ function Formslider() {
                     <div className="flex flex-1 flex-col gap-y-1.5">
                       <label
                         htmlFor="telepon"
-                        className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                       >
                         Telepon/HP
                       </label>
@@ -651,7 +651,7 @@ function Formslider() {
                     <div className="flex flex-1 flex-col gap-y-1.5">
                       <label
                         htmlFor="tempat_lahir"
-                        className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                       >
                         Tempat Lahir
                       </label>
@@ -667,7 +667,7 @@ function Formslider() {
 
                     {/* Tanggal Lahir */}
                     <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                         Tanggal Lahir
                       </label>
                       <MyCalendar
@@ -700,59 +700,11 @@ function Formslider() {
                     </div>
                   </div>
 
-                  {/* Kode Pos + Kelurahan */}
-                  <div className="flex gap-x-3">
-                    {/* Kode Pos */}
-                    <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label
-                        htmlFor="kode_pos"
-                        className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
-                      >
-                        Kode Pos
-                      </label>
-                      <MyTextField
-                        id="kode_pos"
-                        disabled={Boolean(deleted_at)}
-                        name="kode_pos"
-                        type="number"
-                        control={control}
-                        placeholder="Input kode pos"
-                        errors={errors?.kode_pos?.message}
-                      />
-                    </div>
-
-                    {/* Kelurahan */}
-                    <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                        Kelurahan
-                      </label>
-                      <MyAsyncDropdown
-                        trigger={trigger}
-                        disabled={Boolean(deleted_at) || !kecamatan}
-                        getOnRender={false}
-                        name="kelurahan"
-                        placeholder={
-                          kecamatan ? 'Pilih kelurahan' : 'Pilih kecamatan terlebih dahulu'
-                        }
-                        control={control}
-                        error={errors?.kelurahan?.message}
-                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                        getOptionLabel={(e) => e?.name || ''}
-                        value={kelurahan}
-                        asyncFunction={searchKelurahan}
-                        extraData={{ district_id: kecamatan?.id }}
-                        onChange={(_e, value) =>
-                          setValue('kelurahan', value, { shouldDirty: true })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  {/* Kota + Kecamatan */}
-                  <div className="flex gap-x-3">
+                  {/* Address fields (1 row each): Kota -> Kecamatan -> Kelurahan -> Kode Pos */}
+                  <div className="flex flex-col gap-y-4">
                     {/* Kota */}
-                    <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <div className="flex flex-col gap-y-1.5">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                         Kota
                       </label>
                       <MyAsyncDropdown
@@ -777,8 +729,8 @@ function Formslider() {
                     </div>
 
                     {/* Kecamatan */}
-                    <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <div className="flex flex-col gap-y-1.5">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                         Kecamatan
                       </label>
                       <MyAsyncDropdown
@@ -801,12 +753,57 @@ function Formslider() {
                         }}
                       />
                     </div>
+
+                    {/* Kelurahan */}
+                    <div className="flex flex-col gap-y-1.5">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                        Kelurahan
+                      </label>
+                      <MyAsyncDropdown
+                        trigger={trigger}
+                        disabled={Boolean(deleted_at) || !kecamatan}
+                        getOnRender={false}
+                        name="kelurahan"
+                        placeholder={
+                          kecamatan ? 'Pilih kelurahan' : 'Pilih kecamatan terlebih dahulu'
+                        }
+                        control={control}
+                        error={errors?.kelurahan?.message}
+                        isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                        getOptionLabel={(e) => e?.name || ''}
+                        value={kelurahan}
+                        asyncFunction={searchKelurahan}
+                        extraData={{ district_id: kecamatan?.id }}
+                        onChange={(_e, value) =>
+                          setValue('kelurahan', value, { shouldDirty: true })
+                        }
+                      />
+                    </div>
+
+                    {/* Kode Pos */}
+                    <div className="flex flex-col gap-y-1.5">
+                      <label
+                        htmlFor="kode_pos"
+                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                      >
+                        Kode Pos
+                      </label>
+                      <MyTextField
+                        id="kode_pos"
+                        disabled={Boolean(deleted_at)}
+                        name="kode_pos"
+                        type="number"
+                        control={control}
+                        placeholder="Input kode pos"
+                        errors={errors?.kode_pos?.message}
+                      />
+                    </div>
                   </div>
 
                   {/* Alamat Sesuai Identitas */}
                   <div className="flex flex-col gap-y-1.5">
                     <div className="flex items-center gap-x-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                         Alamat Sesuai Identitas
                       </label>
                       <MyTooltip title="Masukkan alamat sesuai dengan KTP" placement="top">
@@ -826,7 +823,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="nama_ibu"
-                      className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
                     >
                       Nama Ibu Gadis Kandung
                     </label>
@@ -868,7 +865,7 @@ function Formslider() {
 
                   {/* Tujuan Permintaan */}
                   <div className="flex flex-col gap-y-1.5">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Tujuan Permintaan
                     </label>
                     <MyAutocomplete
@@ -890,7 +887,9 @@ function Formslider() {
                   {/* Penjelasan */}
                   <div className="flex flex-col gap-y-1.5">
                     <div className="flex items-center gap-x-1.5">
-                      <label className="text-sm-medium text-gray-700">Penjelasan</label>
+                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                        Penjelasan
+                      </label>
                       <MyTooltip
                         title="Jelaskan tujuan permintaan informasi kredit secara singkat"
                         placement="top"
@@ -1065,7 +1064,7 @@ function Formslider() {
                           <div className="mt-2 flex items-center justify-center">
                             <button
                               type="button"
-                              className="text-sm-medium text-brand-600 underline hover:text-brand-700"
+                              className="text-sm-medium text-brand/600 underline hover:text-brand-700"
                               onClick={() => setIsMobileSigning(true)}
                             >
                               Gambar dari perangkat seluler Anda
@@ -1082,7 +1081,7 @@ function Formslider() {
                             level="H"
                             includeMargin
                           />
-                          <p className="mt-4 text-center text-sm-medium text-brand-600">
+                          <p className="mt-4 text-center text-sm-medium text-brand/600">
                             Scan QR ini di perangkat seluler anda untuk tanda tangan
                           </p>
                           <button
@@ -1124,7 +1123,7 @@ function Formslider() {
               </div>
             </SimpleBar>
           </section>
-          <footer className="flex items-center justify-end gap-4 border-t border-gray-200 px-4 py-4">
+          <footer className="shrink-0 flex items-center justify-end gap-4 border-t border-gray-200 px-4 py-4 bg-white">
             {import.meta.env.VITE_MODE === 'DEVELOPMENT' && currentStep === 1 && !deleted_at && (
               <MyButton
                 disabled={isSubmitting}

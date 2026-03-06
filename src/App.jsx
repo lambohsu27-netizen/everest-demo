@@ -24,12 +24,12 @@ export default function App() {
         closeOnClick
       />
       {cookies['token-backoffice'] ? (
-        <div id="main-content" className="relative flex w-full">
+        <div id="main-content" className="relative w-full overflow-x-hidden md:flex">
           <LoginProvider>
             <Navigation />
           </LoginProvider>
 
-          <div className="flex-1 h-[100vh] mt-16 md:mt-0 overflow-y-auto">
+          <div className="w-full md:flex-1 h-[100dvh] md:h-[100vh] pt-16 md:pt-0 overflow-y-auto overflow-x-hidden box-border">
             <AuthenticatedRoutes />
           </div>
         </div>

@@ -24,7 +24,7 @@ function Login() {
   const nav = useNavigate()
 
   const [show, setShow] = useState(false)
-  const localRememberMe = localStorage.getItem('rv5zzc9noTdU5AD2')
+  const localRememberMe = localStorage.getItem('rv5zzc9noTdU5AD2') || false
 
   const {
     setValue,

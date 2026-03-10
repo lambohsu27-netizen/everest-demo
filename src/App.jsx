@@ -23,7 +23,7 @@ export default function App() {
         pauseOnHover
         closeOnClick
       />
-      {cookies['token-backoffice'] ? (
+      {!cookies['token-backoffice'] ? (
         <div id="main-content" className="relative w-full overflow-x-hidden md:flex">
           <LoginProvider>
             <Navigation />

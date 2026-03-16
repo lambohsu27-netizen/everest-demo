@@ -74,8 +74,11 @@ function Register() {
         handleCurrentModal={handleCurrentModal}
         currentModal={currentModal}
       />
-      <main className="flex h-screen z-50">
-        <div id="left" className="flex w-full items-center justify-center max-md:w-full">
+      <main className="flex min-h-screen z-50">
+        <div className="w-[30.55%] min-w-[220px] bg-brand/800 max-md:hidden flex items-center justify-center flex-shrink-0">
+          {/* Brand area */}
+        </div>
+        <div id="right" className="flex flex-1 items-center justify-center max-md:w-full">
           <form
             className="items-center justify-center gap-6 w-full max-w-[480px] rounded-xl p-5 md:p-10 column z-50"
             onSubmit={onSubmit}

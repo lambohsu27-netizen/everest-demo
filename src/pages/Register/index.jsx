@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Eye, EyeOff } from '@untitled-ui/icons-react'
+import { MyBgPatternDecorativeCube, MyButton, MyLogo, MyTextField } from '@interstellar-component'
+import { CheckCircle, Eye, EyeOff } from '@untitled-ui/icons-react'
 import CryptoJS from 'crypto-js'
-import {
-  MyBgPatternDecorativeCube,
-  MyButton,
-  MyCheckbox,
-  MyTextField,
-  MyLogo,
-} from '@interstellar-component'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import CheckIcon from '../../assets/Check-icon.svg'
 
-import { useRegister } from './Context'
 import { checkErrorYup, handleError } from '../../services/Helper'
-import RegisterSchema from './schema'
+import { useRegister } from './Context'
 import AlertModal from './modal'
+import RegisterSchema from './schema'
 
 function Register() {
   const { register, currentModal, handleCurrentModal } = useRegister()
@@ -64,6 +59,14 @@ function Register() {
   }, [localRememberMe, setValue])
 
   const { name, email, password, remember_me } = watch()
+
+  const passwordChecks = {
+    containUppercase: /[A-Z]/.test(password),
+    containLowercase: /[a-z]/.test(password),
+    containNumber: /\d/.test(password),
+    containSpecialCharacter: /[@$!%*?&#\-+=~^|`_'";:/.,\\]/.test(password),
+    minimumLength: password?.length >= 8,
+  }
 
   const onSubmit = handleSubmit(handleError(register, control), checkErrorYup)
 
@@ -155,19 +158,33 @@ function Register() {
                 />
               </div>
             </div>
-            <section className="z-40 relative flex w-full items-center justify-between">
-              <div className="flex flex-1 items-center gap-x-2">
-                <MyCheckbox
-                  name="remember_me"
-                  control={control}
-                  onChangeForm={(e) => {
-                    setValue('remember_me', e.target.checked)
-                  }}
-                  checked={remember_me}
-                />
-                <p className="text-sm-medium text-gray-700">Remember for 30 days</p>
+
+            <section className="w-full flex flex-col gap-y-2">
+              <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
+                {passwordChecks.minimumLength !== true ? (
+                  <div className="">
+                    <img src={CheckIcon} alt="CheckIcon" />
+                  </div>
+                ) : (
+                  <div className="text-success/600">
+                    <CheckCircle className="size-5" />
+                  </div>
+                )}
+                Must be at least 8 characters
+              </div>
+              {/* 2 */}
+              <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
+                {passwordChecks.containUppercase !== true ? (
+                  <img src={CheckIcon} alt="CheckIcon" />
+                ) : (
+                  <div className="flex items-center text-success/600">
+                    <CheckCircle className="size-5" />
+                  </div>
+                )}
+                <p className="">Must contain one special character</p>
               </div>
             </section>
+
             <div className="z-40 relative w-full space-y-4">
               <MyButton
                 type="submit"

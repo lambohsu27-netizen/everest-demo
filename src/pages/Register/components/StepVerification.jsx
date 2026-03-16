@@ -1,6 +1,6 @@
-import { MyTextField } from '@interstellar-component'
+import { MyButton, MyTextField } from '@interstellar-component'
 
-function StepVerification({ control, trigger }) {
+function StepVerification({ control, trigger, isSubmitting, onBack }) {
   return (
     <>
       <div className="z-40 flex flex-col gap-6 items-center">
@@ -25,8 +25,34 @@ function StepVerification({ control, trigger }) {
           />
         </div>
       </div>
+
+      <div className="z-40 relative w-full space-y-4 mt-6">
+        <MyButton
+          type="submit"
+          color="primary"
+          variant="filled"
+          size="lg"
+          expanded
+          disabled={isSubmitting}
+        >
+          <p className="text-md-semibold">Verify</p>
+        </MyButton>
+
+        <MyButton
+          type="button"
+          color="secondary"
+          variant="outlined"
+          size="lg"
+          expanded
+          disabled={isSubmitting}
+          onClick={onBack}
+        >
+          <p className="text-md-semibold">Back</p>
+        </MyButton>
+      </div>
     </>
   )
 }
+
 
 export default StepVerification

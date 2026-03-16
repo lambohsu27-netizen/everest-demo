@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import CheckIcon from '../../assets/Check-icon.svg'
+import GoogleIcon from '../../assets/GoogleIcon.svg'
 
 import { checkErrorYup, handleError } from '../../services/Helper'
 import { useRegister } from './Context'
@@ -166,13 +167,16 @@ function Register() {
               </MyButton>
               <MyButton
                 type="submit"
-                color="primary"
-                variant="filled"
+                color="secondary"
+                variant="outlined"
                 size="lg"
                 expanded
                 disabled={isSubmitting}
               >
-                <p className="text-md-semibold">Sign up with Google</p>
+                <div className="flex items-center gap-x-3">
+                  <img src={GoogleIcon} alt="GoogleIcon" />
+                  <p className="text-md-semibold">Sign up with Google</p>
+                </div>
               </MyButton>
             </div>
             <div className="z-40 relative w-full flex justify-center mt-4">

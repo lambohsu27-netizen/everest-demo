@@ -8,7 +8,7 @@ import RegisterForm from './RegisterForm'
 
 function Register() {
   const { currentModal, handleCurrentModal } = useRegister()
-  const [activeStep, setActiveStep] = useState(1)
+  const [activeStep, setActiveStep] = useState(2)
 
   return (
     <>
@@ -18,7 +18,7 @@ function Register() {
         currentModal={currentModal}
       />
       <main className="flex min-h-screen z-50">
-        <div className="w-[440px] bg-[#53389e] max-md:hidden h-screen flex flex-col justify-between shrink-0">
+        <div className="w-[440px] bg-brand/800 max-md:hidden h-screen flex flex-col justify-between shrink-0">
           <div className="p-8 flex flex-col gap-20">
             <MyLogo showText darkMode />
             <div className="flex flex-col gap-8 pr-8">
@@ -58,7 +58,7 @@ function Register() {
             </div>
           </div>
         </div>
-        <RegisterForm activeStep={2} setActiveStep={setActiveStep} />
+        <RegisterForm activeStep={activeStep} setActiveStep={setActiveStep} />
       </main>
     </>
   )

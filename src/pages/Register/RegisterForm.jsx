@@ -9,11 +9,13 @@ import GoogleIcon from '../../assets/GoogleIcon.svg'
 import { checkErrorYup, handleError } from '../../services/Helper'
 import { useRegister } from './Context'
 import RegisterSchema from './schema'
+import TermsConditions from './TermsConditions'
 
 function RegisterForm({ activeStep, setActiveStep }) {
   const { register } = useRegister()
   const nav = useNavigate()
   const [show, setShow] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const {
     handleSubmit,
@@ -43,6 +45,19 @@ function RegisterForm({ activeStep, setActiveStep }) {
     }
   }, checkErrorYup)
 
+  if (activeStep === 2) {
+    return (
+      <div id="right" className="flex flex-1 items-center justify-center max-md:w-full bg-white relative z-50">
+        <TermsConditions
+          onBack={() => setActiveStep(1)}
+          onAccept={() => setActiveStep(3)}
+          accepted={acceptedTerms}
+          setAccepted={setAcceptedTerms}
+        />
+      </div>
+    )
+  }
+
   return (
     <div id="right" className="flex flex-1 items-center justify-center max-md:w-full">
       <form
@@ -59,12 +74,6 @@ function RegisterForm({ activeStep, setActiveStep }) {
               <>
                 <p className="display-sm-semibold text-gray-900">Create admin account</p>
                 <p className="text-md-regular text-gray-600">Enter your details to create the administrator account.</p>
-              </>
-            )}
-            {activeStep === 2 && (
-              <>
-                <p className="display-sm-semibold text-gray-900">Review terms & conditions</p>
-                <p className="text-md-regular text-gray-600">Read and agree to the terms required to use the platform.</p>
               </>
             )}
             {activeStep === 3 && (
@@ -160,14 +169,6 @@ function RegisterForm({ activeStep, setActiveStep }) {
           </div>
         )}
 
-        {activeStep === 2 && (
-          <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
-            <p className="text-sm-regular text-gray-600 text-center">
-              Terms and conditions go here. Please read them carefully.
-            </p>
-          </div>
-        )}
-
         {activeStep === 3 && (
           <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
             <div className="gap-1 column">
@@ -194,8 +195,8 @@ function RegisterForm({ activeStep, setActiveStep }) {
             disabled={isSubmitting}
             onClick={(e) => {
               if (activeStep < 3) {
-                e.preventDefault();
-                setActiveStep(activeStep + 1);
+                e.preventDefault()
+                setActiveStep(activeStep + 1)
               }
             }}
           >
@@ -218,7 +219,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
             </MyButton>
           )}
 
-          {activeStep > 1 && (
+          {activeStep > 1 && (activeStep !== 2) && (
             <MyButton
               type="button"
               color="secondary"
@@ -254,6 +255,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
       </form>
     </div>
   )
+
 }
 
 export default RegisterForm

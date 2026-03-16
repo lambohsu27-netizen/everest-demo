@@ -1,4 +1,5 @@
-import { MyButton, MyTextField, MyBgPatternDecorativeCube, MyLogo } from '@interstellar-component'
+import { MyButton, MyTextField, MyBgPatternDecorativeCube, MyFeaturedIcon } from '@interstellar-component'
+
 import { ArrowLeft } from '@untitled-ui/icons-react'
 
 function StepVerification({ control, trigger, watch, isSubmitting, onBack }) {
@@ -11,8 +12,10 @@ function StepVerification({ control, trigger, watch, isSubmitting, onBack }) {
           <MyBgPatternDecorativeCube />
         </div>
         <div className="z-40 flex flex-col gap-6 items-center">
-          <MyLogo />
+          <MyFeaturedIcon icon="Mail01" color="Gray" size="xl" />
         </div>
+
+
 
         <div className="z-40 flex flex-col gap-6 items-center">
           <div className="gap-y-2 column items-center text-center">

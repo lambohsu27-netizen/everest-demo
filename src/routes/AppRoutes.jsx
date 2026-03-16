@@ -34,13 +34,14 @@ export function AuthenticatedRoutes() {
     }
   }, [Access, accesses])
 
-  const isAccessAllowed = (accessName) =>
-    // const filteredAccess = accesses.filter((acc) => acc.view === true)
-    // const access = filteredAccess.find((acces) => acces.name === accessName)
-    // if (access) {
-    //   return access
-    // }
-    true
+  const isAccessAllowed = (accessName) => {
+    const filteredAccess = accesses.filter((acc) => acc.view === true)
+    const access = filteredAccess.find((acces) => acces.name === accessName)
+    if (access) {
+      return access
+    }
+    return false
+  }
 
   return (
     <Routes>

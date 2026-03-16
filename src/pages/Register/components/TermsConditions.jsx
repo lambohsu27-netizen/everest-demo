@@ -47,62 +47,62 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
   ]
 
   return (
-    <div className="flex flex-col w-full max-w-[1000px] h-full overflow-y-auto px-16 pt-24 pb-16 gap-12 scrollbar-hide bg-white">
-      <div className="flex flex-col gap-6">
-        <MyButton
-          variant="link"
-          color="primary"
-          onClick={onBack}
-          className="w-fit p-0 h-fit !text-primary-700"
-        >
-          <div className="flex items-center gap-2">
-            <ArrowLeft size={20} />
-            <p className="text-sm-semibold">Back to previous page</p>
-          </div>
-        </MyButton>
-
-        <div className="flex flex-col gap-1 border-b border-gray-200 pb-5">
-          <p className="display-sm-semibold text-gray-900">Terms and conditions</p>
-          <p className="text-sm-regular text-gray-600">Current as of 20 Jan 2025</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-12">
-        <div className="flex flex-col gap-8">
-          {sections.map((section, index) => (
-            <div key={index} className="flex flex-col gap-4">
-              <p className="text-lg-semibold text-gray-900">{section.heading}</p>
-              <div className="text-md-regular text-gray-600 whitespace-pre-line">
-                {section.content}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col gap-6 border-t border-gray-200 pt-8 pb-12">
-          <div className="flex items-start gap-3">
-            <MyCheckbox
-              checked={accepted}
-              onChange={(e) => setAccepted(e.target.checked)}
-            />
-            <p className="text-sm-regular text-gray-900">
-              Dengan menyetujui ini, Anda menyatakan telah membaca dan menyetujui syarat & ketentuan yang berlaku.
-            </p>
-          </div>
-
+    <section className="w-full h-full flex items-center justify-center px-8 py-12 lg:px-16 lg:py-24">
+      <div className="flex flex-col overflow-y-auto gap-12 scrollbar-hide bg-white max-w-3xl">
+        <div className="flex flex-col gap-6">
           <MyButton
-            variant="filled"
+            variant="link"
             color="primary"
-            size="lg"
-            expanded
-            disabled={!accepted}
-            onClick={onAccept}
+            onClick={onBack}
+            className="w-fit p-0 h-fit !text-primary-700"
           >
-            <p className="text-md-semibold">Kirim pengajuan</p>
+            <div className="flex items-center gap-2">
+              <ArrowLeft size={20} />
+              <p className="text-sm-semibold">Back to previous page</p>
+            </div>
           </MyButton>
+
+          <div className="flex flex-col gap-1 border-b border-gray-200 pb-5">
+            <p className="display-sm-semibold text-gray-900">Terms and conditions</p>
+            <p className="text-sm-regular text-gray-600">Current as of 20 Jan 2025</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-8">
+            {sections.map((section, index) => (
+              <div key={index} className="flex flex-col gap-4">
+                <p className="text-lg-semibold text-gray-900">{section.heading}</p>
+                <div className="text-md-regular text-gray-600 whitespace-pre-line">
+                  {section.content}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-6 border-t border-gray-200 pt-8 pb-12">
+            <div className="flex items-start gap-3">
+              <MyCheckbox checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+              <p className="text-sm-regular text-gray-900">
+                Dengan menyetujui ini, Anda menyatakan telah membaca dan menyetujui syarat &
+                ketentuan yang berlaku.
+              </p>
+            </div>
+
+            <MyButton
+              variant="filled"
+              color="primary"
+              size="lg"
+              expanded
+              disabled={!accepted}
+              onClick={onAccept}
+            >
+              <p className="text-md-semibold">Kirim pengajuan</p>
+            </MyButton>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

@@ -2,7 +2,7 @@ import { MyButton, MyTextField } from '@interstellar-component'
 
 function StepVerification({ control, trigger, isSubmitting, onBack }) {
   return (
-    <>
+    <section className="w-full h-full flex items-center justify-center ">
       <div className="z-40 flex flex-col gap-6 items-center">
         <div className="gap-y-2 column items-center text-center">
           <p className="display-sm-semibold text-gray-900">Verify your account</p>
@@ -50,9 +50,8 @@ function StepVerification({ control, trigger, isSubmitting, onBack }) {
           <p className="text-md-semibold">Back</p>
         </MyButton>
       </div>
-    </>
+    </section>
   )
 }
-
 
 export default StepVerification

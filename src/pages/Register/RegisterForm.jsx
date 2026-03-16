@@ -7,7 +7,7 @@ import StepAccountDetails from './components/StepAccountDetails'
 import StepVerification from './components/StepVerification'
 import { useRegister } from './Context'
 import RegisterSchema from './schema'
-import TermsConditions from './TermsConditions'
+import TermsConditions from './components/TermsConditions'
 
 function RegisterForm({ activeStep, setActiveStep }) {
   const { register } = useRegister()

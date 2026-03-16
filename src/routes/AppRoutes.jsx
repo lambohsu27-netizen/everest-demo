@@ -12,6 +12,8 @@ import Enquiry from '@src/pages/Enquiry'
 import { EnquiryProvider } from '@src/pages/Enquiry/Context'
 import Login from '@src/pages/Login'
 import { LoginProvider } from '@src/pages/Login/Context'
+import Register from '@src/pages/Register'
+import { RegisterProvider } from '@src/pages/Register/Context'
 import MobileSignature from '@src/pages/MobileSignature'
 import Profile from '@src/pages/Profile'
 import { ProfileProvider } from '@src/pages/Profile/context'
@@ -105,6 +107,14 @@ export function UnauthenticatedRoutes() {
           <LoginProvider>
             <Login />
           </LoginProvider>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <RegisterProvider>
+            <Register />
+          </RegisterProvider>
         }
       />
       <Route

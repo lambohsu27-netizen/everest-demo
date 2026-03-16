@@ -56,22 +56,7 @@ function RegisterProvider({ children }) {
             path: '/',
           })
 
-          if (body?.remember_me === true) {
-            const rememberMeData = {
-              name: body.name,
-              email: body.email,
-              password: encryptedPassword,
-            }
-            localStorage.setItem(
-              'rv5zzc9noTdU5AD2', // remember_me
-              CryptoJS.AES.encrypt(
-                JSON.stringify(rememberMeData),
-                import.meta.env.VITE_APP_SECRET_KEY
-              ).toString()
-            )
-          } else {
-            localStorage.removeItem('rv5zzc9noTdU5AD2')
-          }
+
         })
         .catch((e) => {
           if (e.code) {

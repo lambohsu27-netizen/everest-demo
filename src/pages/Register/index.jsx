@@ -1,8 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { MyBgPatternDecorativeCube, MyButton, MyLogo, MyTextField } from '@interstellar-component'
 import { CheckCircle, Eye, EyeOff } from '@untitled-ui/icons-react'
-import CryptoJS from 'crypto-js'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import CheckIcon from '../../assets/Check-icon.svg'
@@ -17,10 +16,8 @@ function Register() {
   const nav = useNavigate()
 
   const [show, setShow] = useState(false)
-  const localRememberMe = localStorage.getItem('rv5zzc9noTdU5AD2') || false
 
   const {
-    setValue,
     handleSubmit,
     control,
     watch,
@@ -29,36 +26,7 @@ function Register() {
   } = useForm({
     resolver: yupResolver(RegisterSchema),
   })
-
-  useEffect(() => {
-    if (localRememberMe) {
-      const decrypted = CryptoJS.AES.decrypt(
-        localRememberMe,
-        import.meta.env.VITE_APP_SECRET_KEY
-      ).toString(CryptoJS.enc.Utf8)
-
-      if (decrypted) {
-        try {
-          const rememberMeData = JSON.parse(decrypted)
-          const decryptedpassword = CryptoJS.AES.decrypt(
-            rememberMeData.password,
-            import.meta.env.VITE_APP_SECRET_KEY
-          ).toString(CryptoJS.enc.Utf8)
-
-          setValue('name', rememberMeData?.name || '')
-          setValue('email', rememberMeData?.email || '')
-          setValue('password', decryptedpassword || '')
-          setValue('remember_me', true)
-        } catch (error) {
-          // Silent error
-        }
-      }
-    } else {
-      setValue('remember_me', false)
-    }
-  }, [localRememberMe, setValue])
-
-  const { name, email, password, remember_me } = watch()
+  const { name, email, password } = watch()
 
   const passwordChecks = {
     containUppercase: /[A-Z]/.test(password),

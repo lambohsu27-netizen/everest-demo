@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { MyBgPatternDecorativeCube, MyButton, MyLogo, MyTextField } from '@interstellar-component'
-import { CheckCircle, Eye, EyeOff } from '@untitled-ui/icons-react'
+import { MyBgPatternDecorativeCube, MyButton, MyLogo, MyStep, MyStepper, MyTextField } from '@interstellar-component'
+import { CheckCircle, Eye, EyeOff, Mail01 } from '@untitled-ui/icons-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -47,8 +47,75 @@ function Register() {
         currentModal={currentModal}
       />
       <main className="flex min-h-screen z-50">
-        <div className="w-[30.55%] min-w-[220px] bg-brand/800 max-md:hidden flex items-center justify-center flex-shrink-0">
-          {/* Brand area */}
+        <div className="w-[440px] bg-[#53389e] max-md:hidden h-screen flex flex-col justify-between shrink-0">
+          <div className="p-8 flex flex-col gap-20">
+            <MyLogo showText darkMode />
+            <div className="flex flex-col gap-8 pr-8">
+              <MyStepper activeStep={1}>
+                <MyStep
+                  stepIcon={
+                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
+                      1
+                    </div>
+                  }
+                  value={1}
+                >
+                  <div className="flex flex-col">
+                    <p className="text-md-semibold text-white">Your details</p>
+                    <p className="text-sm-regular text-[#e9d7fe]">Please provide your name and email</p>
+                  </div>
+                </MyStep>
+                <MyStep
+                  stepIcon={
+                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
+                      2
+                    </div>
+                  }
+                  value={2}
+                >
+                  <div className="flex flex-col">
+                    <p className="text-md-semibold text-white/60">Choose a password</p>
+                    <p className="text-sm-regular text-[#e9d7fe]/60">Must be at least 8 characters</p>
+                  </div>
+                </MyStep>
+                <MyStep
+                  stepIcon={
+                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
+                      3
+                    </div>
+                  }
+                  value={3}
+                >
+                  <div className="flex flex-col">
+                    <p className="text-md-semibold text-white/60">Invite your team</p>
+                    <p className="text-sm-regular text-[#e9d7fe]/60">
+                      Start collaborating with your team
+                    </p>
+                  </div>
+                </MyStep>
+                <MyStep
+                  stepIcon={
+                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
+                      4
+                    </div>
+                  }
+                  value={4}
+                >
+                  <div className="flex flex-col">
+                    <p className="text-md-semibold text-white/60">Add your socials</p>
+                    <p className="text-sm-regular text-[#e9d7fe]/60">Share your profile with the world</p>
+                  </div>
+                </MyStep>
+              </MyStepper>
+            </div>
+          </div>
+          <div className="p-8 flex justify-between items-end h-[96px]">
+            <p className="text-sm-regular text-[#e9d7fe]">© Everest 2026</p>
+            <div className="flex items-center gap-2 text-[#e9d7fe]">
+              <Mail01 size={17} />
+              <p className="text-sm-regular">help@everest.com</p>
+            </div>
+          </div>
         </div>
         <div id="right" className="flex flex-1 items-center justify-center max-md:w-full">
           <form

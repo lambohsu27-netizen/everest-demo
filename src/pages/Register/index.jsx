@@ -58,7 +58,7 @@ function Register() {
             </div>
           </div>
         </div>
-        <RegisterForm activeStep={activeStep} setActiveStep={setActiveStep} />
+        <RegisterForm activeStep={2} setActiveStep={setActiveStep} />
       </main>
     </>
   )

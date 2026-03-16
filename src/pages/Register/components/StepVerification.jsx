@@ -1,0 +1,32 @@
+import { MyTextField } from '@interstellar-component'
+
+function StepVerification({ control, trigger }) {
+  return (
+    <>
+      <div className="z-40 flex flex-col gap-6 items-center">
+        <div className="gap-y-2 column items-center text-center">
+          <p className="display-sm-semibold text-gray-900">Verify your account</p>
+          <p className="text-md-regular text-gray-600">
+            Enter the OTP sent to your email to confirm your account.
+          </p>
+        </div>
+      </div>
+
+      <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
+        <div className="gap-1 column">
+          <p className="text-sm-medium text-gray-700">OTP</p>
+          <MyTextField
+            name="otp"
+            trigger={trigger}
+            placeholder="Enter 6-digit OTP"
+            control={control}
+            focusColor="#01172D"
+            focusShadow="#E6EBF0"
+          />
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default StepVerification

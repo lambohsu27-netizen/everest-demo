@@ -1,5 +1,5 @@
 import { MyButton, MyCheckbox } from '@interstellar-component'
-import { ArrowLeft } from '@untitled-ui/icons-react'
+import { ArrowLeft, ChevronDown } from '@untitled-ui/icons-react'
 import React from 'react'
 
 function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
@@ -80,7 +80,12 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
             ))}
           </div>
 
-          <div className="flex flex-col gap-6 border-t border-gray-200 pt-8 mt-auto">
+          <div className="flex flex-col gap-6 mt-auto">
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gray-200" />
+              <ChevronDown size={20} className="text-gray-600" />
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
             <div className="flex items-center gap-3">
               <MyCheckbox checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
               <p className="text-sm-regular text-gray-900">

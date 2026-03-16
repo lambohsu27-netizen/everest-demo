@@ -29,7 +29,7 @@ function NotFound() {
 
       {/* 🔹 Footer Section */}
       <footer className="text-sm text-gray-400">
-        &copy; {new Date().getFullYear()} Bipura. All rights reserved.
+        &copy; {new Date().getFullYear()} Everest. All rights reserved.
       </footer>
     </div>
   )

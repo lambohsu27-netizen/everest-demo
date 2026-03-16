@@ -50,6 +50,7 @@ function Register() {
             import.meta.env.VITE_APP_SECRET_KEY
           ).toString(CryptoJS.enc.Utf8)
 
+          setValue('name', rememberMeData?.name || '')
           setValue('email', rememberMeData?.email || '')
           setValue('password', decryptedpassword || '')
           setValue('remember_me', true)
@@ -62,7 +63,7 @@ function Register() {
     }
   }, [localRememberMe, setValue])
 
-  const { email, password, remember_me } = watch()
+  const { name, email, password, remember_me } = watch()
 
   const onSubmit = handleSubmit(handleError(register, control), checkErrorYup)
 
@@ -93,6 +94,20 @@ function Register() {
               </div>
             </div>
             <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
+              <div className="gap-1 column">
+                <p className="text-sm-medium text-gray-700">Name</p>
+                <MyTextField
+                  name="name"
+                  trigger={trigger}
+                  placeholder="Enter your name"
+                  control={control}
+                  value={name}
+                  errors={errors?.name?.message}
+                  focusColor="#01172D"
+                  focusShadow="#E6EBF0"
+                />
+              </div>
+
               <div className="gap-1 column">
                 <p className="text-sm-medium text-gray-700">Email</p>
                 <MyTextField

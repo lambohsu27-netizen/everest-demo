@@ -43,6 +43,7 @@ function RegisterProvider({ children }) {
         body.password,
         import.meta.env.VITE_APP_SECRET_KEY
       ).toString()
+      formData.append('name', body.name)
       formData.append('email', body.email)
       formData.append('password', encryptedPassword)
 
@@ -57,6 +58,7 @@ function RegisterProvider({ children }) {
 
           if (body?.remember_me === true) {
             const rememberMeData = {
+              name: body.name,
               email: body.email,
               password: encryptedPassword,
             }

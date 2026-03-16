@@ -9,9 +9,8 @@ import {
   MyButton,
   MyCheckbox,
   MyTextField,
+  MyLogo,
 } from '@interstellar-component'
-
-import bipura_logo from '../../assets/Login/bipura_logo.png'
 
 import { useRegister } from './Context'
 import { checkErrorYup, handleError } from '../../services/Helper'
@@ -87,12 +86,10 @@ function Register() {
               <MyBgPatternDecorativeCube />
             </div>
             <div className="z-40 flex flex-col gap-6 items-center">
-              <img src={bipura_logo} alt="logo" width={42} height={21} />
+              <MyLogo />
               <div className="gap-y-2 column items-center text-center">
-                <p className="display-sm-semibold text-gray-900">Create an account</p>
-                <p className="text-md-regular text-gray-600">
-                  Welcome! Please enter your details to register.
-                </p>
+                <p className="display-sm-semibold text-gray-900">Create Admin Account</p>
+                <p className="text-md-regular text-gray-600">Start your 30-day free trial.</p>
               </div>
             </div>
             <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
@@ -156,7 +153,7 @@ function Register() {
                 <p className="text-sm-medium text-gray-700">Remember for 30 days</p>
               </div>
             </section>
-            <div className="z-40 relative w-full">
+            <div className="z-40 relative w-full space-y-4">
               <MyButton
                 type="submit"
                 color="primary"
@@ -165,7 +162,17 @@ function Register() {
                 expanded
                 disabled={isSubmitting}
               >
-                <p className="text-md-semibold">Register</p>
+                <p className="text-md-semibold">Get started</p>
+              </MyButton>
+              <MyButton
+                type="submit"
+                color="primary"
+                variant="filled"
+                size="lg"
+                expanded
+                disabled={isSubmitting}
+              >
+                <p className="text-md-semibold">Sign up with Google</p>
               </MyButton>
             </div>
             <div className="z-40 relative w-full flex justify-center mt-4">

@@ -52,58 +52,28 @@ function Register() {
             <MyLogo showText darkMode />
             <div className="flex flex-col gap-8 pr-8">
               <MyStepper activeStep={1}>
-                <MyStep
-                  stepIcon={
-                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
-                      1
-                    </div>
-                  }
-                  value={1}
-                >
+                <MyStep value={1}>
                   <div className="flex flex-col">
-                    <p className="text-md-semibold text-white">Your details</p>
-                    <p className="text-sm-regular text-[#e9d7fe]">Please provide your name and email</p>
-                  </div>
-                </MyStep>
-                <MyStep
-                  stepIcon={
-                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
-                      2
-                    </div>
-                  }
-                  value={2}
-                >
-                  <div className="flex flex-col">
-                    <p className="text-md-semibold text-white/60">Choose a password</p>
-                    <p className="text-sm-regular text-[#e9d7fe]/60">Must be at least 8 characters</p>
-                  </div>
-                </MyStep>
-                <MyStep
-                  stepIcon={
-                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
-                      3
-                    </div>
-                  }
-                  value={3}
-                >
-                  <div className="flex flex-col">
-                    <p className="text-md-semibold text-white/60">Invite your team</p>
-                    <p className="text-sm-regular text-[#e9d7fe]/60">
-                      Start collaborating with your team
+                    <p className="text-md-semibold text-white">Create admin account</p>
+                    <p className="text-sm-regular text-white">
+                      Enter your details to create the administrator account.
                     </p>
                   </div>
                 </MyStep>
-                <MyStep
-                  stepIcon={
-                    <div className="flex items-center justify-center rounded-full bg-white/10 w-8 h-8 text-white">
-                      4
-                    </div>
-                  }
-                  value={4}
-                >
+                <MyStep value={2}>
                   <div className="flex flex-col">
-                    <p className="text-md-semibold text-white/60">Add your socials</p>
-                    <p className="text-sm-regular text-[#e9d7fe]/60">Share your profile with the world</p>
+                    <p className="text-md-semibold text-white">Review terms & conditions</p>
+                    <p className="text-sm-regular text-white">
+                      Read and agree to the terms required to use the platform.
+                    </p>
+                  </div>
+                </MyStep>
+                <MyStep value={3}>
+                  <div className="flex flex-col">
+                    <p className="text-md-semibold text-white">Verify your account</p>
+                    <p className="text-sm-regular text-[#e9d7fe]">
+                      Enter the OTP sent to your email to confirm your account.
+                    </p>
                   </div>
                 </MyStep>
               </MyStepper>
@@ -128,8 +98,8 @@ function Register() {
             <div className="z-40 flex flex-col gap-6 items-center">
               <MyLogo />
               <div className="gap-y-2 column items-center text-center">
-                <p className="display-sm-semibold text-gray-900">Create Admin Account</p>
-                <p className="text-md-regular text-gray-600">Start your 30-day free trial.</p>
+                <p className="display-sm-semibold text-gray-900">Create admin account</p>
+                <p className="text-md-regular text-gray-600">Enter your details to create the administrator account.</p>
               </div>
             </div>
             <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">

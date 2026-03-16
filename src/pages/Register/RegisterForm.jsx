@@ -58,6 +58,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
         <StepVerification
           control={control}
           trigger={trigger}
+          watch={watch}
           isSubmitting={isSubmitting}
           onBack={() => setActiveStep(2)}
         />

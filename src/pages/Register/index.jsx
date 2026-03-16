@@ -17,7 +17,7 @@ function Register() {
         handleCurrentModal={handleCurrentModal}
         currentModal={currentModal}
       />
-      <main className="flex min-h-screen z-50">
+      <main className="flex h-screen overflow-hidden z-50">
         <div className="w-[440px] bg-brand/800 max-md:hidden h-screen flex flex-col justify-between shrink-0">
           <div className="p-8 flex flex-col gap-20">
             <MyLogo showText darkMode />

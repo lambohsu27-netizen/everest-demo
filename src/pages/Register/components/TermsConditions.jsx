@@ -47,8 +47,8 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
   ]
 
   return (
-    <section className="w-full h-full flex items-center justify-center px-8 py-12 lg:px-16 lg:py-24">
-      <div className="flex flex-col overflow-y-auto gap-12 scrollbar-hide bg-white max-w-3xl">
+    <section className="w-full h-full flex items-center justify-center px-8 pt-12 pb-8 lg:px-16 lg:pt-24 lg:pb-16">
+      <div className="flex flex-col h-full gap-12 bg-white max-w-3xl">
         <div className="flex flex-col gap-6">
           <MyButton
             variant="link"
@@ -68,8 +68,8 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-12">
-          <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-12 flex-1 overflow-hidden" id="tnc-contents">
+          <div className="flex flex-col gap-8 flex-1 overflow-y-auto pr-2">
             {sections.map((section, index) => (
               <div key={index} className="flex flex-col gap-4">
                 <p className="text-lg-semibold text-gray-900">{section.heading}</p>
@@ -80,8 +80,8 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
             ))}
           </div>
 
-          <div className="flex flex-col gap-6 border-t border-gray-200 pt-8 pb-12">
-            <div className="flex items-start gap-3">
+          <div className="flex flex-col gap-6 border-t border-gray-200 pt-8 mt-auto">
+            <div className="flex items-center gap-3">
               <MyCheckbox checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
               <p className="text-sm-regular text-gray-900">
                 Dengan menyetujui ini, Anda menyatakan telah membaca dan menyetujui syarat &

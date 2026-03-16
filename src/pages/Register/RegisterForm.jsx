@@ -33,7 +33,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
   }, checkErrorYup)
 
   return (
-    <form id="right" className="flex-1" onSubmit={onSubmit}>
+    <form id="right" className="flex-1 overflow-y-hidden h-full" onSubmit={onSubmit}>
       {activeStep === 1 && (
         <StepAccountDetails
           control={control}

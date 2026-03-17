@@ -25,7 +25,7 @@ function StepLegalBusinessInfo({
             <ArrowLeft className="w-5 h-5 text-brand/700" /> Back to company menu
           </button>
           <div className="flex flex-col gap-1 w-full">
-            <h1 className="text-display-xs-semibold text-gray-900">Legal & Business Information</h1>
+            <h1 className="display-xs-semibold text-gray-900">Legal & Business Information</h1>
             <p className="text-md-regular text-gray-600">
               Provide legal and registration details required to verify your company.
             </p>

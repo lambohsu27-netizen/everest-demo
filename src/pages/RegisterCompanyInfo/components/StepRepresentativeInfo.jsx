@@ -1,5 +1,5 @@
 import { MyButton, MyTextField, MyDropzone } from '@interstellar-component'
-import { ArrowLeft, Mail01, Phone } from '@untitled-ui/icons-react'
+import { ArrowLeft, Mail01, Phone, Download04 } from '@untitled-ui/icons-react'
 
 function StepRepresentativeInfo({
   control,
@@ -112,8 +112,16 @@ function StepRepresentativeInfo({
                     </label>
                   </div>
                   <div className="w-fit mb-1">
-                    <MyButton variant="outlined" color="secondary" type="button" size="sm">
-                      <span className="text-sm-semibold">Download Template</span>
+                    <MyButton
+                      variant="outlined"
+                      color="purple"
+                      type="button"
+                      size="md"
+                    >
+                      <div className="flex items-center gap-x-3">
+                        <Download04 className="w-5 h-5" />
+                        <span className="text-sm-semibold">Download Template</span>
+                      </div>
                     </MyButton>
                   </div>
                   <div className="flex flex-col gap-2">

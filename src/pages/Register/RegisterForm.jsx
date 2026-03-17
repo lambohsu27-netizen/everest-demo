@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { checkErrorYup, handleError } from '../../services/Helper'
 import StepAccountDetails from './components/StepAccountDetails'
 import StepVerification from './components/StepVerification'
+import StepEmailVerified from './components/StepEmailVerified'
 import { useRegister } from './Context'
 import RegisterSchema from './schema'
 import TermsConditions from './components/TermsConditions'
@@ -34,17 +35,14 @@ function RegisterForm({ activeStep, setActiveStep }) {
     [otp]
   )
 
-  const handleOtpBackspaceAndEnter = useCallback(
-    (e, index) => {
-      if (e.key === 'Backspace' && !e.target.value && index > 0) {
-        otpBoxReference.current[index - 1]?.focus()
-      }
-      if (e.key === 'Enter' && e.target.value && index < numberOfDigits - 1) {
-        otpBoxReference.current[index + 1]?.focus()
-      }
-    },
-    []
-  )
+  const handleOtpBackspaceAndEnter = useCallback((e, index) => {
+    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+      otpBoxReference.current[index - 1]?.focus()
+    }
+    if (e.key === 'Enter' && e.target.value && index < numberOfDigits - 1) {
+      otpBoxReference.current[index + 1]?.focus()
+    }
+  }, [])
 
   // COUNT DOWN
   const [minutes, setMinutes] = useState(0)
@@ -146,6 +144,14 @@ function RegisterForm({ activeStep, setActiveStep }) {
           minutes={minutes}
           seconds={seconds}
           setCountdown={setCountdown}
+        />
+      )}
+
+      {activeStep === 4 && (
+        <StepEmailVerified
+          isSubmitting={isSubmitting}
+          onBack={() => nav('/login')}
+          onContinue={onSubmit}
         />
       )}
     </form>

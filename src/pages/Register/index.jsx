@@ -8,7 +8,7 @@ import RegisterForm from './RegisterForm'
 
 function Register() {
   const { currentModal, handleCurrentModal } = useRegister()
-  const [activeStep, setActiveStep] = useState(3)
+  const [activeStep, setActiveStep] = useState(4)
 
   return (
     <>

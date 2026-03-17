@@ -1,0 +1,59 @@
+import { MyButton, MyBgPatternDecorativeCube, MyFeaturedIcon } from '@interstellar-component'
+
+import { ArrowLeft } from '@untitled-ui/icons-react'
+
+function StepEmailVerified({ onBack, onContinue, isSubmitting }) {
+  return (
+    <section className="w-full h-full flex items-start justify-center pt-24">
+      <div className="items-center justify-center gap-6 w-full max-w-[360px] rounded-xl column z-50">
+        <div className="z-0">
+          <MyBgPatternDecorativeCube />
+        </div>
+        <div className="z-40 flex flex-col gap-6 items-center">
+          <MyFeaturedIcon icon="CheckCircle" color="Black" size="xl" />
+        </div>
+
+        <div className="z-40 flex flex-col gap-6 items-center">
+          <div className="gap-y-2 column items-center text-center">
+            <p className="display-sm-semibold text-gray-900">Email verified</p>
+            <p className="text-md-regular text-gray-600">
+              Your email has been successfully verified. Click continue to complete your account
+              setup.
+            </p>
+          </div>
+        </div>
+
+        <div className="z-40 relative w-full space-y-8">
+          <MyButton
+            type="button"
+            color="primary"
+            variant="filled"
+            size="lg"
+            expanded
+            disabled={isSubmitting}
+            onClick={onContinue}
+          >
+            <p className="text-md-semibold">Continue</p>
+          </MyButton>
+
+          <div className="w-full items-center justify-center flex">
+            <MyButton
+              variant="link"
+              color="gray"
+              onClick={onBack}
+              disabled={isSubmitting}
+              className="w-fit p-0 h-fit !text-gray-600"
+            >
+              <div className="flex items-center gap-2 text-gray-600">
+                <ArrowLeft size={20} />
+                <p className="text-sm-semibold">Back to log in</p>
+              </div>
+            </MyButton>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default StepEmailVerified

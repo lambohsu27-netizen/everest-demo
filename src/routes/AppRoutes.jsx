@@ -6,7 +6,6 @@ import UITemplate from '@src/pages/ui-template'
 import HomePage from '@src/pages/HomePage'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
-import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import Enquiry from '@src/pages/Enquiry'
 import { EnquiryProvider } from '@src/pages/Enquiry/Context'
@@ -19,6 +18,9 @@ import Profile from '@src/pages/Profile'
 import { ProfileProvider } from '@src/pages/Profile/context'
 import ForgetPassword from '@src/pages/Forget-password'
 import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
+import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
+import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
+
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -63,6 +65,15 @@ export function AuthenticatedRoutes() {
           <EnquiryProvider>
             {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
           </EnquiryProvider>
+        }
+      />
+
+      <Route
+        path="/register-company-info"
+        element={
+          <RegisterCompanyInfoProvider>
+            <RegisterCompanyInfo />
+          </RegisterCompanyInfoProvider>
         }
       />
 

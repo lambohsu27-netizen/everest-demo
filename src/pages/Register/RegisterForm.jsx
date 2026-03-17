@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import moment from 'moment'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { checkErrorYup, handleError } from '../../services/Helper'
@@ -13,6 +14,80 @@ function RegisterForm({ activeStep, setActiveStep }) {
   const { register } = useRegister()
   const nav = useNavigate()
   const [acceptedTerms, setAcceptedTerms] = useState(false)
+
+  const [otpMode, setOtpMode] = useState(false)
+  const numberOfDigits = 4
+  const [otp, setOtp] = useState(new Array(numberOfDigits).fill(''))
+  const otpBoxReference = useRef([])
+
+  const handleOtpChange = useCallback(
+    (value, index) => {
+      const normalizedValue = value.replace(/\D/, '')
+      const newArr = [...otp]
+      newArr[index] = normalizedValue
+      setOtp(newArr)
+
+      if (normalizedValue && index < numberOfDigits - 1) {
+        otpBoxReference.current[index + 1]?.focus()
+      }
+    },
+    [otp]
+  )
+
+  const handleOtpBackspaceAndEnter = useCallback(
+    (e, index) => {
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        otpBoxReference.current[index - 1]?.focus()
+      }
+      if (e.key === 'Enter' && e.target.value && index < numberOfDigits - 1) {
+        otpBoxReference.current[index + 1]?.focus()
+      }
+    },
+    []
+  )
+
+  // COUNT DOWN
+  const [minutes, setMinutes] = useState(0)
+  const [seconds, setSeconds] = useState(0)
+  const [countdown, setCountdown] = useState(null)
+
+  useEffect(() => {
+    if (!countdown) return
+
+    const intervalId = setInterval(() => {
+      const now = moment()
+      const timeDifference = moment(countdown).diff(now) // ms
+
+      if (timeDifference <= 0) {
+        clearInterval(intervalId)
+        setMinutes(0)
+        setSeconds(0)
+        localStorage.removeItem('countdown_to_new_otp')
+        return
+      }
+
+      const dur = moment.duration(timeDifference)
+      setMinutes(dur.minutes())
+      setSeconds(dur.seconds())
+    }, 1000)
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [countdown])
+
+  useEffect(() => {
+    const storedCountdown = localStorage.getItem('countdown_to_new_otp')
+    if (storedCountdown) {
+      setCountdown(storedCountdown)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (countdown) {
+      localStorage.setItem('countdown_to_new_otp', countdown)
+    }
+  }, [countdown])
 
   const {
     handleSubmit,
@@ -61,6 +136,16 @@ function RegisterForm({ activeStep, setActiveStep }) {
           watch={watch}
           isSubmitting={isSubmitting}
           onBack={() => setActiveStep(2)}
+          otpMode={otpMode}
+          setOtpMode={setOtpMode}
+          otp={otp}
+          setOtp={setOtp}
+          handleOtpChange={handleOtpChange}
+          handleOtpBackspaceAndEnter={handleOtpBackspaceAndEnter}
+          otpBoxReference={otpBoxReference}
+          minutes={minutes}
+          seconds={seconds}
+          setCountdown={setCountdown}
         />
       )}
     </form>

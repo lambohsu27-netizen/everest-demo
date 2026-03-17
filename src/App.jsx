@@ -1,13 +1,21 @@
 import './App.css'
 import { useCookies } from 'react-cookie'
 import { ToastContainer } from 'react-toastify'
+import { useLocation } from 'react-router-dom'
 
 import { AuthenticatedRoutes, UnauthenticatedRoutes } from './routes/AppRoutes'
 import Navigation from './pages/Navigation/Navigation'
 import { LoginProvider } from './pages/Login/Context'
 
+const ROUTES_WITHOUT_NAV = ['/register-company-info']
+
 export default function App() {
   const [cookies] = useCookies(['token-backoffice'])
+  const location = useLocation()
+
+  const isBypassAuth = import.meta.env.VITE_APP_BYPASS_AUTH === 'true'
+  const isAuthenticated = cookies['token-backoffice'] || isBypassAuth
+  const showNavigation = !ROUTES_WITHOUT_NAV.includes(location.pathname)
 
   return (
     <>
@@ -23,13 +31,19 @@ export default function App() {
         pauseOnHover
         closeOnClick
       />
-      {cookies['token-backoffice'] || import.meta.env.VITE_APP_BYPASS_AUTH === 'true' ? (
+      {isAuthenticated ? (
         <div id="main-content" className="relative w-full overflow-x-hidden md:flex">
-          <LoginProvider>
-            <Navigation />
-          </LoginProvider>
+          {showNavigation && (
+            <LoginProvider>
+              <Navigation />
+            </LoginProvider>
+          )}
 
-          <div className="w-full md:flex-1 h-[100dvh] md:h-[100vh] pt-16 md:pt-0 overflow-y-auto overflow-x-hidden box-border">
+          <div
+            className={`${
+              showNavigation ? 'md:flex-1 pt-16 md:pt-0' : 'w-full'
+            } w-full h-[100dvh] md:h-[100vh] overflow-y-auto overflow-x-hidden box-border`}
+          >
             <AuthenticatedRoutes />
           </div>
         </div>

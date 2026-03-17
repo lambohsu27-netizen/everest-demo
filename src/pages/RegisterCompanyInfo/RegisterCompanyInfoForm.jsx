@@ -8,6 +8,7 @@ import StepCompanyInfo from './components/StepCompanyInfo'
 import StepLegalBusinessInfo from './components/StepLegalBusinessInfo'
 import StepRepresentativeInfo from './components/StepRepresentativeInfo'
 import StepMembershipAgreement from './components/StepMembershipAgreement'
+import StepMembershipApplicationSubmitSuccessful from './components/StepMembershipApplicationSubmitSuccessful'
 
 const RegisterCompanySchema = yup.object().shape({
   company_name: yup.string().required('Company name is required'),
@@ -74,11 +75,10 @@ function RegisterCompanyInfoForm({ activeStep, setActiveStep }) {
   const onSubmit = handleSubmit((data) => {
     if (activeStep < 4) {
       setActiveStep(activeStep + 1)
-    } else {
+    } else if (activeStep === 4) {
       console.log('Final Data:', data)
       // Here you would typically call an API service
-      alert('Registration Successful!')
-      nav('/dashboard') // Or wherever the next step is
+      setActiveStep(5)
     }
   })
 
@@ -127,6 +127,12 @@ function RegisterCompanyInfoForm({ activeStep, setActiveStep }) {
           onBack={() => setActiveStep(3)}
           accepted={accepted}
           setAccepted={setAccepted}
+        />
+      )}
+
+      {activeStep === 5 && (
+        <StepMembershipApplicationSubmitSuccessful
+          onBackToCompanyList={() => nav('/dashboard')}
         />
       )}
     </form>

@@ -3,9 +3,9 @@ import {
   MyTextField,
   MyAutocomplete,
   MyDropzone,
-  MyTextArea
+  MyTextArea,
 } from '@interstellar-component'
-import { ArrowLeft } from '@untitled-ui/icons-react'
+import { ArrowLeft, Mail01 } from '@untitled-ui/icons-react'
 
 function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitting }) {
   const {
@@ -20,7 +20,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
     district,
     subdistrict,
     postal_code,
-    company_address
+    company_address,
   } = watch()
 
   return (
@@ -43,7 +43,6 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
       {/* Section */}
       <div className="flex flex-col gap-8 w-full">
         <div className="px-8 w-full flex flex-col gap-6">
-          
           {/* Form Area 1: Company Details */}
           <div className="flex flex-col md:flex-row gap-8 w-full">
             {/* Section label */}
@@ -55,7 +54,6 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
             {/* Form panel */}
             <div className="flex-1 max-w-[624px] rounded-xl border border-gray-200 shadow-[0_1px_2px_rgba(10,13,18,0.05)] bg-white flex flex-col">
               <div className="p-6 flex flex-col gap-5">
-                
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
                     Legal name
@@ -70,46 +68,48 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    Business category
-                  </label>
-                  <MyAutocomplete
-                    name="business_category"
-                    options={[
-                      { label: 'Technology', value: 'technology' },
-                      { label: 'Finance', value: 'finance' },
-                    ]}
-                    trigger={trigger}
-                    placeholder="Select type"
-                    control={control}
-                    value={business_category}
-                    errors={errors?.business_category?.message}
-                  />
-                </div>
+                <section className="w-full flex justify-between gap-6 ">
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      Business category
+                    </label>
+                    <MyAutocomplete
+                      name="business_category"
+                      options={[
+                        { label: 'Technology', value: 'technology' },
+                        { label: 'Finance', value: 'finance' },
+                      ]}
+                      trigger={trigger}
+                      placeholder="Select type"
+                      control={control}
+                      value={business_category}
+                      errors={errors?.business_category?.message}
+                    />
+                  </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    Industry
-                  </label>
-                  <MyAutocomplete
-                    name="industry"
-                    options={[
-                      { label: 'Technology', value: 'technology' },
-                      { label: 'Finance', value: 'finance' },
-                      { label: 'Healthcare', value: 'healthcare' },
-                      { label: 'Education', value: 'education' },
-                      { label: 'Other', value: 'other' },
-                    ]}
-                    trigger={trigger}
-                    placeholder="Select industry"
-                    control={control}
-                    value={industry}
-                    errors={errors?.industry?.message}
-                  />
-                </div>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      Industry
+                    </label>
+                    <MyAutocomplete
+                      name="industry"
+                      options={[
+                        { label: 'Technology', value: 'technology' },
+                        { label: 'Finance', value: 'finance' },
+                        { label: 'Healthcare', value: 'healthcare' },
+                        { label: 'Education', value: 'education' },
+                        { label: 'Other', value: 'other' },
+                      ]}
+                      trigger={trigger}
+                      placeholder="Select industry"
+                      control={control}
+                      value={industry}
+                      errors={errors?.industry?.message}
+                    />
+                  </div>
+                </section>
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 max-w-[312px]">
                   <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
                     Number of employee
                   </label>
@@ -131,9 +131,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700">
-                    Company Website
-                  </label>
+                  <label className="text-sm-medium text-gray-700">Company Website</label>
                   <MyTextField
                     name="website"
                     trigger={trigger}
@@ -143,7 +141,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                     errors={errors?.website?.message}
                   />
                 </div>
-                
+
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
                     Email address
@@ -155,6 +153,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                     control={control}
                     value={email}
                     errors={errors?.email?.message}
+                    startAdornment={<Mail01 className="w-5 h-5 text-gray-500" />}
                   />
                 </div>
 
@@ -176,86 +175,90 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                     errors={errors?.logo?.message}
                   />
                 </div>
-
               </div>
             </div>
           </div>
-        
+
           <hr className="w-full border-gray-200" />
-          
+
           {/* Form Area 2: Company Address */}
           <div className="flex flex-col md:flex-row gap-8 w-full">
             {/* Section label */}
             <div className="w-full md:w-[280px] shrink-0 flex flex-col">
               <h2 className="text-sm-semibold text-gray-900">Company Address</h2>
-              <p className="text-sm-regular text-gray-600">Location details of your registered company address.</p>
+              <p className="text-sm-regular text-gray-600">
+                Location details of your registered company address.
+              </p>
             </div>
 
             {/* Form panel */}
             <div className="flex-1 max-w-[624px] rounded-xl border border-gray-200 shadow-[0_1px_2px_rgba(10,13,18,0.05)] bg-white flex flex-col">
               <div className="p-6 flex flex-col gap-5">
-                
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    Province
-                  </label>
-                  <MyAutocomplete
-                    name="province"
-                    options={[]} // Add real options when integrating with API
-                    trigger={trigger}
-                    placeholder="Select Province"
-                    control={control}
-                    value={province}
-                    errors={errors?.province?.message}
-                  />
-                </div>
+                <section className="w-full flex justify-between gap-6">
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      Province
+                    </label>
+                    <MyAutocomplete
+                      name="province"
+                      options={[]} // Add real options when integrating with API
+                      trigger={trigger}
+                      placeholder="Select Province"
+                      control={control}
+                      value={province}
+                      errors={errors?.province?.message}
+                    />
+                  </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    City / Kabupaten
-                  </label>
-                  <MyAutocomplete
-                    name="city"
-                    options={[]} // Add real options when integrating with API
-                    trigger={trigger}
-                    placeholder="Select City / Kabupaten"
-                    control={control}
-                    value={city}
-                    errors={errors?.city?.message}
-                  />
-                </div>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      City / Kabupaten
+                    </label>
+                    <MyAutocomplete
+                      name="city"
+                      options={[]} // Add real options when integrating with API
+                      trigger={trigger}
+                      placeholder="Select City / Kabupaten"
+                      control={control}
+                      value={city}
+                      errors={errors?.city?.message}
+                    />
+                  </div>
+                </section>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    District
-                  </label>
-                  <MyAutocomplete
-                    name="district"
-                    options={[]} // Add real options when integrating with API
-                    trigger={trigger}
-                    placeholder="Select District"
-                    control={control}
-                    value={district}
-                    errors={errors?.district?.message}
-                  />
-                </div>
+                <section className="w-full flex justify-between gap-6 ">
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      District
+                    </label>
+                    <MyAutocomplete
+                      name="district"
+                      options={[]} // Add real options when integrating with API
+                      trigger={trigger}
+                      placeholder="Select District"
+                      control={control}
+                      value={district}
+                      errors={errors?.district?.message}
+                    />
+                  </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
-                    Subdistrict
-                  </label>
-                  <MyAutocomplete
-                    name="subdistrict"
-                    options={[]} // Add real options when integrating with API
-                    trigger={trigger}
-                    placeholder="Select Subdistrict"
-                    control={control}
-                    value={subdistrict}
-                    errors={errors?.subdistrict?.message}
-                  />
-                </div>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                      Subdistrict
+                    </label>
+                    <MyAutocomplete
+                      name="subdistrict"
+                      options={[]} // Add real options when integrating with API
+                      trigger={trigger}
+                      placeholder="Select Subdistrict"
+                      control={control}
+                      value={subdistrict}
+                      errors={errors?.subdistrict?.message}
+                    />
+                  </div>
+                </section>
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 max-w-[312px]">
                   <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
                     Postal Code
                   </label>
@@ -285,35 +288,22 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   />
                   <p className="text-sm-regular text-gray-500 mt-1">275 characters left</p>
                 </div>
-
               </div>
             </div>
           </div>
-
         </div>
-        
+
         <div className="px-8 w-full">
-           <hr className="w-full border-gray-200 mb-5" />
-           <div className="flex justify-end w-full gap-3">
-             <MyButton 
-               variant="outlined" 
-               color="secondary"
-               type="button"
-               disabled={isSubmitting}
-             >
-               <span className="text-sm-semibold">Cancel & save draft</span>
-             </MyButton>
-             <MyButton 
-               variant="filled" 
-               color="primary"
-               type="submit"
-               disabled={isSubmitting}
-             >
-               <span className="text-sm-semibold text-white">Next</span>
-             </MyButton>
-           </div>
+          <hr className="w-full border-gray-200 mb-5" />
+          <div className="flex justify-end w-full gap-3">
+            <MyButton variant="outlined" color="secondary" type="button" disabled={isSubmitting}>
+              <span className="text-sm-semibold">Cancel & save draft</span>
+            </MyButton>
+            <MyButton variant="filled" color="primary" type="submit" disabled={isSubmitting}>
+              <span className="text-sm-semibold text-white">Next</span>
+            </MyButton>
+          </div>
         </div>
-
       </div>
     </div>
   )

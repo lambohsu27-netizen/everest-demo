@@ -5,7 +5,7 @@ import { useState } from 'react'
 import RegisterCompanyInfoForm from './RegisterCompanyInfoForm'
 
 function RegisterCompanyInfo() {
-  const [activeStep, setActiveStep] = useState(1)
+  const [activeStep, setActiveStep] = useState(2)
 
   return (
     <main className="flex h-screen overflow-hidden z-50">
@@ -33,7 +33,9 @@ function RegisterCompanyInfo() {
               </MyStep>
               <MyStep value={3}>
                 <div className="flex flex-col">
-                  <p className="text-md-semibold text-white">Authorized Representative Information</p>
+                  <p className="text-md-semibold text-white">
+                    Authorized Representative Information
+                  </p>
                   <p className="text-sm-regular text-white/70">
                     Provide details of the individual authorized to represent the company
                   </p>
@@ -60,7 +62,7 @@ function RegisterCompanyInfo() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-white overflow-y-auto">
+      <div className="flex-1 bg-white overflow-hidden">
         <RegisterCompanyInfoForm activeStep={activeStep} setActiveStep={setActiveStep} />
       </div>
     </main>

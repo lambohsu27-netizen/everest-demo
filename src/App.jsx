@@ -32,7 +32,7 @@ export default function App() {
         closeOnClick
       />
       {isAuthenticated ? (
-        <div id="main-content" className="relative w-full overflow-x-hidden md:flex">
+        <div id="main-content" className="relative w-full overflow-hidden md:flex">
           {showNavigation && (
             <LoginProvider>
               <Navigation />
@@ -42,7 +42,7 @@ export default function App() {
           <div
             className={`${
               showNavigation ? 'md:flex-1 pt-16 md:pt-0' : 'w-full'
-            } w-full h-[100dvh] md:h-[100vh] overflow-y-auto overflow-x-hidden box-border`}
+            } w-full h-[100dvh] md:h-[100vh] overflow-hidden box-border`}
           >
             <AuthenticatedRoutes />
           </div>

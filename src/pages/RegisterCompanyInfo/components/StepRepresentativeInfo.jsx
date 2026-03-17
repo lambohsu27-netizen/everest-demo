@@ -1,5 +1,12 @@
 import { MyButton, MyTextField, MyDropzone } from '@interstellar-component'
-import { ArrowLeft, Mail01, Phone, Download04 } from '@untitled-ui/icons-react'
+import {
+  ArrowLeft,
+  Mail01,
+  Phone,
+  Download04,
+  UploadCloud02,
+} from '@untitled-ui/icons-react'
+import { useState } from 'react'
 
 function StepRepresentativeInfo({
   control,
@@ -10,6 +17,7 @@ function StepRepresentativeInfo({
   isSubmitting,
   onBack,
 }) {
+  const [isDownloaded, setIsDownloaded] = useState(false)
   const { rep_name, rep_position, rep_email, rep_phone } = watch()
 
   return (
@@ -117,6 +125,7 @@ function StepRepresentativeInfo({
                       color="purple"
                       type="button"
                       size="md"
+                      onClick={() => setIsDownloaded(true)}
                     >
                       <div className="flex items-center gap-x-3">
                         <Download04 className="w-5 h-5" />
@@ -125,30 +134,39 @@ function StepRepresentativeInfo({
                     </MyButton>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm-regular text-gray-700">
-                        Please download the template first, then upload the completed template file.
-                      </p>
-                      <p className="text-sm-regular text-gray-600">
-                        Only files based on the provided template will be accepted.
-                      </p>
-                    </div>
-                    <MyDropzone
-                      colorBg="bg-white"
-                      multiple={false}
-                      accept={['.pdf', '.png', '.jpg', '.jpeg', '.docx']}
-                      maxSize={5242880} // 5MB
-                      onChange={(files) => {
-                        setValue(
-                          'surat_kuasa_document',
-                          files && files.length > 0 ? files[0] : null,
-                          {
-                            shouldDirty: true,
-                          }
-                        )
-                      }}
-                      errors={errors?.surat_kuasa_document?.message}
-                    />
+                    {!isDownloaded ? (
+                      <div className="flex w-full flex-col items-center justify-center gap-y-3 rounded-xl border border-gray-200 bg-gray-50 px-6 py-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm">
+                          <UploadCloud02 className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <div className="flex flex-col items-center gap-1 text-center">
+                          <p className="text-sm-regular text-gray-600">
+                            Please download the template first, then upload the completed
+                            template file.
+                          </p>
+                          <p className="text-xs-regular text-gray-600">
+                            Only files based on the provided template will be accepted.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <MyDropzone
+                        colorBg="bg-white"
+                        multiple={false}
+                        accept={['.pdf', '.png', '.jpg', '.jpeg', '.docx']}
+                        maxSize={5242880} // 5MB
+                        onChange={(files) => {
+                          setValue(
+                            'surat_kuasa_document',
+                            files && files.length > 0 ? files[0] : null,
+                            {
+                              shouldDirty: true,
+                            }
+                          )
+                        }}
+                        errors={errors?.surat_kuasa_document?.message}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

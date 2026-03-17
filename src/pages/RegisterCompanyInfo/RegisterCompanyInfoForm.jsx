@@ -11,9 +11,18 @@ import StepMembershipAgreement from './components/StepMembershipAgreement'
 
 const RegisterCompanySchema = yup.object().shape({
   company_name: yup.string().required('Company name is required'),
-  industry: yup.string().required('Industry is required'),
-  website: yup.string().url('Invalid URL format').required('Website is required'),
-  company_size: yup.string().required('Company size is required'),
+  business_category: yup.object().required('Business category is required'),
+  industry: yup.object().required('Industry is required'),
+  website: yup.string().url('Invalid URL format').nullable(), // Optional per Figma (no *)
+  company_size: yup.object().required('Company size is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  logo: yup.mixed().required('Logo is required'),
+  province: yup.object().required('Province is required'),
+  city: yup.object().required('City is required'),
+  district: yup.object().required('District is required'),
+  subdistrict: yup.object().required('Subdistrict is required'),
+  postal_code: yup.object().required('Postal code is required'),
+  company_address: yup.string().required('Company address is required'),
   registration_number: yup.string().required('Registration number is required'),
   business_type: yup.string().required('Business type is required'),
   registered_address: yup.string().required('Registered address is required'),
@@ -33,14 +42,24 @@ function RegisterCompanyInfoForm({ activeStep, setActiveStep }) {
     control,
     trigger,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(RegisterCompanySchema),
     defaultValues: {
       company_name: '',
-      industry: '',
+      business_category: null,
+      industry: null,
       website: '',
-      company_size: '',
+      company_size: null,
+      email: '',
+      logo: null,
+      province: null,
+      city: null,
+      district: null,
+      subdistrict: null,
+      postal_code: null,
+      company_address: '',
       registration_number: '',
       business_type: '',
       registered_address: '',
@@ -71,6 +90,7 @@ function RegisterCompanyInfoForm({ activeStep, setActiveStep }) {
           errors={errors}
           trigger={trigger}
           watch={watch}
+          setValue={setValue}
           isSubmitting={isSubmitting}
         />
       )}

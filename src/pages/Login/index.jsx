@@ -8,8 +8,10 @@ import {
   MyBgPatternDecorativeCube,
   MyButton,
   MyCheckbox,
+  MyLogo,
   MyTextField,
 } from '@interstellar-component'
+import LoginPhoto from '../../assets/Welcome/Section.svg'
 
 import loginPhoto from '../../assets/Login/loginPhoto.png'
 import bipura_logo from '../../assets/Login/bipura_logo.png'
@@ -79,15 +81,10 @@ function Login() {
         handleCurrentModal={handleCurrentModal}
         currentModal={currentModal}
       />
-      <main className="flex h-screen z-50">
-        <div id="left" className="flex w-full items-center justify-center max-md:w-full">
-          <form
-            className="items-center justify-center gap-6 w-full max-w-[480px] rounded-xl p-5 md:p-10 column z-50"
-            onSubmit={onSubmit}
-          >
-            <div className="z-0">
-              <MyBgPatternDecorativeCube />
-            </div>
+      <main className="flex h-screen w-full bg-white overflow-hidden">
+        <div id="left" className="relative flex w-full md:w-1/2 items-center justify-center p-8">
+          <form className="flex flex-col w-full max-w-[360px] gap-y-6 z-50" onSubmit={onSubmit}>
+            <div className="z-0">{/* <MyBgPatternDecorativeCube /> */}</div>
             {/* <img
               src={MantapLogoLogin}
               alt="logo"
@@ -95,15 +92,14 @@ function Login() {
               height={118}
               className="z-40"
             /> */}
-            <div className="z-40 flex flex-col gap-6 items-center">
-              <img src={bipura_logo} alt="logo" width={42} height={21} />
-              <div className="gap-y-2 column items-center text-center">
-                <p className="display-sm-semibold text-gray-900">Log in to your account</p>
-                <p className="text-md-regular text-gray-600">
+            <header className="flex w-[400px] flex-col justify-start gap-y-6">
+              <div className="flex flex-col items-start gap-y-2">
+                <p className="display-xs-semibold">Log in</p>
+                <p className="text-md-regular text-gray-600" data-test="login-header">
                   Welcome back! Please enter your details.
                 </p>
               </div>
-            </div>
+            </header>
             <div className="z-40 relative flex w-full flex-col gap-y-5 mt-2">
               <div className="gap-1 column">
                 <p className="text-sm-medium text-gray-700">Email</p>
@@ -169,7 +165,7 @@ function Login() {
                 <p className="text-sm-semibold">Forgot password</p>
               </MyButton>
             </section>
-            <div className="z-40 relative w-full">
+            <div className="flex flex-col w-full gap-y-4">
               <MyButton
                 type="submit"
                 color="primary"
@@ -178,13 +174,38 @@ function Login() {
                 expanded
                 disabled={isSubmitting}
               >
-                <p className="text-md-semibold">Login</p>
+                <p className="text-md-semibold">Sign in</p>
               </MyButton>
+              <p className="text-sm text-center text-gray-600">
+                Don’t have an account?{' '}
+                <span
+                  onClick={() => nav('/signup')}
+                  className="font-semibold text-brand/700 cursor-pointer"
+                >
+                  Sign up
+                </span>
+              </p>
             </div>
           </form>
+          <div className="absolute bottom-10 left-10 md:left-16">
+            <p className="text-sm text-gray-500">© Everest 2026</p>
+          </div>
+          <div className="absolute top-8 left-8 h-[60px] w-[300px]">
+            <MyLogo showText={true} />
+            {/* <img
+            src={Logo}
+            alt="Login Illustration"
+            className="h-full w-full object-contain"
+          /> */}
+          </div>
+        </div>
+        <div id="right" className="hidden md:flex md:w-1/2 h-full p-6">
+          <div className="w-full h-full overflow-hidden rounded-[40px]">
+            <img src={LoginPhoto} alt="Login Illustration" className="h-full w-full object-cover" />
+          </div>
         </div>
         {/* <div id="right" className="w-5/12 overflow-hidden rounded-l-extraLarge max-md:hidden">
-          <img src={loginPhoto} alt="Login Illustration" className="h-full w-full object-cover" />
+          <img src={LoginPhoto} alt="Login Illustration" className="h-full w-full object-cover" />
         </div> */}
       </main>
     </>

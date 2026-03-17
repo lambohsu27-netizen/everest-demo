@@ -1,4 +1,4 @@
-import { CheckCircle, Key01, Mail02, Passcode } from '@untitled-ui/icons-react'
+import { CheckCircle, Key01, Mail02, Passcode, Stars02, UsersPlus } from '@untitled-ui/icons-react'
 import LineProgress from './Assets/Connector.svg'
 import ForgotPassword from './Components/ForgotPassword'
 import CheckYourEmail from './Components/CheckYourEmail'
@@ -6,6 +6,7 @@ import SetNewPassword from './Components/SetNewPassword'
 import PasswordReset from './Components/PasswordReset'
 import { useForgetPassword } from './context'
 import Logo from '../../assets/Login/bipura_logo.png'
+import { MyLogo } from '@interstellar-component'
 
 function ForgetPassword() {
   const { currentStep } = useForgetPassword()
@@ -13,103 +14,106 @@ function ForgetPassword() {
   return (
     <main className="container flex min-h-screen flex-col md:flex-row">
       {/* LEFT - hidden on mobile, visible from md up */}
-      <div className="hidden min-h-screen w-full flex-shrink-0 bg-gray-light/100 px-8 pt-12 md:block md:w-[440px]">
-        {/* logo */}
-        <div className="mb-10 h-10 w-32">
-          <img src={Logo} alt="Logo" />
+      <div className="hidden min-h-screen w-full flex-shrink-0 bg-[#F9FAFB] border-r border-gray-200 px-10 pt-10 md:block md:w-[400px] relative">
+        <div className="mb-16 transform scale-90 origin-left">
+          <MyLogo showText={true} />
         </div>
-        {/* Content */}
-        <div className="md:gap-x-10">
-          {/* details */}
-          <div className="flex flex-col gap-4 md:flex-row">
-            <div className="flex flex-col items-center justify-center">
+
+        {/* Stepper Content */}
+        <div className="flex flex-col">
+          {/* Step 1 */}
+          <div className="flex items-stretch gap-x-4">
+            <div className="flex flex-col items-center">
               <div
-                className={`rounded-xl border-2 px-3 py-3 ${
-                  currentStep.step_1 ? 'opacity-100' : 'opacity-50'
-                }`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_1 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
-                <Key01 />
+                <Key01 size={20} strokeWidth={2.5} />
               </div>
-              <div className="mx-6 my-1">
-                <img src={LineProgress} alt="LineProgress" />
-              </div>
+              <div className="w-[1.5px] flex-1 bg-gray-200 my-0"></div>
             </div>
-            <div className="max-sm:hidden">
+            <div className="pb-10 pt-0.5">
+              {' '}
               <p
-                className={`text-sm-${currentStep.step_1 ? 'bold' : 'regular'} text-gray-light/700`}
+                className={`text-sm font-semibold mb-0.5 ${currentStep.step_1 ? 'text-gray-900' : 'text-gray-500'}`}
               >
                 Your details
               </p>
-              <p className="text-sm-regular text-gray-light/600">please provide your email</p>
-            </div>
-          </div>
-          {/* email */}
-          <div className="flex flex-col gap-4 md:flex-row">
-            <div className="flex flex-col items-center justify-center">
-              <div
-                className={`rounded-xl border-2 px-3 py-3 ${
-                  currentStep.step_2 ? 'opacity-100' : 'opacity-50'
-                }`}
-              >
-                <Mail02 />
-              </div>
-              <div className="mx-6 my-1">
-                <img src={LineProgress} alt="LineProgress" />
-              </div>
-            </div>
-            <div className="max-sm:hidden">
-              <p
-                className={`text-sm-${currentStep.step_2 ? 'bold' : 'regular'} text-gray-light/700`}
-              >
-                Check your email
-              </p>
-              <p className="text-sm-regular text-gray-light/600">
-                Find password reset link on email
+              <p className="text-sm text-gray-500 leading-tight">
+                Please provide your name and email
               </p>
             </div>
           </div>
-          {/* Set New Password */}
-          <div className="flex flex-col gap-4 md:flex-row">
-            <div className="flex flex-col items-center justify-center">
+
+          {/* Step 2 */}
+          <div className="flex items-stretch gap-x-4">
+            <div className="flex flex-col items-center">
               <div
-                className={`rounded-xl border-2 px-3 py-3 ${
-                  currentStep.step_3 ? 'opacity-100' : 'opacity-50'
-                }`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_2 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
-                <Passcode />
+                <Passcode size={20} strokeWidth={2.5} />
               </div>
-              <div className="mx-6 my-1">
-                <img src={LineProgress} alt="LineProgress" />
-              </div>
+              <div className="w-[1.5px] flex-1 bg-gray-200"></div>
             </div>
-            <div className="max-sm:hidden">
+            <div className="pb-10 pt-0.5">
               <p
-                className={`text-sm-${currentStep.step_3 ? 'bold' : 'regular'} text-gray-light/700`}
+                className={`text-sm font-semibold mb-0.5 ${currentStep.step_2 ? 'text-gray-900' : 'text-gray-500'}`}
               >
-                Set new password
+                Choose a password
               </p>
-              <p className="text-sm-regular text-gray-light/600">Choose a secure password</p>
+              <p className="text-sm text-gray-500 leading-tight">Choose a secure password</p>
             </div>
           </div>
-          {/* password reset */}
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center justify-center">
+
+          {/* Step 3 */}
+          <div className="flex items-stretch gap-x-4">
+            <div className="flex flex-col items-center">
               <div
-                className={`rounded-xl border-2 px-3 py-3 ${
-                  currentStep.step_4 ? 'opacity-100' : 'opacity-50'
-                }`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_3 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
-                <CheckCircle />
+                <UsersPlus size={20} strokeWidth={2.5} />
+              </div>
+              <div className="w-[1.5px] flex-1 bg-gray-200"></div>
+            </div>
+            <div className="pb-10 pt-0.5">
+              <p
+                className={`text-sm font-semibold mb-0.5 ${currentStep.step_3 ? 'text-gray-900' : 'text-gray-500'}`}
+              >
+                Invite your team
+              </p>
+              <p className="text-sm text-gray-500 leading-tight">
+                Start collaborating with your team
+              </p>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="flex items-start gap-x-4">
+            <div className="flex flex-col items-center">
+              <div
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_4 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
+              >
+                <Stars02 size={20} strokeWidth={2.5} />
               </div>
             </div>
-            <div className="max-sm:hidden">
+            <div className="pt-0.5">
               <p
-                className={`text-sm-${currentStep.step_4 ? 'bold' : 'regular'} text-gray-light/700`}
+                className={`text-sm font-semibold mb-0.5 ${currentStep.step_4 ? 'text-gray-900' : 'text-gray-500'}`}
               >
-                Password reset
+                Add your socials
               </p>
-              <p className="text-sm-regular text-gray-light/600">Your password has been reset</p>
+              <p className="text-sm text-gray-500 leading-tight">
+                Share posts to your social accounts
+              </p>
             </div>
+          </div>
+        </div>
+
+        {/* Footer Sisi Kiri (Copyright & Support) */}
+        <div className="absolute bottom-10 left-10 right-10 flex justify-between items-center text-xs text-gray-500">
+          <p>© Everest 2026</p>
+          <div className="flex items-center gap-x-1">
+            <Mail02 size={14} />
+            <span>help@everest.com</span>
           </div>
         </div>
       </div>

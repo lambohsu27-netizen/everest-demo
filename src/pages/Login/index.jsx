@@ -179,7 +179,7 @@ function Login() {
               <p className="text-sm text-center text-gray-600">
                 Don’t have an account?{' '}
                 <span
-                  onClick={() => nav('/signup')}
+                  onClick={() => nav('/register')}
                   className="font-semibold text-brand/700 cursor-pointer"
                 >
                   Sign up
@@ -191,7 +191,7 @@ function Login() {
             <p className="text-sm text-gray-500">© Everest 2026</p>
           </div>
           <div className="absolute top-8 left-8 h-[60px] w-[300px]">
-            <MyLogo showText={true} />
+            <MyLogo showText />
             {/* <img
             src={Logo}
             alt="Login Illustration"

@@ -28,8 +28,8 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
       {/* Header section */}
       <div className="flex flex-col gap-6 w-full border-b border-gray-200 pb-6">
         <div className="px-8 w-full flex flex-col gap-5">
-          <button className="flex items-center gap-1.5 text-brand-700 hover:text-brand-800 font-semibold text-sm w-fit transition-colors">
-            <ArrowLeft className="w-5 h-5 text-brand-700" /> Back to company menu
+          <button className="flex items-center gap-1.5 text-brand/700 hover:text-brand/800 font-semibold text-sm w-fit transition-colors">
+            <ArrowLeft className="w-5 h-5 text-brand/700" /> Back to company menu
           </button>
           <div className="flex flex-col gap-1 w-full">
             <h1 className="text-display-xs-semibold text-gray-900">Company Information</h1>
@@ -55,7 +55,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
             <div className="flex-1 max-w-[624px] rounded-xl border border-gray-200 shadow-[0_1px_2px_rgba(10,13,18,0.05)] bg-white flex flex-col">
               <div className="p-6 flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Legal name
                   </label>
                   <MyTextField
@@ -70,7 +70,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
 
                 <section className="w-full flex justify-between gap-6 ">
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Business category
                     </label>
                     <MyAutocomplete
@@ -88,7 +88,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   </div>
 
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Industry
                     </label>
                     <MyAutocomplete
@@ -110,7 +110,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </section>
 
                 <div className="flex flex-col gap-1.5 max-w-[312px]">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Number of employee
                   </label>
                   <MyAutocomplete
@@ -143,7 +143,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Email address
                   </label>
                   <MyTextField
@@ -158,7 +158,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Logo
                   </label>
                   <MyDropzone
@@ -196,7 +196,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
               <div className="p-6 flex flex-col gap-5">
                 <section className="w-full flex justify-between gap-6">
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Province
                     </label>
                     <MyAutocomplete
@@ -211,7 +211,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   </div>
 
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       City / Kabupaten
                     </label>
                     <MyAutocomplete
@@ -228,7 +228,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
 
                 <section className="w-full flex justify-between gap-6 ">
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       District
                     </label>
                     <MyAutocomplete
@@ -243,7 +243,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   </div>
 
                   <div className="flex flex-col gap-1.5 w-full">
-                    <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Subdistrict
                     </label>
                     <MyAutocomplete
@@ -259,7 +259,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </section>
 
                 <div className="flex flex-col gap-1.5 max-w-[312px]">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Postal Code
                   </label>
                   <MyAutocomplete
@@ -274,7 +274,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand-600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                     Company Address
                   </label>
                   <MyTextArea

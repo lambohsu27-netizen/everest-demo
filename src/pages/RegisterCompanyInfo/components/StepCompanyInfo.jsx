@@ -296,10 +296,22 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
         <div className="px-8 w-full">
           <hr className="w-full border-gray-200 mb-5" />
           <div className="flex justify-end w-full gap-3">
-            <MyButton variant="outlined" color="secondary" type="button" disabled={isSubmitting}>
+            <MyButton
+              variant="outlined"
+              color="secondary"
+              type="button"
+              size="md"
+              disabled={isSubmitting}
+            >
               <span className="text-sm-semibold">Cancel & save draft</span>
             </MyButton>
-            <MyButton variant="filled" color="primary" type="submit" disabled={isSubmitting}>
+            <MyButton
+              size="md"
+              variant="filled"
+              color="primary"
+              type="submit"
+              disabled={isSubmitting}
+            >
               <span className="text-sm-semibold text-white">Next</span>
             </MyButton>
           </div>

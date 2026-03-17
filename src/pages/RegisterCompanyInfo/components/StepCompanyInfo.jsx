@@ -44,9 +44,9 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
       <div className="flex flex-col gap-8 w-full">
         <div className="px-8 w-full flex flex-col gap-6">
           {/* Form Area 1: Company Details */}
-          <div className="flex flex-col md:flex-row gap-8 w-full">
+          <div className="flex flex-col xl:flex-row gap-8 w-full">
             {/* Section label */}
-            <div className="w-full md:w-[280px] shrink-0 flex flex-col">
+            <div className="w-full xl:w-[280px] shrink-0 flex flex-col">
               <h2 className="text-sm-semibold text-gray-900">Company Details</h2>
               <p className="text-sm-regular text-gray-600">Basic information about your company.</p>
             </div>
@@ -68,7 +68,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   />
                 </div>
 
-                <section className="w-full flex justify-between gap-6 ">
+                <section className="w-full flex flex-col md:flex-row justify-between gap-6 ">
                   <div className="flex flex-col gap-1.5 w-full">
                     <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Business category
@@ -182,9 +182,9 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
           <hr className="w-full border-gray-200" />
 
           {/* Form Area 2: Company Address */}
-          <div className="flex flex-col md:flex-row gap-8 w-full">
+          <div className="flex flex-col xl:flex-row gap-8 w-full">
             {/* Section label */}
-            <div className="w-full md:w-[280px] shrink-0 flex flex-col">
+            <div className="w-full xl:w-[280px] shrink-0 flex flex-col">
               <h2 className="text-sm-semibold text-gray-900">Company Address</h2>
               <p className="text-sm-regular text-gray-600">
                 Location details of your registered company address.
@@ -194,7 +194,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
             {/* Form panel */}
             <div className="flex-1 max-w-[624px] rounded-xl border border-gray-200 shadow-[0_1px_2px_rgba(10,13,18,0.05)] bg-white flex flex-col">
               <div className="p-6 flex flex-col gap-5">
-                <section className="w-full flex justify-between gap-6">
+                <section className="w-full flex flex-col md:flex-row justify-between gap-6">
                   <div className="flex flex-col gap-1.5 w-full">
                     <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       Province
@@ -226,7 +226,7 @@ function StepCompanyInfo({ control, errors, trigger, watch, setValue, isSubmitti
                   </div>
                 </section>
 
-                <section className="w-full flex justify-between gap-6 ">
+                <section className="w-full flex flex-col md:flex-row justify-between gap-6 ">
                   <div className="flex flex-col gap-1.5 w-full">
                     <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
                       District

@@ -164,7 +164,7 @@ export function StepAccountDetailsLogin({ nav }) {
         <span
           role="button"
           tabIndex={0}
-          className="text-sm-semibold text-primary-700 cursor-pointer"
+          className="text-sm-semibold text-brand/700 cursor-pointer"
           onClick={() => nav('/login')}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') nav('/login')

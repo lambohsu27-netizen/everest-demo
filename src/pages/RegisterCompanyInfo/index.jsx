@@ -5,7 +5,7 @@ import { useState } from 'react'
 import RegisterCompanyInfoForm from './RegisterCompanyInfoForm'
 
 function RegisterCompanyInfo() {
-  const [activeStep, setActiveStep] = useState(4)
+  const [activeStep, setActiveStep] = useState(1)
 
   return (
     <main className="flex h-screen overflow-hidden z-50">

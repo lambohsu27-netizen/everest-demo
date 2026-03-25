@@ -37,19 +37,25 @@ function ChartCard({ title, subtitle, series }) {
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
           <p className="text-sm text-gray-600">{subtitle}</p>
         </div>
-        {/* Custom Legend because MyChartBar legend is false */}
-        <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-          {series.map((s, i) => (
-            <div key={s.name} className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[i] }} />
-              {s.name}
-            </div>
-          ))}
-        </div>
+      </div>
+
+      {/* Custom Legend because MyChartBar legend is false */}
+      <div className="flex items-center justify-end gap-4 text-xs font-medium text-gray-500">
+        {series.map((s, i) => (
+          <div key={s.name} className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CHART_COLORS[i] }} />
+            {s.name}
+          </div>
+        ))}
       </div>
 
       <div className="h-[240px] w-full">
-        <MyLayeredBarChart series={series} colors={CHART_COLORS} labels={CHART_LABELS} height={240} />
+        <MyLayeredBarChart
+          series={series}
+          colors={CHART_COLORS}
+          labels={CHART_LABELS}
+          height={240}
+        />
       </div>
     </div>
   )

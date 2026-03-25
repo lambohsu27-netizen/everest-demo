@@ -7,7 +7,7 @@ function ReportEnquiryMetrics() {
 
   return (
     <div className="px-8 pb-6">
-      <div className="flex flex-wrap gap-4 md:flex-nowrap">
+      <div className="flex flex-wrap gap-4">
         {metrics?.map((m) => (
           <MyMetricCard
             key={m.label}
@@ -15,6 +15,7 @@ function ReportEnquiryMetrics() {
             value={m.value}
             active={m.active}
             onClick={() => handleMetricClick(m.label)}
+            className="w-full md:w-auto"
           />
         ))}
       </div>

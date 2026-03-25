@@ -1,5 +1,6 @@
 import React from 'react'
 import { SearchMd } from '@untitled-ui/icons-react'
+import { MyMetricCard } from '../../../interstellar-component'
 
 const metrics = [
   { label: 'All KOL', value: '1,432', active: true },
@@ -9,19 +10,6 @@ const metrics = [
   { label: 'KOL 4', value: '43', active: false },
   { label: 'KOL 5', value: '5', active: false },
 ]
-
-function MetricCard({ label, value, active }) {
-  return (
-    <div
-      className={`flex flex-col gap-2 rounded-xl border p-4 shadow-sm w-[160px] md:flex-1 ${
-        active ? 'border-brand/500 bg-white' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <span className="text-sm font-medium text-gray-500">{label}</span>
-      <span className="text-3xl font-semibold text-gray-900">{value}</span>
-    </div>
-  )
-}
 
 function EmployeeDashboardSection({ searchTerm, onSearchTermChange }) {
   return (
@@ -55,7 +43,13 @@ function EmployeeDashboardSection({ searchTerm, onSearchTermChange }) {
 
       <div className="flex flex-wrap gap-4 md:flex-nowrap">
         {metrics.map((m) => (
-          <MetricCard key={m.label} label={m.label} value={m.value} active={m.active} />
+          <MyMetricCard 
+            key={m.label} 
+            label={m.label} 
+            value={m.value} 
+            active={m.active} 
+            onClick={() => {}}
+          />
         ))}
       </div>
     </div>

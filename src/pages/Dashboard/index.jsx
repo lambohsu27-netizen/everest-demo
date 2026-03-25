@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import DashboardHeader from './components/DashboardHeader'
 import KolektibilitasSection from './components/KolektibilitasSection'
 import EmployeeDashboardSection from './components/EmployeeDashboardSection'
 import EmployeeTable from './components/EmployeeTable'
+import { useDashboard } from './Context'
 
 function Dashboard() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const { searchTerm, setSearchTerm } = useDashboard()
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-gray-50/50">

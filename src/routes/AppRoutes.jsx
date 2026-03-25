@@ -4,6 +4,7 @@ import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
 import Dashboard from '@src/pages/Dashboard'
+import { DashboardProvider } from '@src/pages/Dashboard/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -49,7 +50,14 @@ export function AuthenticatedRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardProvider>
+            <Dashboard />
+          </DashboardProvider>
+        }
+      />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
         path="/profile"

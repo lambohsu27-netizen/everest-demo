@@ -142,11 +142,13 @@ function EmployeeTable() {
                   alt={row.name}
                   className="h-10 w-10 rounded-full object-cover"
                 />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">
+                <div className="flex flex-col truncate">
+                  <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                     {row.name}
                   </span>
-                  <span className="text-sm text-gray-500">{row.role}</span>
+                  <span className="whitespace-nowrap text-sm text-gray-500">
+                    {row.role}
+                  </span>
                 </div>
               </div>
             )}
@@ -190,7 +192,9 @@ function EmployeeTable() {
           <MyColumn
             header="Data as"
             body={(row) => (
-              <span className="text-sm text-gray-600">{row.dataAs}</span>
+              <span className="whitespace-nowrap text-sm text-gray-600">
+                {row.dataAs}
+              </span>
             )}
           />
         </MyDataTable>

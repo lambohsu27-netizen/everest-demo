@@ -26,11 +26,9 @@ function MetricCard({ label, value, active }) {
 function EmployeeDashboardSection({ searchTerm, onSearchTermChange }) {
   return (
     <div className="flex flex-col gap-6 p-8 pb-4">
-      <div className="flex flex-col gap-4 border-b border-gray-200 pb-5 md:flex-row md:items-end justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end justify-between">
         <div className="flex flex-col gap-1">
-          <h2 className="text-[18px] font-semibold text-gray-900">
-            Employee dashboard
-          </h2>
+          <h2 className="text-[18px] font-semibold text-gray-900">Employee dashboard</h2>
           <p className="text-[14px] text-gray-600">
             Manage your team members and their account permissions here.
           </p>
@@ -57,12 +55,7 @@ function EmployeeDashboardSection({ searchTerm, onSearchTermChange }) {
 
       <div className="flex flex-wrap gap-4 md:flex-nowrap">
         {metrics.map((m) => (
-          <MetricCard
-            key={m.label}
-            label={m.label}
-            value={m.value}
-            active={m.active}
-          />
+          <MetricCard key={m.label} label={m.label} value={m.value} active={m.active} />
         ))}
       </div>
     </div>

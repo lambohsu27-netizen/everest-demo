@@ -120,7 +120,12 @@ function Navigation({ childs }) {
             </div>
 
             <div className="flex flex-col gap-0.5 px-3">
-              <NavItem icon={<HomeLine />} path="/home" label="Home" isAccess={Access?.USER} />
+              <NavItem
+                icon={<HomeLine />}
+                path="/dashboard"
+                label="Dashboard"
+                isAccess={Access?.USER}
+              />
               <NavItem
                 icon={<BarChartSquare02 />}
                 path="/analytics"

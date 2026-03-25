@@ -1,6 +1,5 @@
+import { MyColumn, MyDataTable } from '@interstellar-component'
 import React, { useState } from 'react'
-import MyDataTable from '../../../interstellar-component/components/Table/MyDataTable'
-import MyColumn from '../../../interstellar-component/components/Table/MyColumn'
 
 const MOCK_DATA = [
   {
@@ -185,9 +184,7 @@ function EmployeeTable() {
                   <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                     {row.name}
                   </span>
-                  <span className="whitespace-nowrap text-sm text-gray-500">
-                    {row.role}
-                  </span>
+                  <span className="whitespace-nowrap text-sm text-gray-500">{row.role}</span>
                 </div>
               </div>
             )}
@@ -196,9 +193,7 @@ function EmployeeTable() {
             header="Level"
             field="level"
             onSort={handleSort}
-            body={(row) => (
-              <span className="text-sm text-gray-600">{row.level}</span>
-            )}
+            body={(row) => <span className="text-sm text-gray-600">{row.level}</span>}
           />
           <MyColumn
             header="Kolektibilitas"
@@ -218,34 +213,26 @@ function EmployeeTable() {
             header="Credit score"
             field="creditScore"
             onSort={handleSort}
-            body={(row) => (
-              <span className="text-sm text-gray-600">{row.creditScore}</span>
-            )}
+            body={(row) => <span className="text-sm text-gray-600">{row.creditScore}</span>}
           />
           <MyColumn
             header="Footprint/3 mo."
             field="footprint"
             onSort={handleSort}
-            body={(row) => (
-              <span className="text-sm text-gray-600">{row.footprint}</span>
-            )}
+            body={(row) => <span className="text-sm text-gray-600">{row.footprint}</span>}
           />
           <MyColumn
             header="Outstanding"
             field="outstanding"
             onSort={handleSort}
-            body={(row) => (
-              <span className="text-sm text-gray-600">{row.outstanding}</span>
-            )}
+            body={(row) => <span className="text-sm text-gray-600">{row.outstanding}</span>}
           />
           <MyColumn
             header="Data as"
             field="dataAs"
             onSort={handleSort}
             body={(row) => (
-              <span className="whitespace-nowrap text-sm text-gray-600">
-                {row.dataAs}
-              </span>
+              <span className="whitespace-nowrap text-sm text-gray-600">{row.dataAs}</span>
             )}
           />
         </MyDataTable>

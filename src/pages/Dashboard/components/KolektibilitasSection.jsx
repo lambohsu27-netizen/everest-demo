@@ -1,5 +1,4 @@
-import React from 'react'
-import MyLayeredBarChart from '../../../interstellar-component/components/Chart/MyLayeredBarChart'
+import { MyLayeredBarChart } from '@interstellar-component'
 
 const CHART_COLORS = ['#6941C6', '#9E77ED', '#EAEBEE']
 const CHART_LABELS = [

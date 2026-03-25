@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import DashboardHeader from './DashboardHeader'
-import KolektibilitasSection from './KolektibilitasSection'
-import EmployeeDashboardSection from './EmployeeDashboardSection'
-import EmployeeTable from './EmployeeTable'
+import DashboardHeader from './components/DashboardHeader'
+import KolektibilitasSection from './components/KolektibilitasSection'
+import EmployeeDashboardSection from './components/EmployeeDashboardSection'
+import EmployeeTable from './components/EmployeeTable'
 
 function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -13,10 +13,7 @@ function Dashboard() {
       <div className="mx-auto w-full max-w-[1372px]">
         <DashboardHeader />
         <KolektibilitasSection />
-        <EmployeeDashboardSection
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-        />
+        <EmployeeDashboardSection searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
         <EmployeeTable />
       </div>
     </div>

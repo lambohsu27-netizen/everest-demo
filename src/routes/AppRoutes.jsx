@@ -3,7 +3,7 @@ import VersionPage from '@src/pages/VersionPage'
 import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
-import Dashboard from '@src/pages/Dashboard/Dashboard'
+import Dashboard from '@src/pages/Dashboard'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -20,7 +20,6 @@ import ForgetPassword from '@src/pages/Forget-password'
 import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
 import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
 import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
-
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()

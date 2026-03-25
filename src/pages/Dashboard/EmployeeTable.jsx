@@ -136,13 +136,13 @@ function EmployeeTable() {
           <MyColumn
             header="Name"
             body={(row) => (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pr-8">
                 <img
                   src={row.avatar}
                   alt={row.name}
                   className="h-10 w-10 rounded-full object-cover"
                 />
-                <div className="flex flex-col truncate">
+                <div className="flex flex-col">
                   <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                     {row.name}
                   </span>

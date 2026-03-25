@@ -9,6 +9,8 @@ import ReportEnquiry from '@src/pages/ReportEnquiry'
 import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
 import Workforce from '@src/pages/Workforce'
 import { WorkforceProvider } from '@src/pages/Workforce/Context'
+import Company from '@src/pages/Company'
+import { CompanyProvider } from '@src/pages/Company/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -76,6 +78,14 @@ export function AuthenticatedRoutes() {
           <WorkforceProvider>
             <Workforce />
           </WorkforceProvider>
+        }
+      />
+      <Route
+        path="/company"
+        element={
+          <CompanyProvider>
+            <Company />
+          </CompanyProvider>
         }
       />
       <Route path="/login" element={<Navigate to="/" replace />} />

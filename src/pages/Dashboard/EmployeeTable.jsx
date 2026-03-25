@@ -108,6 +108,41 @@ function getBadgeColor(kol) {
 
 function EmployeeTable() {
   const [data, setData] = useState(MOCK_DATA)
+  const [sortField, setSortField] = useState(null)
+  const [sortOrder, setSortOrder] = useState(null)
+
+  const handleSort = ({ sort, order }) => {
+    setSortField(sort)
+    setSortOrder(order)
+
+    if (!sort || !order) {
+      setData(MOCK_DATA)
+      return
+    }
+
+    const sortedData = [...data].sort((a, b) => {
+      let valA = a[sort] || ''
+      let valB = b[sort] || ''
+
+      // Handle numeric sorting for relevant fields
+      if (['creditScore', 'footprint'].includes(sort)) {
+        valA = Number(valA)
+        valB = Number(valB)
+      }
+
+      // Handle currency sorting for Outstanding
+      if (sort === 'outstanding') {
+        valA = Number(valA.replace(/[^0-9.-]+/g, ''))
+        valB = Number(valB.replace(/[^0-9.-]+/g, ''))
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1
+      if (valA > valB) return order === 'asc' ? 1 : -1
+      return 0
+    })
+
+    setData(sortedData)
+  }
 
   const handleSelectionChange = (updated) => {
     setData(updated.data)
@@ -132,9 +167,13 @@ function EmployeeTable() {
           selectionMode="multiple"
           onSelectionChange={handleSelectionChange}
           paginator
+          currentSortFieldFromParams={sortField}
+          currentSortOrderFromParams={sortOrder}
         >
           <MyColumn
             header="Name"
+            field="name"
+            onSort={handleSort}
             body={(row) => (
               <div className="flex items-center gap-3 pr-8">
                 <img
@@ -155,12 +194,16 @@ function EmployeeTable() {
           />
           <MyColumn
             header="Level"
+            field="level"
+            onSort={handleSort}
             body={(row) => (
               <span className="text-sm text-gray-600">{row.level}</span>
             )}
           />
           <MyColumn
             header="Kolektibilitas"
+            field="kolektibilitas"
+            onSort={handleSort}
             body={(row) => (
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getBadgeColor(
@@ -173,24 +216,32 @@ function EmployeeTable() {
           />
           <MyColumn
             header="Credit score"
+            field="creditScore"
+            onSort={handleSort}
             body={(row) => (
               <span className="text-sm text-gray-600">{row.creditScore}</span>
             )}
           />
           <MyColumn
             header="Footprint/3 mo."
+            field="footprint"
+            onSort={handleSort}
             body={(row) => (
               <span className="text-sm text-gray-600">{row.footprint}</span>
             )}
           />
           <MyColumn
             header="Outstanding"
+            field="outstanding"
+            onSort={handleSort}
             body={(row) => (
               <span className="text-sm text-gray-600">{row.outstanding}</span>
             )}
           />
           <MyColumn
             header="Data as"
+            field="dataAs"
+            onSort={handleSort}
             body={(row) => (
               <span className="whitespace-nowrap text-sm text-gray-600">
                 {row.dataAs}

@@ -7,6 +7,8 @@ import Dashboard from '@src/pages/Dashboard'
 import { DashboardProvider } from '@src/pages/Dashboard/Context'
 import ReportEnquiry from '@src/pages/ReportEnquiry'
 import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
+import Workforce from '@src/pages/Workforce'
+import { WorkforceProvider } from '@src/pages/Workforce/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -66,6 +68,14 @@ export function AuthenticatedRoutes() {
           <ReportEnquiryProvider>
             <ReportEnquiry />
           </ReportEnquiryProvider>
+        }
+      />
+      <Route
+        path="/workforce"
+        element={
+          <WorkforceProvider>
+            <Workforce />
+          </WorkforceProvider>
         }
       />
       <Route path="/login" element={<Navigate to="/" replace />} />

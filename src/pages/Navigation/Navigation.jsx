@@ -152,8 +152,8 @@ function Navigation({ childs }) {
               />
               <NavItem
                 icon={<Users01 />}
-                path="/enquiry"
-                label="User Management"
+                path="/workforce"
+                label="Workforce"
                 isAccess={Access?.USER}
               />
             </div>

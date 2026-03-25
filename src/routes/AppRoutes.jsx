@@ -3,7 +3,10 @@ import VersionPage from '@src/pages/VersionPage'
 import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
-import Dashboard from '@src/pages/Dashboard/Dashboard'
+import Dashboard from '@src/pages/Dashboard'
+import { DashboardProvider } from '@src/pages/Dashboard/Context'
+import ReportEnquiry from '@src/pages/ReportEnquiry'
+import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -20,7 +23,6 @@ import ForgetPassword from '@src/pages/Forget-password'
 import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
 import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
 import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
-
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -50,7 +52,22 @@ export function AuthenticatedRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardProvider>
+            <Dashboard />
+          </DashboardProvider>
+        }
+      />
+      <Route
+        path="/report-enquiry"
+        element={
+          <ReportEnquiryProvider>
+            <ReportEnquiry />
+          </ReportEnquiryProvider>
+        }
+      />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
         path="/profile"

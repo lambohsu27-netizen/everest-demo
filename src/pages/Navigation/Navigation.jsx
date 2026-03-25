@@ -134,8 +134,8 @@ function Navigation({ childs }) {
               />
               <NavItem
                 icon={<LayersThree01 />}
-                path="/layers"
-                label="Layers"
+                path="/report-enquiry"
+                label="Report Enquiry"
                 isAccess={Access?.USER}
               />
               <NavItem

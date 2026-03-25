@@ -14,6 +14,7 @@ import { CompanyProvider } from '@src/pages/Company/Context'
 import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
+import ContactUs from '@src/pages/ContactUs'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -102,6 +103,10 @@ export function AuthenticatedRoutes() {
       <Route
         path="/legal"
         element={<Legal />}
+      />
+      <Route
+        path="/contact-us"
+        element={<ContactUs />}
       />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route

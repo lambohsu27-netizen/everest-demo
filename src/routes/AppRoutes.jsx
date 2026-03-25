@@ -5,6 +5,8 @@ import ComponentReview from '@src/pages/component-review'
 import UITemplate from '@src/pages/ui-template'
 import Dashboard from '@src/pages/Dashboard'
 import { DashboardProvider } from '@src/pages/Dashboard/Context'
+import ReportEnquiry from '@src/pages/ReportEnquiry'
+import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -56,6 +58,14 @@ export function AuthenticatedRoutes() {
           <DashboardProvider>
             <Dashboard />
           </DashboardProvider>
+        }
+      />
+      <Route
+        path="/report-enquiry"
+        element={
+          <ReportEnquiryProvider>
+            <ReportEnquiry />
+          </ReportEnquiryProvider>
         }
       />
       <Route path="/login" element={<Navigate to="/" replace />} />

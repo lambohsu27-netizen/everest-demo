@@ -9,6 +9,12 @@ import ReportEnquiry from '@src/pages/ReportEnquiry'
 import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
 import Workforce from '@src/pages/Workforce'
 import { WorkforceProvider } from '@src/pages/Workforce/Context'
+import Company from '@src/pages/Company'
+import { CompanyProvider } from '@src/pages/Company/Context'
+import AuditTrail from '@src/pages/AuditTrail'
+import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
+import Legal from '@src/pages/Legal'
+import ContactUs from '@src/pages/ContactUs'
 import { useEffect, useState } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -77,6 +83,30 @@ export function AuthenticatedRoutes() {
             <Workforce />
           </WorkforceProvider>
         }
+      />
+      <Route
+        path="/company"
+        element={
+          <CompanyProvider>
+            <Company />
+          </CompanyProvider>
+        }
+      />
+      <Route
+        path="/audit-trail"
+        element={
+          <AuditTrailProvider>
+            <AuditTrail />
+          </AuditTrailProvider>
+        }
+      />
+      <Route
+        path="/legal"
+        element={<Legal />}
+      />
+      <Route
+        path="/contact-us"
+        element={<ContactUs />}
       />
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route

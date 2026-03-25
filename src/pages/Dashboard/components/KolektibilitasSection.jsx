@@ -1,31 +1,11 @@
 import { MyLayeredBarChart } from '@interstellar-component'
 
+import { useDashboard } from '../Context'
+
 const CHART_COLORS = ['#6941C6', '#9E77ED', '#EAEBEE']
 const CHART_LABELS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-]
-
-const mockSeries1 = [
-  { name: 'KOL 1', data: [15, 20, 10, 15, 10, 20, 15, 20, 15, 20, 25, 15] },
-  { name: 'KOL 2', data: [20, 30, 15, 25, 15, 30, 25, 30, 25, 35, 40, 25] },
-  { name: 'KOL 3', data: [30, 40, 20, 35, 20, 40, 30, 40, 30, 45, 50, 35] },
-]
-
-const mockSeries2 = [
-  { name: 'KOL 1', data: [12, 18, 8, 13, 8, 18, 13, 18, 13, 18, 23, 13] },
-  { name: 'KOL 2', data: [18, 28, 13, 23, 13, 28, 23, 28, 23, 33, 38, 23] },
-  { name: 'KOL 3', data: [28, 38, 18, 33, 18, 38, 28, 38, 28, 43, 48, 33] },
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ]
 
 function ChartCard({ title, subtitle, series }) {
@@ -61,6 +41,8 @@ function ChartCard({ title, subtitle, series }) {
 }
 
 function KolektibilitasSection() {
+  const { employeeSeries, candidateSeries } = useDashboard()
+
   return (
     <div className="flex w-full flex-col gap-6 p-8 pb-0">
       <div className="flex flex-col gap-1">
@@ -74,12 +56,12 @@ function KolektibilitasSection() {
         <ChartCard
           title="Employee"
           subtitle="Track how your rating compares to your industry average."
-          series={mockSeries1}
+          series={employeeSeries || []}
         />
         <ChartCard
           title="Candidate interview"
           subtitle="Track how your rating compares to your industry average."
-          series={mockSeries2}
+          series={candidateSeries || []}
         />
       </div>
     </div>

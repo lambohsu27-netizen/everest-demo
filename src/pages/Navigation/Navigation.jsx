@@ -17,6 +17,8 @@ import {
   Rows01,
   Building07,
   PackageSearch,
+  MessageSmileSquare,
+  FileLock02,
 } from '@untitled-ui/icons-react'
 import { MyAvatar, MyTooltip, MyConfirmModal, MyButton, MyLogo } from '@interstellar-component'
 import { useCookies } from 'react-cookie'
@@ -160,17 +162,18 @@ function Navigation({ childs }) {
           <div className="flex w-full flex-col items-center gap-y-4">
             <div className="flex flex-col gap-0.5 px-3">
               <NavItem
-                icon={<LifeBuoy01 />}
-                path="/support"
-                label="Support"
-                isAccess={Access?.USER}
-              />
-              <NavItem
                 icon={<Settings01 />}
                 path="/settings"
                 label="Settings"
                 isAccess={Access?.SETTING}
               />
+              <NavItem
+                icon={<MessageSmileSquare />}
+                path="/contact-us"
+                label="Contact us"
+                isAccess={Access?.USER}
+              />
+              <NavItem icon={<FileLock02 />} path="/legal" label="Legal" isAccess={Access?.USER} />
             </div>
 
             <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>

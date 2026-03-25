@@ -4,11 +4,29 @@ import { DashboardService } from './service'
 
 const DashboardContext = createContext()
 
+const INITIAL_METRICS = [
+  { label: 'All KOL', value: '1,432', active: true },
+  { label: 'KOL 1', value: '272', active: false },
+  { label: 'KOL 2', value: '0', active: false },
+  { label: 'KOL 3', value: '12', active: false },
+  { label: 'KOL 4', value: '43', active: false },
+  { label: 'KOL 5', value: '5', active: false },
+]
+
 function DashboardProvider({ children }) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [metrics, setMetrics] = useState(null)
+  const [metrics, setMetrics] = useState(INITIAL_METRICS)
   const [employees, setEmployees] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  const handleMetricClick = useCallback((label) => {
+    setMetrics((prev) =>
+      prev.map((m) => ({
+        ...m,
+        active: m.label === label,
+      }))
+    )
+  }, [])
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -39,12 +57,13 @@ function DashboardProvider({ children }) {
       searchTerm,
       setSearchTerm,
       metrics,
+      handleMetricClick,
       fetchMetrics,
       employees,
       fetchEmployees,
       isLoading,
     }),
-    [searchTerm, fetchMetrics, fetchEmployees, metrics, employees, isLoading]
+    [searchTerm, fetchMetrics, fetchEmployees, metrics, handleMetricClick, employees, isLoading]
   )
 
   return <DashboardContext.Provider value={contextValue}>{children}</DashboardContext.Provider>

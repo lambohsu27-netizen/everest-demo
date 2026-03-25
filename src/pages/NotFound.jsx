@@ -1,7 +1,5 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { MyButton } from '@interstellar-component'
-import logo from '../assets/Login/bipura_logo.png'
+import { MyButton, MyLogo } from '@interstellar-component'
+import { useNavigate } from 'react-router-dom'
 
 function NotFound() {
   const nav = useNavigate()
@@ -9,7 +7,7 @@ function NotFound() {
     <div className="relative flex h-screen flex-col items-center justify-around text-gray-800">
       {/* 🔹 Logo Section */}
       <div className="flex flex-col items-center">
-        <img src={logo} alt="Logo" className="w-24" />
+        <MyLogo width={48} height={48} />
       </div>
 
       {/* 🔹 Message Section */}

@@ -14,6 +14,9 @@ import {
   Users01,
   LifeBuoy01,
   Settings01,
+  Rows01,
+  Building07,
+  PackageSearch,
 } from '@untitled-ui/icons-react'
 import { MyAvatar, MyTooltip, MyConfirmModal, MyButton, MyLogo } from '@interstellar-component'
 import { useCookies } from 'react-cookie'
@@ -121,40 +124,34 @@ function Navigation({ childs }) {
 
             <div className="flex flex-col gap-0.5 px-3">
               <NavItem
-                icon={<HomeLine />}
+                icon={<BarChartSquare02 />}
                 path="/dashboard"
                 label="Dashboard"
                 isAccess={Access?.USER}
               />
               <NavItem
-                icon={<BarChartSquare02 />}
-                path="/analytics"
-                label="Analytics"
-                isAccess={Access?.USER}
-              />
-              <NavItem
-                icon={<LayersThree01 />}
+                icon={<Rows01 />}
                 path="/report-enquiry"
                 label="Report Enquiry"
                 isAccess={Access?.USER}
-              />
-              <NavItem
-                icon={<CheckDone01 />}
-                path="/approval"
-                label="Otorisasi"
-                isAccess={Access?.APPROVAL}
-              />
-              <NavItem
-                icon={<PieChart03 />}
-                path="/dashboard"
-                label="Dashboard"
-                isAccess={Access?.DASHBOARD}
               />
               <NavItem
                 icon={<Users01 />}
                 path="/workforce"
                 label="Workforce"
                 isAccess={Access?.USER}
+              />
+              <NavItem
+                icon={<Building07 />}
+                path="/company"
+                label="Company"
+                isAccess={Access?.APPROVAL}
+              />
+              <NavItem
+                icon={<PackageSearch />}
+                path="/audit-trail"
+                label="Audit Trail"
+                isAccess={Access?.DASHBOARD}
               />
             </div>
           </div>

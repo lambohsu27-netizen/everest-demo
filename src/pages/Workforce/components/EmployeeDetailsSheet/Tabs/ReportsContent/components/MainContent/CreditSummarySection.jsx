@@ -35,7 +35,7 @@ export default function CreditSummarySection() {
 
       <div className="flex flex-col gap-6">
         {/* Row 1: Status & Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col p-6 h-full">
             {/* Collectability Status Section */}
             <div className="flex flex-col gap-4 pb-6 border-b border-gray-100">
@@ -72,19 +72,19 @@ export default function CreditSummarySection() {
             <h4 className="text-md-bold text-gray-900 px-6 py-5 border-b border-gray-200">
               Lorem ipsum
             </h4>
-            <div className="p-6 flex flex-col">
+            <div className="p-6 flex flex-col h-full justify-center">
               <div className="flex flex-col gap-6">
-                <div className="flex justify-between items-center text-md-regular border-b border-gray-100 pb-6">
-                  <span className="text-gray-600">Estimasi cicilan/bulan</span>
-                  <span className="font-bold text-gray-900">Rp 20,801,000</span>
+                <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular border-b border-gray-100 pb-6">
+                  <span className="text-gray-600 min-w-[120px]">Estimasi cicilan/bulan</span>
+                  <span className="font-bold text-gray-900 whitespace-nowrap">Rp 20,801,000</span>
                 </div>
-                <div className="flex justify-between items-center text-md-regular border-b border-gray-100 pb-6">
-                  <span className="text-gray-600">Fasilitas paling awal</span>
-                  <span className="font-bold text-gray-900">18 Feb 2011</span>
+                <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular border-b border-gray-100 pb-6">
+                  <span className="text-gray-600 min-w-[120px]">Fasilitas paling awal</span>
+                  <span className="font-bold text-gray-900 whitespace-nowrap">18 Feb 2011</span>
                 </div>
-                <div className="flex justify-between items-center text-md-regular">
-                  <span className="text-gray-600">Fasilitas terbaru</span>
-                  <span className="font-bold text-gray-900">28 Juli 2024</span>
+                <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular">
+                  <span className="text-gray-600 min-w-[120px]">Fasilitas terbaru</span>
+                  <span className="font-bold text-gray-900 whitespace-nowrap">28 Juli 2024</span>
                 </div>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function CreditSummarySection() {
         </div>
 
         {/* Row 2: Loan Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
           <StatCard title="Total Outstanding Loans" value="Rp 384,500,000" trend="15%" trendUp />
           <StatCard title="Total Overdue Loans" value="Rp 11,500,000" trend="15%" trendUp={false} />
           <StatCard

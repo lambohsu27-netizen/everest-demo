@@ -9,7 +9,7 @@ import {
   UserCheck01,
 } from '@untitled-ui/icons-react'
 import { useParams } from 'react-router-dom'
-import { useWorkforce } from '../Context'
+import { useWorkforce } from '../../Context'
 
 export default function EmployeeDetailsSheet() {
   const { id } = useParams()

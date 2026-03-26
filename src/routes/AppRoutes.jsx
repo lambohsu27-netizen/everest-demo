@@ -32,6 +32,11 @@ import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
 import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
 import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
 
+import Settings from '@src/pages/Settings'
+import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
+import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
+import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
+
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
   const [isLoading, setIsLoading] = useState(true)
@@ -108,6 +113,12 @@ export function AuthenticatedRoutes() {
         path="/contact-us"
         element={<ContactUs />}
       />
+      <Route path="/settings" element={<Settings />}>
+        <Route index element={<Navigate to="general" replace />} />
+        <Route path="general" element={<GeneralSettings />} />
+        <Route path="user-role-access" element={<UserRoleAccess />} />
+        <Route path="employment-level" element={<EmploymentLevel />} />
+      </Route>
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
         path="/profile"

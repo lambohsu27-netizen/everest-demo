@@ -1,0 +1,81 @@
+import React from 'react'
+
+export default function GeneralSettings() {
+  return (
+    <div className="flex flex-col pt-8">
+      {/* General Settings Header */}
+      <div className="flex flex-col gap-1 w-full pb-5 border-b border-[#e9eaeb]">
+        <h2 className="text-lg font-semibold text-[#181d27]">General Settings</h2>
+        <p className="text-sm text-[#535862]">Configure system-wide preferences and verification rules.</p>
+      </div>
+
+      {/* Session Auto Timeout Row */}
+      <div className="flex flex-row w-full py-5 border-b border-[#e9eaeb] items-start">
+        <div className="w-[300px] shrink-0 mr-8 flex flex-col gap-1">
+          <label className="text-sm font-semibold text-[#344054]">Session Auto Timeout</label>
+          <p className="text-sm text-[#475467]">Automatically sign out users after a period of inactivity.</p>
+        </div>
+        <div className="flex-1 max-w-[400px]">
+          <div className="relative flex items-center w-full rounded-lg border border-[#D0D5DD] bg-white shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-[#6941C6] focus-within:border-[#6941C6]">
+            <input
+              type="text"
+              name="timeout"
+              id="timeout"
+              className="block w-full border-0 py-2.5 pl-3.5 pr-16 text-gray-900 ring-0 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 outline-none"
+              defaultValue="30"
+            />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <span className="text-gray-500 sm:text-sm">minute</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Verification Row */}
+      <div className="flex flex-row w-full py-5 border-b border-[#e9eaeb] items-start">
+        <div className="w-[300px] shrink-0 mr-8 flex flex-col gap-1">
+          <label className="text-sm font-semibold text-[#344054]">
+            Verification <span className="text-[#6941C6]">*</span>
+          </label>
+          <p className="text-sm text-[#475467]">Configure thresholds for automated and manual identity verification.</p>
+        </div>
+        <div className="flex-1 max-w-[400px]">
+          <label className="block text-sm font-medium text-[#344054] mb-1.5">
+            Auto verification threshold <span className="text-[#6941C6]">*</span>
+          </label>
+          <div className="relative flex items-center w-full rounded-lg border border-[#D0D5DD] bg-white shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-[#6941C6] focus-within:border-[#6941C6]">
+            <input
+              type="text"
+              name="threshold"
+              id="threshold"
+              className="block w-full border-0 py-2.5 pl-3.5 pr-8 text-gray-900 ring-0 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 outline-none"
+              defaultValue="85"
+            />
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <span className="text-gray-500 sm:text-sm">%</span>
+            </div>
+          </div>
+          <p className="mt-2 text-sm text-[#475467]">
+            Minimum face similarity score required for automatic identity approval.
+          </p>
+        </div>
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="flex w-full justify-end gap-3 pt-6 pb-2">
+        <button
+          type="button"
+          className="rounded-lg border border-[#D0D5DD] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="rounded-lg bg-[#6941C6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#53389E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6941C6] transition-colors"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  )
+}

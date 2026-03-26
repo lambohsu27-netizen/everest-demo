@@ -1,12 +1,11 @@
-import React from 'react'
 import {
   SearchMd,
   FilterLines,
   Trash01,
   Plus,
-  EyeOff
+  EyeOff,
 } from '@untitled-ui/icons-react'
-import { MyDataTable, MyColumn } from '@interstellar-component'
+import { MyDataTable, MyColumn, MyHorizontalTabV2 } from '@interstellar-component'
 import { useSettings } from '../Context'
 
 export default function EmploymentLevel() {
@@ -56,31 +55,22 @@ export default function EmploymentLevel() {
       {/* Header section */}
       <div className="flex flex-col gap-1 w-full pb-6 border-b border-[#e9eaeb] mb-6">
         <h2 className="text-lg font-semibold text-[#181d27]">Employment level</h2>
-        <p className="text-sm text-[#535862]">Define employee levels and their associated consent and screening rules.</p>
+        <p className="text-sm text-[#535862]">
+          Define employee levels and their associated consent and screening rules.
+        </p>
       </div>
 
       {/* Primary Sub-tabs */}
-      <div className="flex w-max rounded-lg bg-[#fafafa] p-1 border border-[#e9eaeb] mb-6 gap-1">
-        <button
-          onClick={() => setActiveEmpSubTab('level')}
-          className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${
-            activeEmpSubTab === 'level'
-              ? 'bg-white text-[#181d27] shadow-sm border border-[#d5d7da]'
-              : 'text-[#535862] hover:text-[#181d27]'
-          }`}
-        >
-          Level
-        </button>
-        <button
-          onClick={() => setActiveEmpSubTab('position')}
-          className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-all ${
-            activeEmpSubTab === 'position'
-              ? 'bg-white text-[#181d27] shadow-sm border border-[#d5d7da]'
-              : 'text-[#535862] hover:text-[#181d27]'
-          }`}
-        >
-          Position
-        </button>
+      <div className="mb-6">
+        <MyHorizontalTabV2
+          value={activeEmpSubTab}
+          onChange={(val) => setActiveEmpSubTab(val)}
+          fitContent
+          tabs={[
+            { value: 'level', label: 'Level' },
+            { value: 'position', label: 'Position' },
+          ]}
+        />
       </div>
 
       {activeEmpSubTab === 'level' && (

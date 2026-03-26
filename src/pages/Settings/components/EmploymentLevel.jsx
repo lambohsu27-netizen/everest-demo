@@ -1,10 +1,4 @@
-import {
-  SearchMd,
-  FilterLines,
-  Trash01,
-  Plus,
-  EyeOff,
-} from '@untitled-ui/icons-react'
+import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyHorizontalTabV2 } from '@interstellar-component'
 import { useSettings } from '../Context'
 
@@ -51,9 +45,9 @@ export default function EmploymentLevel() {
   }
 
   return (
-    <div className="flex flex-col pt-8 pb-12">
+    <div className="flex flex-col pt-8">
       {/* Header section */}
-      <div className="flex flex-col gap-1 w-full pb-6 border-b border-[#e9eaeb] mb-6">
+      <div className="flex flex-col gap-1 w-full pb-6">
         <h2 className="text-lg font-semibold text-[#181d27]">Employment level</h2>
         <p className="text-sm text-[#535862]">
           Define employee levels and their associated consent and screening rules.
@@ -134,7 +128,9 @@ export default function EmploymentLevel() {
               field="level"
               onSort={handleEmpSort}
               body={(row) => (
-                <span className={`text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}>
+                <span
+                  className={`text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}
+                >
                   {row.level}
                 </span>
               )}
@@ -222,7 +218,9 @@ export default function EmploymentLevel() {
               field="name"
               onSort={handlePosSort}
               body={(row) => (
-                <span className={`text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}>
+                <span
+                  className={`text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}
+                >
                   {row.name}
                 </span>
               )}

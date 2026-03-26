@@ -56,7 +56,7 @@ export default function UserRoleAccess() {
   }
 
   return (
-    <div className="flex flex-col pt-8 pb-12">
+    <div className="flex flex-col pt-8">
       {/* Header section */}
       <div className="flex flex-col gap-1 w-full pb-6">
         <h2 className="text-lg font-semibold text-[#181d27]">User and role access</h2>

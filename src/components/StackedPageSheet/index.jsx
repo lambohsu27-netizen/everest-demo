@@ -41,7 +41,7 @@ export default function StackedPageSheet({ title, children, backUrl, closeUrl })
         isVisible ? 'translate-x-0' : 'translate-x-full'
       }`}
     >
-      <section className="flex flex-1 flex-col overflow-hidden rounded-tl-[40px] border-l border-t border-gray-200 bg-white pb-12 pt-8">
+      <section className="flex flex-1 flex-col overflow-hidden rounded-tl-[40px] border-l border-t border-gray-200 bg-white pt-8">
         {/* Header section */}
         <header className="mb-8 flex flex-col gap-6 px-8">
           <div className="flex items-center justify-between">
@@ -64,7 +64,7 @@ export default function StackedPageSheet({ title, children, backUrl, closeUrl })
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto px-8">{children}</main>
+        <main className="flex-1 overflow-y-auto px-8 pb-12">{children}</main>
       </section>
     </section>
   )

@@ -2,26 +2,26 @@ import React from 'react'
 import { useSettings } from '../Context'
 
 export default function GeneralSettings() {
-  const { 
-    sessionTimeout, 
-    setSessionTimeout, 
-    verificationThreshold, 
-    setVerificationThreshold 
-  } = useSettings()
+  const { sessionTimeout, setSessionTimeout, verificationThreshold, setVerificationThreshold } =
+    useSettings()
 
   return (
-    <div className="flex flex-col pt-8 pb-12">
+    <div className="flex flex-col pt-8">
       {/* General Settings Header */}
       <div className="flex flex-col gap-1 w-full pb-5 border-b border-[#e9eaeb]">
         <h2 className="text-lg font-semibold text-[#181d27]">General Settings</h2>
-        <p className="text-sm text-[#535862]">Configure system-wide preferences and verification rules.</p>
+        <p className="text-sm text-[#535862]">
+          Configure system-wide preferences and verification rules.
+        </p>
       </div>
 
       {/* Session Auto Timeout Row */}
       <div className="flex flex-row w-full py-5 border-b border-[#e9eaeb] items-start">
         <div className="w-[300px] shrink-0 mr-8 flex flex-col gap-1">
           <label className="text-sm font-semibold text-[#344054]">Session Auto Timeout</label>
-          <p className="text-sm text-[#475467]">Automatically sign out users after a period of inactivity.</p>
+          <p className="text-sm text-[#475467]">
+            Automatically sign out users after a period of inactivity.
+          </p>
         </div>
         <div className="flex-1 max-w-[400px]">
           <div className="relative flex items-center w-full rounded-lg border border-[#D0D5DD] bg-white shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-[#6941C6] focus-within:border-[#6941C6]">
@@ -46,7 +46,9 @@ export default function GeneralSettings() {
           <label className="text-sm font-semibold text-[#344054]">
             Verification <span className="text-[#6941C6]">*</span>
           </label>
-          <p className="text-sm text-[#475467]">Configure thresholds for automated and manual identity verification.</p>
+          <p className="text-sm text-[#475467]">
+            Configure thresholds for automated and manual identity verification.
+          </p>
         </div>
         <div className="flex-1 max-w-[400px]">
           <label className="block text-sm font-medium text-[#344054] mb-1.5">

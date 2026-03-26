@@ -6,7 +6,6 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col gap-8 w-full">
       <OverviewSection />
-      <hr className="border-gray-200" />
       <RiskSignalsSection />
     </div>
   )

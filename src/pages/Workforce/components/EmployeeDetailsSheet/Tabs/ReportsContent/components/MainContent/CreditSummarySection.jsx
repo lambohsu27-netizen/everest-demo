@@ -35,41 +35,39 @@ export default function CreditSummarySection() {
 
       <div className="flex flex-col gap-6">
         {/* Row 1: Status & Info */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Collectability Status</h4>
-              <div className="text-3xl font-bold text-red-600 mb-3">KOL 5</div>
-              <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
-                <div className="w-full bg-red-600" />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Credit Score</h4>
-              <div className="text-3xl font-bold text-gray-900 mb-3">212</div>
-              <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
-                <div className="w-1/4 bg-red-600" />
-              </div>
-              <div className="text-sm font-semibold text-red-600 mt-2">High risk</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
+            <h4 className="text-sm font-medium text-gray-600 mb-2">Collectability Status</h4>
+            <div className="text-3xl font-bold text-red-600 mb-3">KOL 5</div>
+            <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
+              <div className="w-full bg-red-600" />
             </div>
           </div>
 
-          <div className="bg-[#fdfdfd] rounded-xl border border-gray-200 p-5 shadow-sm">
-            <h4 className="text-sm font-bold text-gray-900 mb-5">Lorem ipsum</h4>
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Estimasi cicilan/bulan</span>
-                <span className="font-semibold text-gray-900">Rp 20,801,000</span>
-              </div>
-              <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                <span className="text-gray-500">Fasilitas paling awal</span>
-                <span className="font-semibold text-gray-900">18 Feb 2011</span>
-              </div>
-              <div className="flex justify-between items-center text-sm pb-1">
-                <span className="text-gray-500">Fasilitas terbaru</span>
-                <span className="font-semibold text-gray-900">28 Juli 2024</span>
-              </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
+            <h4 className="text-sm font-medium text-gray-600 mb-2">Credit Score</h4>
+            <div className="text-3xl font-bold text-gray-900 mb-3">212</div>
+            <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
+              <div className="w-1/4 bg-red-600" />
+            </div>
+            <div className="text-sm font-semibold text-red-600 mt-2">High risk</div>
+          </div>
+        </div>
+
+        <div className="bg-[#fdfdfd] rounded-xl border border-gray-200 p-5 shadow-sm">
+          <h4 className="text-sm font-bold text-gray-900 mb-5">Lorem ipsum</h4>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
+              <span className="text-gray-500">Estimasi cicilan/bulan</span>
+              <span className="font-semibold text-gray-900">Rp 20,801,000</span>
+            </div>
+            <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
+              <span className="text-gray-500">Fasilitas paling awal</span>
+              <span className="font-semibold text-gray-900">18 Feb 2011</span>
+            </div>
+            <div className="flex justify-between items-center text-sm pb-1">
+              <span className="text-gray-500">Fasilitas terbaru</span>
+              <span className="font-semibold text-gray-900">28 Juli 2024</span>
             </div>
           </div>
         </div>

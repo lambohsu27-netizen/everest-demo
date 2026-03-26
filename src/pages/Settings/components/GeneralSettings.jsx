@@ -1,8 +1,16 @@
 import React from 'react'
+import { useSettings } from '../Context'
 
 export default function GeneralSettings() {
+  const { 
+    sessionTimeout, 
+    setSessionTimeout, 
+    verificationThreshold, 
+    setVerificationThreshold 
+  } = useSettings()
+
   return (
-    <div className="flex flex-col pt-8">
+    <div className="flex flex-col pt-8 pb-12">
       {/* General Settings Header */}
       <div className="flex flex-col gap-1 w-full pb-5 border-b border-[#e9eaeb]">
         <h2 className="text-lg font-semibold text-[#181d27]">General Settings</h2>
@@ -22,7 +30,8 @@ export default function GeneralSettings() {
               name="timeout"
               id="timeout"
               className="block w-full border-0 py-2.5 pl-3.5 pr-16 text-gray-900 ring-0 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 outline-none"
-              defaultValue="30"
+              value={sessionTimeout}
+              onChange={(e) => setSessionTimeout(e.target.value)}
             />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <span className="text-gray-500 sm:text-sm">minute</span>
@@ -49,7 +58,8 @@ export default function GeneralSettings() {
               name="threshold"
               id="threshold"
               className="block w-full border-0 py-2.5 pl-3.5 pr-8 text-gray-900 ring-0 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 outline-none"
-              defaultValue="85"
+              value={verificationThreshold}
+              onChange={(e) => setVerificationThreshold(e.target.value)}
             />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <span className="text-gray-500 sm:text-sm">%</span>

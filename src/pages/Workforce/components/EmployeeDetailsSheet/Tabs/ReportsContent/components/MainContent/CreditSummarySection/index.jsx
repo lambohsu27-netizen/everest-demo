@@ -3,6 +3,7 @@ import StatCard from './StatCard'
 import RiskScoreCard from './RiskScoreCard'
 import SummaryListCard from './SummaryListCard'
 import TrendChartCard from './TrendChartCard'
+import CreditScoreTrend from './CreditScoreTrend'
 
 export default function CreditSummarySection() {
   return (
@@ -36,15 +37,21 @@ export default function CreditSummarySection() {
         {/* Charts */}
         <TrendChartCard
           title="Credit Score Trend"
-          subtitle="Historical view of the individual's credit score over time"
-          placeholderText="[ Line Chart Placeholder ]"
-        />
+          subtitle="Historical view of the individual's credit score over time."
+        >
+          <CreditScoreTrend />
+        </TrendChartCard>
 
         <TrendChartCard
           title="Collectability Trend"
           subtitle="Distribution of non-collectability status over time based on credit records."
-          placeholderText="[ Multi-line Chart Placeholder ]"
-        />
+        >
+          <div className="h-64 w-full bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-200">
+            <span className="text-sm text-gray-400 font-medium">
+              [ Multi-line Chart Placeholder ]
+            </span>
+          </div>
+        </TrendChartCard>
       </div>
     </div>
   )

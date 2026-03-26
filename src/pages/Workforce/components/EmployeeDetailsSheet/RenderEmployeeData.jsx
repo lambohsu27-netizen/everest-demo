@@ -9,9 +9,12 @@ import {
   Phone01,
   UserCheck01,
 } from '@untitled-ui/icons-react'
-import { MyConsentStatusChip } from '@interstellar-component'
+import ProfileHeader from './ProfileHeader'
+import { useEmployeeDetailsSheet } from './Context'
 
 export default function RenderEmployeeData({ employee }) {
+  const { currentTabs } = useEmployeeDetailsSheet()
+
   const sections = [
     {
       title: 'Personal Information',
@@ -49,62 +52,48 @@ export default function RenderEmployeeData({ employee }) {
   ]
 
   return (
-    <div className="flex flex-col gap-8 pb-12">
-      {/* Profile Header */}
-      <div className="flex items-center gap-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        {employee.avatar ? (
-          <img
-            src={employee.avatar}
-            alt={employee.name}
-            className="h-24 w-24 rounded-full object-cover ring-4 ring-brand/50"
-          />
+    <div className="flex flex-col gap-8">
+      <ProfileHeader employee={employee} />
+
+      <div className="px-8 pb-12">
+        {currentTabs.type === 'personal_information' ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {sections.map((section, idx) => (
+              <div
+                key={idx}
+                className={`flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm ${idx === sections.length - 1 ? 'lg:col-span-2' : ''}`}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
+                <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-8">
+                  {section.items.map((item, i) => (
+                    <div key={i} className="flex flex-col gap-1">
+                      <span className="text-sm font-medium text-gray-500">{item.label}</span>
+                      <div className="flex items-center gap-2 text-gray-900">
+                        {item.icon && <span className="text-gray-400">{item.icon}</span>}
+                        <p className="text-base font-medium">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-brand/50 text-2xl font-bold text-brand/700 ring-4 ring-brand/50">
-            {employee.name.charAt(0)}
+          <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-gray-200 shadow-sm min-h-[400px]">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Reports Content</h2>
+            <p className="text-gray-500">This section is under development.</p>
           </div>
         )}
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold text-gray-900">{employee.name}</h2>
-          <p className="text-lg font-medium text-brand/700">{employee.role || employee.level}</p>
-          <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-            <MyConsentStatusChip status={employee.consentStatus} />
-            <span>•</span>
-            <span>{employee.employeeId}</span>
-          </div>
+
+        {/* Actions Footer */}
+        <div className="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-8">
+          <button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+            Edit Information
+          </button>
+          <button className="rounded-lg bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/700">
+            Update Status
+          </button>
         </div>
-      </div>
-
-      {/* Details Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {sections.map((section, idx) => (
-          <div
-            key={idx}
-            className={`flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm ${idx === sections.length - 1 ? 'lg:col-span-2' : ''}`}
-          >
-            <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
-            <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-8">
-              {section.items.map((item, i) => (
-                <div key={i} className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">{item.label}</span>
-                  <div className="flex items-center gap-2 text-gray-900">
-                    {item.icon && <span className="text-gray-400">{item.icon}</span>}
-                    <p className="text-base font-medium">{item.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Actions Footer */}
-      <div className="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 pt-8">
-        <button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
-          Edit Information
-        </button>
-        <button className="rounded-lg bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/700">
-          Update Status
-        </button>
       </div>
     </div>
   )

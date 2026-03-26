@@ -42,7 +42,7 @@ export default function App() {
           <div
             className={`${
               showNavigation ? 'md:flex-1 pt-16 md:pt-0' : 'w-full'
-            } w-full h-[100dvh] md:h-[100vh] overflow-hidden box-border`}
+            } relative w-full h-[100dvh] md:h-[100vh] overflow-hidden box-border`}
           >
             <AuthenticatedRoutes />
           </div>

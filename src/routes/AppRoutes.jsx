@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import VersionPage from '@src/pages/VersionPage'
 import WelcomePageBoilerPlate from '@src/pages/WelcomePageBoilerPlate'
 import ComponentReview from '@src/pages/component-review'
@@ -15,7 +15,7 @@ import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
 import Enquiry from '@src/pages/Enquiry'
@@ -32,9 +32,33 @@ import { ForgetPasswordProvider } from '@src/pages/Forget-password/context'
 import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
 import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
 
+import Settings from '@src/pages/Settings'
+import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
+import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
+import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
+import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
+
+
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
   const [isLoading, setIsLoading] = useState(true)
+  const location = useLocation()
+  const previousLocationRaw = useRef(location)
+  const [backgroundLocation, setBackgroundLocation] = useState(null)
+
+  const isStackedRoute = (path) => path.startsWith('/settings')
+
+  useEffect(() => {
+    if (isStackedRoute(location.pathname)) {
+      if (!isStackedRoute(previousLocationRaw.current.pathname)) {
+        setBackgroundLocation(previousLocationRaw.current)
+      }
+    } else {
+      setBackgroundLocation(null)
+    }
+    previousLocationRaw.current = location
+  }, [location])
+
   const accesses = [
     {
       name: Access?.USER,
@@ -58,8 +82,9 @@ export function AuthenticatedRoutes() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    <>
+      <Routes location={backgroundLocation || location}>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route
         path="/dashboard"
         element={
@@ -108,6 +133,13 @@ export function AuthenticatedRoutes() {
         path="/contact-us"
         element={<ContactUs />}
       />
+      <Route path="/settings" element={<Settings />}>
+        <Route index element={<Navigate to="general" replace />} />
+        <Route path="general" element={<GeneralSettings />} />
+        <Route path="user-role-access" element={<UserRoleAccess />} />
+        <Route path="employment-level" element={<EmploymentLevel />} />
+        <Route path="consent-editor" element={<ConsentEditor />} />
+      </Route>
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
         path="/profile"
@@ -137,7 +169,20 @@ export function AuthenticatedRoutes() {
 
       <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
-    </Routes>
+      </Routes>
+
+      {backgroundLocation && isStackedRoute(location.pathname) && (
+        <Routes location={location}>
+          <Route path="/settings" element={<Settings />}>
+            <Route index element={<Navigate to="general" replace />} />
+            <Route path="general" element={<GeneralSettings />} />
+            <Route path="user-role-access" element={<UserRoleAccess />} />
+            <Route path="employment-level" element={<EmploymentLevel />} />
+            <Route path="consent-editor" element={<ConsentEditor />} />
+          </Route>
+        </Routes>
+      )}
+    </>
   )
 }
 

@@ -9,6 +9,7 @@ import {
   UserCheck01,
 } from '@untitled-ui/icons-react'
 import { useParams } from 'react-router-dom'
+import { MyConsentStatusChip } from '@interstellar-component'
 import { useWorkforce } from '../../Context'
 
 export default function EmployeeDetailsSheet() {
@@ -82,17 +83,7 @@ export default function EmployeeDetailsSheet() {
             <h2 className="text-2xl font-bold text-gray-900">{employee.name}</h2>
             <p className="text-lg font-medium text-brand/700">{employee.role || employee.level}</p>
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  employee.consentStatus === 'Active'
-                    ? 'bg-success/50 text-success/700 border border-success/100'
-                    : employee.consentStatus === 'Pending'
-                      ? 'bg-warning/50 text-warning/700 border border-warning/100'
-                      : 'bg-error/50 text-error/700 border border-error/100'
-                }`}
-              >
-                {employee.consentStatus}
-              </span>
+              <MyConsentStatusChip status={employee.consentStatus} />
               <span>•</span>
               <span>{employee.employeeId}</span>
             </div>

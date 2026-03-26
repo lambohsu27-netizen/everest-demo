@@ -8,38 +8,8 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable } from '@interstellar-component'
+import { MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
 import { useWorkforce } from '../Context'
-
-function getBadgeColor(status) {
-  switch (status) {
-    case 'New':
-      return 'bg-brand/50 text-brand/700 border border-brand/200'
-    case 'Pending':
-      return 'bg-warning/50 text-warning/700 border border-warning/200'
-    case 'Expired':
-      return 'bg-error/50 text-error/700 border border-error/200'
-    case 'Active':
-      return 'bg-success/50 text-success/700 border border-success/200'
-    default:
-      return 'bg-gray-100 text-gray-700 border border-gray-200'
-  }
-}
-
-function getDotColor(status) {
-  switch (status) {
-    case 'New':
-      return 'bg-brand/500'
-    case 'Pending':
-      return 'bg-warning/500'
-    case 'Expired':
-      return 'bg-error/500'
-    case 'Active':
-      return 'bg-success/500'
-    default:
-      return 'bg-gray-500'
-  }
-}
 
 function WorkforceTable() {
   const navigate = useNavigate()
@@ -152,7 +122,11 @@ function WorkforceTable() {
             body={(row) => (
               <div className="flex items-center gap-3 py-1 whitespace-nowrap">
                 {row.avatar ? (
-                  <img src={row.avatar} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                  <img
+                    src={row.avatar}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500">
                     <span className="text-sm font-medium">{row.name.charAt(0)}</span>
@@ -181,22 +155,15 @@ function WorkforceTable() {
             header="Company"
             field="company"
             onSort={handleSort}
-            body={(row) => <span className="text-sm text-gray-600 whitespace-nowrap">{row.company}</span>}
+            body={(row) => (
+              <span className="text-sm text-gray-600 whitespace-nowrap">{row.company}</span>
+            )}
           />
           <MyColumn
             header="Consent Status"
             field="consentStatus"
             onSort={handleSort}
-            body={(row) => (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${getBadgeColor(
-                  row.consentStatus
-                )}`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${getDotColor(row.consentStatus)}`} />
-                {row.consentStatus}
-              </span>
-            )}
+            body={(row) => <MyConsentStatusChip status={row.consentStatus} />}
           />
           <MyColumn
             header="Consent expiry"

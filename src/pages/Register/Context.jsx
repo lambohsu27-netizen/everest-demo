@@ -20,6 +20,12 @@ function RegisterProvider({ children }) {
     error: null,
   })
 
+  const [registerBody, setRegisterBody] = useState({
+    name: '',
+    email: '',
+    password: '',
+  })
+
   const handleCurrentModal = useCallback((modal) => {
     if (modal && modal.current) {
       setCurrentModal({
@@ -43,6 +49,7 @@ function RegisterProvider({ children }) {
         body.password,
         import.meta.env.VITE_APP_SECRET_KEY
       ).toString()
+      
       formData.append('name', body.name)
       formData.append('email', body.email)
       formData.append('password', encryptedPassword)
@@ -55,8 +62,6 @@ function RegisterProvider({ children }) {
           setCookie('token-backoffice', result?.data?.token, {
             path: '/',
           })
-
-
         })
         .catch((e) => {
           if (e.code) {
@@ -83,21 +88,24 @@ function RegisterProvider({ children }) {
     []
   )
 
-  const changePassword = useCallback(async (body) => {
-    const formData = new FormData()
-    formData.append('old_password', body.old_password)
-    formData.append('new_password', body.new_password)
-    return await RegisterService.changePassword(formData)
-      .then((e) => {
-        myToaster(e)
-        setIsProfileSliderOpen(false)
-        getSession()
-      })
-      .catch((e) => {
-        myToaster(e)
-        throw e
-      })
-  }, [getSession])
+  const changePassword = useCallback(
+    async (body) => {
+      const formData = new FormData()
+      formData.append('old_password', body.old_password)
+      formData.append('new_password', body.new_password)
+      return await RegisterService.changePassword(formData)
+        .then((e) => {
+          myToaster(e)
+          setIsProfileSliderOpen(false)
+          getSession()
+        })
+        .catch((e) => {
+          myToaster(e)
+          throw e
+        })
+    },
+    [getSession]
+  )
 
   const updateProfile = useCallback(
     async (body, shouldChangePassword) => {

@@ -17,7 +17,7 @@ function StepAccountDetails({ control, errors, trigger, watch, isSubmitting, nav
   }
 
   return (
-    <section className="w-full h-full flex items-center justify-center flex">
+    <section className="w-full h-full flex items-center justify-center">
       <div className="items-center justify-center gap-6 w-full max-w-[480px] rounded-xl p-5 md:p-10 column z-50">
         <div className="z-0">
           <MyBgPatternDecorativeCube />

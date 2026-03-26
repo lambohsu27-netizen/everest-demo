@@ -1,7 +1,7 @@
 import { useEmployeeDetailsSheet } from './Context'
 import ProfileHeader from './ProfileHeader'
 import PersonalInformation from './Tabs/PersonalInformation'
-import ReportsContent from './Tabs/ReportsContent'
+import ReportsContent from './Tabs/ReportsContent/index'
 
 export default function RenderEmployeeData({ employee }) {
   const { currentTabs } = useEmployeeDetailsSheet()
@@ -10,7 +10,7 @@ export default function RenderEmployeeData({ employee }) {
     <div className="flex flex-col gap-8">
       <ProfileHeader employee={employee} />
 
-      <div className="px-8 pb-12">
+      <div>
         {currentTabs.type === 'personal_information' ? (
           <PersonalInformation employee={employee} />
         ) : (

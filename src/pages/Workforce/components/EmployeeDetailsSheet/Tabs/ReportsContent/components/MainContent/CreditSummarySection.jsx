@@ -35,39 +35,58 @@ export default function CreditSummarySection() {
 
       <div className="flex flex-col gap-6">
         {/* Row 1: Status & Info */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
-            <h4 className="text-sm font-medium text-gray-600 mb-2">Collectability Status</h4>
-            <div className="text-3xl font-bold text-red-600 mb-3">KOL 5</div>
-            <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
-              <div className="w-full bg-red-600" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col p-6 h-full">
+            {/* Collectability Status Section */}
+            <div className="flex flex-col gap-4 pb-6 border-b border-gray-100">
+              <h4 className="text-md-medium text-gray-600">Collectability Status</h4>
+              <div className="text-[40px] leading-[48px] font-bold text-[#b42318]">KOL 5</div>
+              <div className="relative pt-3 pb-1">
+                {/* Pointer */}
+                <div className="absolute top-0 left-[10%] -translate-x-1/2">
+                  <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-gray-400" />
+                </div>
+                {/* Segmented Bar */}
+                <div className="flex gap-1 h-2.5 w-full">
+                  <div className="flex-1 bg-[#912018] rounded-l-full" />
+                  <div className="flex-1 bg-[#f04438]" />
+                  <div className="flex-1 bg-[#ff692e]" />
+                  <div className="flex-1 bg-[#fdb022]" />
+                  <div className="flex-1 bg-[#12b76a] rounded-r-full" />
+                </div>
+              </div>
+            </div>
+
+            {/* Credit Score Section */}
+            <div className="flex flex-col gap-4 pt-6">
+              <h4 className="text-md-medium text-gray-600">Credit Score</h4>
+              <div className="text-[40px] leading-[48px] font-bold text-gray-700">212</div>
+              <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-gray-100">
+                <div className="w-[40%] bg-[#b42318]" />
+              </div>
+              <div className="text-md-semibold text-[#b42318]">High risk</div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm flex flex-col justify-between">
-            <h4 className="text-sm font-medium text-gray-600 mb-2">Credit Score</h4>
-            <div className="text-3xl font-bold text-gray-900 mb-3">212</div>
-            <div className="flex h-2 w-full rounded-full overflow-hidden bg-gray-100">
-              <div className="w-1/4 bg-red-600" />
-            </div>
-            <div className="text-sm font-semibold text-red-600 mt-2">High risk</div>
-          </div>
-        </div>
-
-        <div className="bg-[#fdfdfd] rounded-xl border border-gray-200 p-5 shadow-sm">
-          <h4 className="text-sm font-bold text-gray-900 mb-5">Lorem ipsum</h4>
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-              <span className="text-gray-500">Estimasi cicilan/bulan</span>
-              <span className="font-semibold text-gray-900">Rp 20,801,000</span>
-            </div>
-            <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-              <span className="text-gray-500">Fasilitas paling awal</span>
-              <span className="font-semibold text-gray-900">18 Feb 2011</span>
-            </div>
-            <div className="flex justify-between items-center text-sm pb-1">
-              <span className="text-gray-500">Fasilitas terbaru</span>
-              <span className="font-semibold text-gray-900">28 Juli 2024</span>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col h-full">
+            <h4 className="text-md-bold text-gray-900 px-6 py-5 border-b border-gray-200">
+              Lorem ipsum
+            </h4>
+            <div className="p-6 flex flex-col">
+              <div className="flex flex-col gap-6">
+                <div className="flex justify-between items-center text-md-regular border-b border-gray-100 pb-6">
+                  <span className="text-gray-600">Estimasi cicilan/bulan</span>
+                  <span className="font-bold text-gray-900">Rp 20,801,000</span>
+                </div>
+                <div className="flex justify-between items-center text-md-regular border-b border-gray-100 pb-6">
+                  <span className="text-gray-600">Fasilitas paling awal</span>
+                  <span className="font-bold text-gray-900">18 Feb 2011</span>
+                </div>
+                <div className="flex justify-between items-center text-md-regular">
+                  <span className="text-gray-600">Fasilitas terbaru</span>
+                  <span className="font-bold text-gray-900">28 Juli 2024</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

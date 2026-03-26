@@ -1,8 +1,10 @@
 import { MyButton, MyCheckbox } from '@interstellar-component'
 import { ArrowLeft, ChevronDown } from '@untitled-ui/icons-react'
 import React from 'react'
+import { useRegister } from '../Context'
 
 function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
+  const { register } = useRegister()
   const sections = [
     {
       heading: 'Lorem ipsum delarus?',
@@ -99,7 +101,7 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
               color="primary"
               size="lg"
               expanded
-              disabled={!accepted}
+              // disabled={!accepted}
               onClick={onAccept}
             >
               <p className="text-md-semibold">Kirim pengajuan</p>

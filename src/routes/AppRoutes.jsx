@@ -15,6 +15,7 @@ import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
+import EmployeeDetailsSheet from '@src/pages/Workforce/components/EmployeeDetailsSheet'
 import { useEffect, useState, useRef } from 'react'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
@@ -46,7 +47,7 @@ export function AuthenticatedRoutes() {
   const previousLocationRaw = useRef(location)
   const [backgroundLocation, setBackgroundLocation] = useState(null)
 
-  const isStackedRoute = (path) => path.startsWith('/settings')
+  const isStackedRoute = (path) => path.startsWith('/settings') || path.startsWith('/workforce/employee')
 
   useEffect(() => {
     if (isStackedRoute(location.pathname)) {
@@ -108,7 +109,9 @@ export function AuthenticatedRoutes() {
             <Workforce />
           </WorkforceProvider>
         }
-      />
+      >
+        <Route path="employee/:id" element={<EmployeeDetailsSheet />} />
+      </Route>
       <Route
         path="/company"
         element={
@@ -180,6 +183,7 @@ export function AuthenticatedRoutes() {
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>
+          <Route path="/workforce/employee/:id" element={<WorkforceProvider><EmployeeDetailsSheet /></WorkforceProvider>} />
         </Routes>
       )}
     </>

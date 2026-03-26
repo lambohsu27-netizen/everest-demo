@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   SearchMd,
   FilterLines,
@@ -41,6 +42,7 @@ function getDotColor(status) {
 }
 
 function WorkforceTable() {
+  const navigate = useNavigate()
   const {
     searchTerm,
     setSearchTerm,
@@ -141,6 +143,7 @@ function WorkforceTable() {
           paginator
           currentSortFieldFromParams={sortField}
           currentSortOrderFromParams={sortOrder}
+          onClick={(row) => navigate(`/workforce/employee/${row.id}`)}
         >
           <MyColumn
             header="Name & Employee ID"

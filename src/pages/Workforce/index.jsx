@@ -1,4 +1,5 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 import WorkforceHeader from './components/WorkforceHeader'
 import WorkforceTable from './components/WorkforceTable'
@@ -9,6 +10,7 @@ function Workforce() {
       <div className="mx-auto w-full max-w-[1372px]">
         <WorkforceHeader />
         <WorkforceTable />
+        <Outlet />
       </div>
     </div>
   )

@@ -36,6 +36,8 @@ import Settings from '@src/pages/Settings'
 import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
 import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
+import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
+
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -136,6 +138,7 @@ export function AuthenticatedRoutes() {
         <Route path="general" element={<GeneralSettings />} />
         <Route path="user-role-access" element={<UserRoleAccess />} />
         <Route path="employment-level" element={<EmploymentLevel />} />
+        <Route path="consent-editor" element={<ConsentEditor />} />
       </Route>
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route
@@ -175,6 +178,7 @@ export function AuthenticatedRoutes() {
             <Route path="general" element={<GeneralSettings />} />
             <Route path="user-role-access" element={<UserRoleAccess />} />
             <Route path="employment-level" element={<EmploymentLevel />} />
+            <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>
         </Routes>
       )}

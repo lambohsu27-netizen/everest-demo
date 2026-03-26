@@ -6,6 +6,7 @@ export default function SettingsHeader() {
     { name: 'General', path: '/settings/general' },
     { name: 'User & role access', path: '/settings/user-role-access' },
     { name: 'Employment level', path: '/settings/employment-level' },
+    { name: 'Consent editor', path: '/settings/consent-editor' },
   ]
 
   return (
@@ -15,7 +16,7 @@ export default function SettingsHeader() {
         <p className="text-[16px] text-gray-500">Lorem ipsum</p>
       </div>
 
-      <div className="flex items-center gap-2 border-b border-[#e9eaeb] pb-3">
+      <div className="flex items-center gap-2">
         {tabs.map((tab) => (
           <NavLink
             key={tab.name}

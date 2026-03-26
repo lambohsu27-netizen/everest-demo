@@ -65,6 +65,16 @@ const INITIAL_USERS = [
   }
 ]
 
+const INITIAL_ROLES = [
+  { id: 1, name: 'Super admin' },
+  { id: 2, name: 'Area manager' },
+  { id: 3, name: 'Warehouse manager' },
+  { id: 4, name: 'Team leader' },
+  { id: 5, name: 'Field Technician' },
+  { id: 6, name: 'Help Desk' },
+  { id: 7, name: 'Warehouse staff' },
+]
+
 function SettingsProvider({ children }) {
   // General Settings State
   const [sessionTimeout, setSessionTimeout] = useState('30')
@@ -72,9 +82,13 @@ function SettingsProvider({ children }) {
 
   // User Role Access State
   const [users, setUsers] = useState(INITIAL_USERS)
+  const [roles, setRoles] = useState(INITIAL_ROLES)
   const [searchTerm, setSearchTerm] = useState('')
+  const [roleSearchTerm, setRoleSearchTerm] = useState('')
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
+  const [roleSortField, setRoleSortField] = useState(null)
+  const [roleSortOrder, setRoleSortOrder] = useState(null)
   const [selectedStatus, setSelectedStatus] = useState('Active')
   const [activeSubTab, setActiveSubTab] = useState('user')
 
@@ -99,10 +113,33 @@ function SettingsProvider({ children }) {
     setUsers(sortedData)
   }, [users])
 
+  const handleRoleSort = useCallback(({ sort, order }) => {
+    setRoleSortField(sort)
+    setRoleSortOrder(order)
+    
+    if (!sort || !order) {
+      setRoles(INITIAL_ROLES)
+      return
+    }
+
+    const sortedData = [...roles].sort((a, b) => {
+      const valA = a[sort] || ''
+      const valB = b[sort] || ''
+
+      if (valA < valB) return order === 'asc' ? -1 : 1
+      if (valA > valB) return order === 'asc' ? 1 : -1
+      return 0
+    })
+
+    setRoles(sortedData)
+  }, [roles])
+
   const handleSelectionChange = useCallback((updated) => {
-    // Note: The Workforce pattern seems to update the data in context when selection changes
-    // which might include the 'checked' state if handled by MyDataTable
     setUsers(updated.data)
+  }, [])
+
+  const handleRoleSelectionChange = useCallback((updated) => {
+    setRoles(updated.data)
   }, [])
 
   const filteredUsers = useMemo(() => {
@@ -121,6 +158,15 @@ function SettingsProvider({ children }) {
     return result
   }, [users, selectedStatus, searchTerm])
 
+  const filteredRoles = useMemo(() => {
+    let result = roles
+    if (roleSearchTerm) {
+      const lowerSearch = roleSearchTerm.toLowerCase()
+      result = result.filter(r => r.name.toLowerCase().includes(lowerSearch))
+    }
+    return result
+  }, [roles, roleSearchTerm])
+
   const contextValue = useMemo(() => ({
     // General Settings
     sessionTimeout,
@@ -130,12 +176,19 @@ function SettingsProvider({ children }) {
 
     // User Role Access
     users: filteredUsers,
+    roles: filteredRoles,
     searchTerm,
     setSearchTerm,
+    roleSearchTerm,
+    setRoleSearchTerm,
     sortField,
     sortOrder,
     handleSort,
+    roleSortField,
+    roleSortOrder,
+    handleRoleSort,
     handleSelectionChange,
+    handleRoleSelectionChange,
     selectedStatus,
     setSelectedStatus,
     activeSubTab,
@@ -144,11 +197,17 @@ function SettingsProvider({ children }) {
     sessionTimeout,
     verificationThreshold,
     filteredUsers,
+    filteredRoles,
     searchTerm,
+    roleSearchTerm,
     sortField,
     sortOrder,
     handleSort,
+    roleSortField,
+    roleSortOrder,
+    handleRoleSort,
     handleSelectionChange,
+    handleRoleSelectionChange,
     selectedStatus,
     activeSubTab,
   ])

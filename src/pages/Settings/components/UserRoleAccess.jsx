@@ -14,19 +14,26 @@ import { useSettings } from '../Context'
 export default function UserRoleAccess() {
   const {
     users,
+    roles,
     searchTerm,
     setSearchTerm,
+    roleSearchTerm,
+    setRoleSearchTerm,
     sortField,
     sortOrder,
     handleSort,
+    roleSortField,
+    roleSortOrder,
+    handleRoleSort,
     handleSelectionChange,
+    handleRoleSelectionChange,
     selectedStatus,
     setSelectedStatus,
     activeSubTab,
     setActiveSubTab,
   } = useSettings()
 
-  const values = {
+  const userTableValues = {
     data: users,
     meta: {
       current_page: 1,
@@ -34,7 +41,18 @@ export default function UserRoleAccess() {
       per_page: 10,
       total: users.length,
     },
-    checkedAll: users.length > 0 && users.every(u => u.checked),
+    checkedAll: users.length > 0 && users.every((u) => u.checked),
+  }
+
+  const roleTableValues = {
+    data: roles,
+    meta: {
+      current_page: 1,
+      next_page: 2,
+      per_page: 10,
+      total: roles.length,
+    },
+    checkedAll: roles.length > 0 && roles.every((r) => r.checked),
   }
 
   return (
@@ -141,7 +159,7 @@ export default function UserRoleAccess() {
           </div>
 
           <MyDataTable
-            values={values}
+            values={userTableValues}
             selectionMode="multiple"
             onSelectionChange={handleSelectionChange}
             paginator
@@ -154,7 +172,11 @@ export default function UserRoleAccess() {
               onSort={handleSort}
               body={(row) => (
                 <div className="flex items-center gap-3 py-1 whitespace-nowrap">
-                  <img src={row.avatar} alt={row.name} className="w-10 h-10 rounded-full object-cover" />
+                  <img
+                    src={row.avatar}
+                    alt={row.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                   <div className="flex flex-col gap-0.5">
                     <span className="text-sm font-medium text-[#6941C6]">{row.name}</span>
                     <span className="text-sm text-gray-500">{row.role}</span>
@@ -206,8 +228,77 @@ export default function UserRoleAccess() {
       )}
 
       {activeSubTab === 'role' && (
-        <div className="p-8 text-center text-gray-500 text-sm border border-dashed border-[#d5d7da] rounded-xl bg-white">
-          Role access settings coming soon.
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
+          {/* Role Access Header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between p-5 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[18px] font-semibold text-gray-900">Role</h3>
+              <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
+                12 item
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 transition-colors">
+                <Trash01 className="w-5 h-5 text-error/700" />
+                Delete
+              </button>
+              <button className="flex items-center gap-2 rounded-lg bg-[#6941C6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#53389E] transition-colors">
+                <Plus className="w-5 h-5 text-white" />
+                New area
+              </button>
+            </div>
+          </div>
+
+          {/* Role Access Controls */}
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between p-5 border-b border-gray-200">
+            <div className="relative w-full max-w-sm">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <SearchMd className="h-4 w-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+                placeholder="Search"
+                value={roleSearchTerm}
+                onChange={(e) => setRoleSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+                <FilterLines className="h-4 w-4 text-gray-500" />
+                Filters
+              </button>
+              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
+                <EyeOff className="h-4 w-4 text-gray-500" />
+                Hide fields
+              </button>
+            </div>
+          </div>
+
+          <MyDataTable
+            values={roleTableValues}
+            selectionMode="multiple"
+            onSelectionChange={handleRoleSelectionChange}
+            paginator
+            currentSortFieldFromParams={roleSortField}
+            currentSortOrderFromParams={roleSortOrder}
+          >
+            <MyColumn
+              header="Role name"
+              field="name"
+              onSort={handleRoleSort}
+              body={(row) => (
+                <span
+                  className={`text-sm font-medium py-1 whitespace-nowrap ${
+                    row.checked ? 'text-[#6941C6]' : 'text-gray-900'
+                  }`}
+                >
+                  {row.name}
+                </span>
+              )}
+            />
+          </MyDataTable>
         </div>
       )}
     </div>

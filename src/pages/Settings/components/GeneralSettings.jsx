@@ -1,4 +1,4 @@
-import React from 'react'
+import { MyButton } from '@interstellar-component'
 import { useSettings } from '../Context'
 
 export default function GeneralSettings() {
@@ -75,18 +75,12 @@ export default function GeneralSettings() {
 
       {/* Footer Buttons */}
       <div className="flex w-full justify-end gap-3 pt-6 pb-2">
-        <button
-          type="button"
-          className="rounded-lg border border-[#D0D5DD] bg-white px-4 py-2.5 text-sm font-semibold text-[#344054] shadow-sm hover:bg-gray-50 transition-colors"
-        >
+        <MyButton color="secondary" size="md" variant="outlined">
           Cancel
-        </button>
-        <button
-          type="submit"
-          className="rounded-lg bg-[#6941C6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#53389E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6941C6] transition-colors"
-        >
+        </MyButton>
+        <MyButton color="primary" size="md" variant="filled" type="submit">
           Save
-        </button>
+        </MyButton>
       </div>
     </div>
   )

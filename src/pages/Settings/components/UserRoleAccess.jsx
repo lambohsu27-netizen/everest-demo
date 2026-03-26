@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   SearchMd,
   FilterLines,
@@ -8,7 +7,7 @@ import {
   Plus,
   EyeOff,
 } from '@untitled-ui/icons-react'
-import { MyDataTable, MyColumn, MyHorizontalTabV2 } from '@interstellar-component'
+import { MyDataTable, MyColumn, MyHorizontalTabV2, MyButton } from '@interstellar-component'
 import { useSettings } from '../Context'
 
 export default function UserRoleAccess() {
@@ -89,22 +88,22 @@ export default function UserRoleAccess() {
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 transition-colors">
-                <Trash01 className="w-5 h-5 text-error/700" />
+              <MyButton color="error" size="md" variant="outlined">
+                <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
                 Delete
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-[#344054] shadow-sm hover:bg-gray-50 transition-colors">
-                <Download01 className="w-5 h-5 text-[#344054]" />
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-[#344054]">
+                <Download01 className="w-5 h-5 text-[#344054]" stroke="currentColor" />
                 Download
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-[#344054] shadow-sm hover:bg-gray-50 transition-colors">
-                <Upload01 className="w-5 h-5 text-[#344054]" />
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-[#344054]">
+                <Upload01 className="w-5 h-5 text-[#344054]" stroke="currentColor" />
                 Import
-              </button>
-              <button className="flex items-center gap-2 rounded-lg bg-[#6941C6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#53389E] transition-colors">
-                <Plus className="w-5 h-5 text-white" />
+              </MyButton>
+              <MyButton color="primary" size="md" variant="filled">
+                <Plus className="w-5 h-5 text-white" stroke="currentColor" />
                 New user
-              </button>
+              </MyButton>
             </div>
           </div>
 
@@ -123,14 +122,14 @@ export default function UserRoleAccess() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                <FilterLines className="h-4 w-4 text-gray-500" />
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+                <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Filters
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                <EyeOff className="h-4 w-4 text-gray-500" />
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+                <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Hide fields
-              </button>
+              </MyButton>
               <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
                 {['Active', 'Inactive'].map((cat) => (
                   <button
@@ -229,14 +228,14 @@ export default function UserRoleAccess() {
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 transition-colors">
-                <Trash01 className="w-5 h-5 text-error/700" />
+              <MyButton color="error" size="md" variant="outlined">
+                <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
                 Delete
-              </button>
-              <button className="flex items-center gap-2 rounded-lg bg-[#6941C6] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#53389E] transition-colors">
-                <Plus className="w-5 h-5 text-white" />
+              </MyButton>
+              <MyButton color="primary" size="md" variant="filled">
+                <Plus className="w-5 h-5 text-white" stroke="currentColor" />
                 New area
-              </button>
+              </MyButton>
             </div>
           </div>
 
@@ -256,14 +255,14 @@ export default function UserRoleAccess() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                <FilterLines className="h-4 w-4 text-gray-500" />
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+                <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Filters
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors">
-                <EyeOff className="h-4 w-4 text-gray-500" />
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+                <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Hide fields
-              </button>
+              </MyButton>
             </div>
           </div>
 

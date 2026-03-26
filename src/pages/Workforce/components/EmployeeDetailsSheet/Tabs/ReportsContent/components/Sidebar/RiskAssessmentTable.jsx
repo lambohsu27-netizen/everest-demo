@@ -26,9 +26,9 @@ export default function RiskAssessmentTable() {
                 <MyChip
                   label={item.badge}
                   color={item.badgeColor}
-                  variant="modern"
+                  variant="filled"
                   size="sm"
-                  rounded="lg"
+                  rounded="full"
                 />
               )}
             </div>

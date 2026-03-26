@@ -92,5 +92,9 @@ export default function ProfileHeader({ employee }) {
 }
 
 ProfileHeader.propTypes = {
-  employee: PropTypes.shape({}).isRequired,
+  employee: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    employeeId: PropTypes.string.isRequired,
+    avatar: PropTypes.string,
+  }).isRequired,
 }

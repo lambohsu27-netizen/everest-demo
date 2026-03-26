@@ -1,5 +1,3 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import {
   Briefcase01,
   Building01,
@@ -9,8 +7,8 @@ import {
   Phone01,
   UserCheck01,
 } from '@untitled-ui/icons-react'
-import ProfileHeader from './ProfileHeader'
 import { useEmployeeDetailsSheet } from './Context'
+import ProfileHeader from './ProfileHeader'
 
 export default function RenderEmployeeData({ employee }) {
   const { currentTabs } = useEmployeeDetailsSheet()
@@ -97,8 +95,4 @@ export default function RenderEmployeeData({ employee }) {
       </div>
     </div>
   )
-}
-
-RenderEmployeeData.propTypes = {
-  employee: PropTypes.object.isRequired,
 }

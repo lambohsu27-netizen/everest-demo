@@ -209,6 +209,24 @@ export const patch = async (
   }
 }
 
+export const put = async (
+  endpoint,
+  data,
+  type = 'json',
+  timeout = 60 * 60 * 6000,
+  config = {}
+) => {
+  try {
+    const headers = getHeader(type)
+    const url = `${baseURL}${endpoint}`
+    const response = await instance.put(url, data, { headers, timeout, ...config })
+    return response.data
+  } catch (error) {
+    if (error.response?.status === 401) logout()
+    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+  }
+}
+
 export const remove = async (endpoint, data, timeout = 60000) => {
   try {
     const headers = { authorization: `Bearer ${getCookie('token-backoffice')}` }

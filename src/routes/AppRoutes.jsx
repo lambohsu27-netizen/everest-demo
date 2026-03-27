@@ -36,6 +36,8 @@ import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Cont
 import Settings from '@src/pages/Settings'
 import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
 import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
+import UserTab from '@src/pages/Settings/components/UserTab'
+import RoleTab from '@src/pages/Settings/components/RoleTab'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
 import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
 
@@ -114,7 +116,11 @@ export function AuthenticatedRoutes() {
       <Route path="/settings" element={<Settings />}>
         <Route index element={<Navigate to="general" replace />} />
         <Route path="general" element={<GeneralSettings />} />
-        <Route path="user-role-access" element={<UserRoleAccess />} />
+        <Route path="user-role-access" element={<UserRoleAccess />}>
+          <Route index element={<Navigate to="user" replace />} />
+          <Route path="user" element={<UserTab />} />
+          <Route path="role" element={<RoleTab />} />
+        </Route>
         <Route path="employment-level" element={<EmploymentLevel />} />
         <Route path="consent-editor" element={<ConsentEditor />} />
       </Route>
@@ -154,7 +160,11 @@ export function AuthenticatedRoutes() {
           <Route path="/settings" element={<Settings />}>
             <Route index element={<Navigate to="general" replace />} />
             <Route path="general" element={<GeneralSettings />} />
-            <Route path="user-role-access" element={<UserRoleAccess />} />
+            <Route path="user-role-access" element={<UserRoleAccess />}>
+          <Route index element={<Navigate to="user" replace />} />
+          <Route path="user" element={<UserTab />} />
+          <Route path="role" element={<RoleTab />} />
+        </Route>
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>

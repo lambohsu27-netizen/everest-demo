@@ -7,6 +7,7 @@ const INITIAL_WORKFORCE = [
     id: 1,
     name: 'Ahmad Ghozali',
     employeeId: 'ID-00192',
+    hasReport: true,
     level: 'Supervisor',
     category: 'Employee',
     company: 'PT Everest Maju Sejahtera',
@@ -25,6 +26,7 @@ const INITIAL_WORKFORCE = [
     id: 2,
     name: 'Diah Astuti',
     employeeId: 'ID-00193',
+    hasReport: false,
     level: 'Staff',
     category: 'Employee',
     company: 'PT Annapurna Berdiri TInggi',
@@ -43,6 +45,7 @@ const INITIAL_WORKFORCE = [
     id: 3,
     name: 'Pandu Prakoso',
     employeeId: 'ID-00194',
+    hasReport: true,
     level: 'Manager',
     category: 'Employee',
     company: 'PT Annapurna Berdiri TInggi',
@@ -61,6 +64,7 @@ const INITIAL_WORKFORCE = [
     id: 4,
     name: 'Kartini Melviana',
     employeeId: 'ID-00195',
+    hasReport: true,
     level: 'Director',
     category: 'Employee',
     company: 'PT Everest Maju Sejahtera',
@@ -79,6 +83,7 @@ const INITIAL_WORKFORCE = [
     id: 5,
     name: 'Liana Semesta',
     employeeId: 'ID-00196',
+    hasReport: true,
     level: 'Director',
     category: 'Candidate',
     company: 'PT Annapurna Berdiri TInggi',
@@ -97,6 +102,7 @@ const INITIAL_WORKFORCE = [
     id: 6,
     name: 'Lola Chaniago',
     employeeId: 'ID-00197',
+    hasReport: true,
     level: 'Manager',
     category: 'Candidate',
     company: 'PT Everest Maju Sejahtera',
@@ -115,6 +121,7 @@ const INITIAL_WORKFORCE = [
     id: 7,
     name: 'Satrio Pena',
     employeeId: 'ID-00198',
+    hasReport: true,
     level: 'Intern',
     category: 'Candidate',
     company: 'PT Everest Maju Sejahtera',
@@ -138,7 +145,10 @@ function WorkforceProvider({ children }) {
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
 
-  const getEmployeeById = useCallback((id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)), [])
+  const getEmployeeById = useCallback(
+    (id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)),
+    []
+  )
 
   const handleSort = useCallback(
     ({ sort, order }) => {

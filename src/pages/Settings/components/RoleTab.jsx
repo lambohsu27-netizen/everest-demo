@@ -150,20 +150,20 @@ export default function RoleTab() {
           onPageChange={handleRolePageChange}
           currentSortFieldFromParams={roleSortField}
           currentSortOrderFromParams={roleSortOrder}
+          onClick={(row) => openRoleDetail(row.id)}
         >
           <MyColumn
             header="Role name"
             field="name"
             onSort={handleRoleSort}
             body={(row) => (
-              <button
-                className={`text-sm font-medium py-1 whitespace-nowrap text-left hover:underline ${
+              <span
+                className={`text-sm-medium py-1 whitespace-nowrap ${
                   row.checked ? 'text-[#6941C6]' : 'text-gray-900'
                 }`}
-                onClick={() => openRoleDetail(row.id)}
               >
                 {row.name}
-              </button>
+              </span>
             )}
           />
         </MyDataTable>

@@ -12,7 +12,7 @@ import RegisterSchema from './schema'
 import TermsConditions from './components/TermsConditions'
 
 function RegisterForm({ activeStep, setActiveStep }) {
-  const { register, verifyOtp } = useRegister()
+  const { register, verifyOtp, setCookie, cookie } = useRegister()
   const nav = useNavigate()
   const [acceptedTerms, setAcceptedTerms] = useState(false)
 
@@ -108,6 +108,10 @@ function RegisterForm({ activeStep, setActiveStep }) {
         const otpCode = otp.join('')
         await verifyOtp(otpCode)
         setActiveStep(4)
+      } else if (activeStep === 4) {
+        const token = cookie['token-backoffice-temp']
+
+        setCookie('token-backoffice', token, { path: '/' })
       }
     } catch (err) {
       console.error(err)

@@ -1,18 +1,8 @@
-import {
-  ArrowLeft,
-  CheckCircle,
-  Lock01,
-  Eye,
-  EyeOff,
-} from '@untitled-ui/icons-react'
+import { ArrowLeft, CheckCircle, Lock01, Eye, EyeOff } from '@untitled-ui/icons-react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useState } from 'react'
-import {
-  MyBgPatternDecorativeCube,
-  MyTextField,
-  MyButton,
-} from '@interstellar-component'
+import { MyBgPatternDecorativeCube, MyTextField, MyButton } from '@interstellar-component'
 import CheckIcon from '../Assets/Check-icon.svg'
 import { setNewPasswordSchema } from '../schema'
 import { useForgetPassword } from '../context'
@@ -45,10 +35,7 @@ function SetNewPassword() {
     minimumLength: password?.length >= 8,
   }
 
-  const onSubmit = handleSubmit(
-    handleError(updatePassword, control),
-    checkErrorYup
-  )
+  const onSubmit = handleSubmit(handleError(updatePassword, control), checkErrorYup)
 
   return (
     <div className="mx-auto w-full md:mt-1 md:w-3/4">
@@ -68,8 +55,7 @@ function SetNewPassword() {
                 Set new password
               </p>
               <p className="text-md-regular text-center text-gray-light/600">
-                Your new password must be different to previously used
-                passwords.
+                Your new password must be different to previously used passwords.
               </p>
             </div>
           </div>
@@ -77,11 +63,8 @@ function SetNewPassword() {
           <div className="flex flex-col items-center justify-center">
             <form className="w-full max-w-[360px]" onSubmit={onSubmit}>
               <section className="mb-4 flex flex-col gap-y-1.5">
-                <label
-                  htmlFor="password"
-                  className="text-sm-medium text-gray-light/700"
-                >
-                  New password
+                <label htmlFor="password" className="text-sm-medium text-gray-light/700">
+                  Password
                 </label>
                 <MyTextField
                   name="password"
@@ -107,11 +90,8 @@ function SetNewPassword() {
               </section>
 
               <section className="mb-5 flex flex-col gap-y-1.5">
-                <label
-                  htmlFor="confirmPassword"
-                  className="text-sm-medium text-gray-light/700"
-                >
-                  Confirm new password
+                <label htmlFor="confirmPassword" className="text-sm-medium text-gray-light/700">
+                  Confirm password
                 </label>
                 <MyTextField
                   name="confirmPassword"
@@ -148,7 +128,7 @@ function SetNewPassword() {
                   {/* <CheckCircle className="size-5" /> */}
                   {/* </div> */}
                   {/* )} */}
-                  Must be at least 12 characters
+                  Must be at least 8 characters
                 </div>
                 {/* 2 */}
                 <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
@@ -159,43 +139,7 @@ function SetNewPassword() {
                   {/* <CheckCircle className="size-5" /> */}
                   {/* </div> */}
                   {/* )} */}
-                  <p className="">
-                    Password must contain at least one uppercase letter
-                  </p>
-                </div>
-
-                {/* 3 */}
-                <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
-                  {/* {passwordChecks.containLowercase !== true ? ( */}
-                  {/* <img src={CheckIcon} alt="CheckIcon" /> */}
-                  {/* ) : ( */}
-                  {/* <div className="text-success/600"> */}
-                  {/* <CheckCircle className="size-5" /> */}
-                  {/* </div> */}
-                  {/* )} */}
-                  Password must contain at least one lowercase letter
-                </div>
-                {/* 4 */}
-                <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
-                  {/* {passwordChecks.containNumber !== true ? ( */}
-                  {/* <img src={CheckIcon} alt="CheckIcon" /> */}
-                  {/* ) : ( */}
-                  {/* <div className="text-success/600"> */}
-                  {/* <CheckCircle className="size-5" /> */}
-                  {/* </div> */}
-                  {/* )} */}
-                  Password must contain at least one number
-                </div>
-                {/* 5 */}
-                <div className="text-sm-regular flex items-center gap-2 text-gray-light/600">
-                  {/* {passwordChecks.containSpecialCharacter !== true ? ( */}
-                  {/* <img src={CheckIcon} alt="CheckIcon" /> */}
-                  {/* ) : ( */}
-                  {/* <div className="text-success/600"> */}
-                  {/* <CheckCircle className="size-5" /> */}
-                  {/* </div> */}
-                  {/* )} */}
-                  Password must contain at least one special character
+                  <p className="">Must contain one special character</p>
                 </div>
               </div>
 
@@ -213,9 +157,7 @@ function SetNewPassword() {
             <div className="mb-6 mt-4 flex items-center justify-center md:mt-6">
               <MyButton onClick={() => navigate('/login')}>
                 <ArrowLeft size="15" />
-                <p className="text-sm-semibold text-center text-gray-600">
-                  Back to login
-                </p>
+                <p className="text-sm-semibold text-center text-gray-600">Back to login</p>
               </MyButton>
             </div>
           </div>

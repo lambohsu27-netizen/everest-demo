@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   SearchMd,
   FilterLines,
@@ -7,40 +8,11 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable } from '@interstellar-component'
+import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
-function getBadgeColor(status) {
-  switch (status) {
-    case 'New':
-      return 'bg-brand/50 text-brand/700 border border-brand/200'
-    case 'Pending':
-      return 'bg-warning/50 text-warning/700 border border-warning/200'
-    case 'Expired':
-      return 'bg-error/50 text-error/700 border border-error/200'
-    case 'Active':
-      return 'bg-success/50 text-success/700 border border-success/200'
-    default:
-      return 'bg-gray-100 text-gray-700 border border-gray-200'
-  }
-}
-
-function getDotColor(status) {
-  switch (status) {
-    case 'New':
-      return 'bg-brand/500'
-    case 'Pending':
-      return 'bg-warning/500'
-    case 'Expired':
-      return 'bg-error/500'
-    case 'Active':
-      return 'bg-success/500'
-    default:
-      return 'bg-gray-500'
-  }
-}
-
 function WorkforceTable() {
+  const navigate = useNavigate()
   const {
     searchTerm,
     setSearchTerm,
@@ -51,6 +23,7 @@ function WorkforceTable() {
     handleSelectionChange,
     selectedCategory,
     setSelectedCategory,
+    handleCurrentSlider,
   } = useWorkforce()
 
   const values = {
@@ -77,22 +50,40 @@ function WorkforceTable() {
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 focus:outline-none focus:ring-2 focus:ring-error/500 focus:ring-offset-2">
+              <MyButton
+                color="error"
+                variant="outlined"
+                size="md"
+              >
                 <Trash01 className="h-5 w-5" />
-                Delete
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-brand/300 bg-white px-4 py-2 text-sm font-semibold text-brand/700 shadow-sm hover:bg-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <p className="text-sm-semibold">Delete</p>
+              </MyButton>
+              <MyButton
+                color="primary"
+                variant="outlined"
+                size="md"
+              >
                 <DownloadCloud01 className="h-5 w-5" />
-                Download PDF
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <p className="text-sm-semibold">Download PDF</p>
+              </MyButton>
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+                onClick={() => handleCurrentSlider({ status: true, current: 'import-workforce' })}
+              >
                 <UploadCloud01 className="h-5 w-5" />
-                Import
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <p className="text-sm-semibold">Import</p>
+              </MyButton>
+              <MyButton
+                color="primary"
+                variant="filled"
+                size="md"
+                onClick={() => handleCurrentSlider({ status: true, current: 'new-employee' })}
+              >
                 <Plus className="h-5 w-5" />
-                New employee
-              </button>
+                <p className="text-sm-semibold">New employee</p>
+              </MyButton>
             </div>
           </div>
 
@@ -111,10 +102,14 @@ function WorkforceTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
-                <FilterLines className="h-4 w-4 text-gray-500" />
-                Filters
-              </button>
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+              >
+                <FilterLines className="h-4 w-4" />
+                <p className="text-sm-semibold">Filters</p>
+              </MyButton>
               <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
                 {['All category', 'Employee', 'Candidate'].map((cat) => (
                   <button
@@ -141,6 +136,7 @@ function WorkforceTable() {
           paginator
           currentSortFieldFromParams={sortField}
           currentSortOrderFromParams={sortOrder}
+          onClick={(row) => navigate(`/workforce/employee/${row.id}`)}
         >
           <MyColumn
             header="Name & Employee ID"
@@ -149,7 +145,11 @@ function WorkforceTable() {
             body={(row) => (
               <div className="flex items-center gap-3 py-1 whitespace-nowrap">
                 {row.avatar ? (
-                  <img src={row.avatar} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                  <img
+                    src={row.avatar}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500">
                     <span className="text-sm font-medium">{row.name.charAt(0)}</span>
@@ -178,22 +178,15 @@ function WorkforceTable() {
             header="Company"
             field="company"
             onSort={handleSort}
-            body={(row) => <span className="text-sm text-gray-600 whitespace-nowrap">{row.company}</span>}
+            body={(row) => (
+              <span className="text-sm text-gray-600 whitespace-nowrap">{row.company}</span>
+            )}
           />
           <MyColumn
             header="Consent Status"
             field="consentStatus"
             onSort={handleSort}
-            body={(row) => (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${getBadgeColor(
-                  row.consentStatus
-                )}`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${getDotColor(row.consentStatus)}`} />
-                {row.consentStatus}
-              </span>
-            )}
+            body={(row) => <MyConsentStatusChip status={row.consentStatus} />}
           />
           <MyColumn
             header="Consent expiry"

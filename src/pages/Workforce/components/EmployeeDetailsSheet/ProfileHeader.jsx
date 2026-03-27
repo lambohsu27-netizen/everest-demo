@@ -1,5 +1,13 @@
-import { MyButton, MyButtonGroup, MyChip } from '@interstellar-component'
-import { Calendar, ChevronDown, File06, FilterLines, Zap } from '@untitled-ui/icons-react'
+import { MyButton, MyButtonGroup, MyChip, MyContextMenu, MyPopper } from '@interstellar-component'
+import {
+  Calendar,
+  ChevronDown,
+  File06,
+  FilterLines,
+  LinkBroken02,
+  Repeat04,
+  Zap,
+} from '@untitled-ui/icons-react'
 import PropTypes from 'prop-types'
 import { useEmployeeDetailsSheet } from './Context'
 
@@ -34,11 +42,48 @@ export default function ProfileHeader({ employee }) {
         </div>
 
         {/* Action Button */}
-        <MyButton color="primary" variant="filled" size="md" customClassname="gap-2">
-          <Zap className="h-5 w-5" />
-          Action
-          <ChevronDown className="h-5 w-5" />
-        </MyButton>
+        <MyPopper
+          placement="bottom-end"
+          target={(open, show) => (
+            <MyButton
+              onClick={show}
+              color="primary"
+              variant="filled"
+              size="md"
+              customClassname="gap-2"
+            >
+              <Zap className="h-5 w-5" />
+              Action
+              <ChevronDown className={`h-5 w-5 transition-transform ${open ? 'rotate-180' : ''}`} />
+            </MyButton>
+          )}
+        >
+          {(_open, _anchorEl, _show, close) => (
+            <MyContextMenu
+              menuButtonGroups={[
+                [
+                  {
+                    icon: <Repeat04 />,
+                    label: 'Refresh report',
+                    onClick: () => {
+                      // console.log('Refresh report')
+                      close()
+                    },
+                  },
+                  {
+                    icon: <LinkBroken02 />,
+                    label: 'Revoke',
+                    color: '#b42318',
+                    onClick: () => {
+                      // console.log('Revoke')
+                      close()
+                    },
+                  },
+                ],
+              ]}
+            />
+          )}
+        </MyPopper>
       </div>
 
       {/* Badges Section */}

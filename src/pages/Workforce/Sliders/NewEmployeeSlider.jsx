@@ -6,7 +6,7 @@ import SimpleBar from 'simplebar-react'
 // UI Icons
 import { XClose, UserPlus01, User01, Mail01 } from '@untitled-ui/icons-react'
 // Shared Components
-import { MyButton, MyTextField, MyAutocomplete, MyDoubleCard, WhatsApp } from '@interstellar-component'
+import { MyButton, MyTextField, MyAutocomplete, MyDoubleCard, MyHorizontalTabV2, WhatsApp } from '@interstellar-component'
 // Context
 import { useWorkforce } from '../Context'
 
@@ -150,22 +150,15 @@ function NewEmployeeSlider() {
                       name="category"
                       control={control}
                       render={({ field }) => (
-                        <div className="inline-flex rounded-lg border border-gray/300 bg-white p-0.5 w-fit">
-                          {['Candidate', 'Employee'].map((opt) => (
-                            <button
-                              key={opt}
-                              type="button"
-                              onClick={() => field.onChange(opt)}
-                              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                                field.value === opt
-                                  ? 'bg-white shadow-sm text-gray/900 border border-gray/200'
-                                  : 'text-gray/500 hover:text-gray/700 hover:bg-gray-50'
-                              }`}
-                            >
-                              {opt}
-                            </button>
-                          ))}
-                        </div>
+                        <MyHorizontalTabV2
+                          fitContent
+                          value={field.value}
+                          onChange={field.onChange}
+                          tabs={[
+                            { label: 'Candidate', value: 'Candidate' },
+                            { label: 'Employee', value: 'Employee' },
+                          ]}
+                        />
                       )}
                     />
                     {errors.category && (

@@ -6,6 +6,7 @@ import { myToaster } from '@interstellar-component'
 
 import { LoginService } from './service'
 import { useApp } from '../../AppContext'
+import { encryptPassword } from '@src/services/Helper'
 
 const LoginContext = createContext()
 
@@ -41,14 +42,13 @@ function LoginProvider({ children }) {
       // console.log('body', body)
 
       const formData = new FormData()
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        body.password,
-        import.meta.env.VITE_APP_SECRET_KEY
-      ).toString()
-      formData.append('email', body.email)
-      formData.append('password', encryptedPassword)
+      const encryptedPassword = encryptPassword(body.password)
+      const payload = {
+        email: body.email,
+        password: encryptedPassword,
+      }
 
-      return await LoginService.login(formData)
+      return await LoginService.login(payload)
         .then(myToaster)
         .then((result) => {
           console.log('result', result)

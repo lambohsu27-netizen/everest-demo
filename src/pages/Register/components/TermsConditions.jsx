@@ -1,8 +1,10 @@
 import { MyButton, MyCheckbox } from '@interstellar-component'
 import { ArrowLeft, ChevronDown } from '@untitled-ui/icons-react'
 import React from 'react'
+import { useRegister } from '../Context'
 
 function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
+  const { register } = useRegister()
   const sections = [
     {
       heading: 'Lorem ipsum delarus?',
@@ -87,7 +89,7 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
               <div className="flex-1 h-px bg-gray-200" />
             </div>
             <div className="flex items-center gap-3">
-              <MyCheckbox checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+              <MyCheckbox checked={accepted} onChangeForm={(e) => setAccepted(e.target.checked)} />
               <p className="text-sm-regular text-gray-900">
                 Dengan menyetujui ini, Anda menyatakan telah membaca dan menyetujui syarat &
                 ketentuan yang berlaku.
@@ -95,12 +97,13 @@ function TermsConditions({ onBack, onAccept, accepted, setAccepted }) {
             </div>
 
             <MyButton
+              type="submit"
               variant="filled"
               color="primary"
               size="lg"
               expanded
               disabled={!accepted}
-              onClick={onAccept}
+              // onClick={onAccept}
             >
               <p className="text-md-semibold">Kirim pengajuan</p>
             </MyButton>

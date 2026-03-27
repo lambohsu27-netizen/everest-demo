@@ -6,6 +6,7 @@ import { myToaster } from '@interstellar-component'
 
 import { RegisterService } from './service'
 import { useApp } from '../../AppContext'
+import { encryptPassword } from '@src/services/Helper'
 
 const RegisterContext = createContext()
 
@@ -39,24 +40,26 @@ function RegisterProvider({ children }) {
   const register = useCallback(
     async (body) => {
       const formData = new FormData()
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        body.password,
-        import.meta.env.VITE_APP_SECRET_KEY
-      ).toString()
-      formData.append('name', body.name)
-      formData.append('email', body.email)
-      formData.append('password', encryptedPassword)
+      const encryptedPassword = encryptPassword(body.password)
 
-      return await RegisterService.register(formData)
+      const payload = {
+        name: body.name,
+        email: body.email,
+        password: encryptedPassword,
+      }
+      // formData.append('name', body.name)
+      // formData.append('email', body.email)
+      // formData.append('password', encryptedPassword)
+
+      return await RegisterService.register(payload)
         .then(myToaster)
         .then((result) => {
           localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.user_id) // user_id
 
-          setCookie('token-backoffice', result?.data?.token, {
-            path: '/',
-          })
-
-
+          // setCookie('token-backoffice', result?.data?.token, {
+          //   path: '/',
+          // })
+          return result
         })
         .catch((e) => {
           if (e.code) {
@@ -68,7 +71,21 @@ function RegisterProvider({ children }) {
           } else {
             myToaster(e)
           }
+          throw e
         })
+    },
+    [setCookie]
+  )
+
+  const verifyOtp = useCallback(
+    async (otpCode) => {
+      const userId = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
+      const payload = { user_id: userId, code: otpCode }
+
+      const result = await RegisterService.verifyOtp(payload)
+
+      setCookie('token-backoffice', result?.data?.token, { path: '/' })
+      return result
     },
     [setCookie]
   )
@@ -83,21 +100,24 @@ function RegisterProvider({ children }) {
     []
   )
 
-  const changePassword = useCallback(async (body) => {
-    const formData = new FormData()
-    formData.append('old_password', body.old_password)
-    formData.append('new_password', body.new_password)
-    return await RegisterService.changePassword(formData)
-      .then((e) => {
-        myToaster(e)
-        setIsProfileSliderOpen(false)
-        getSession()
-      })
-      .catch((e) => {
-        myToaster(e)
-        throw e
-      })
-  }, [getSession])
+  const changePassword = useCallback(
+    async (body) => {
+      const formData = new FormData()
+      formData.append('old_password', body.old_password)
+      formData.append('new_password', body.new_password)
+      return await RegisterService.changePassword(formData)
+        .then((e) => {
+          myToaster(e)
+          setIsProfileSliderOpen(false)
+          getSession()
+        })
+        .catch((e) => {
+          myToaster(e)
+          throw e
+        })
+    },
+    [getSession]
+  )
 
   const updateProfile = useCallback(
     async (body, shouldChangePassword) => {
@@ -125,6 +145,7 @@ function RegisterProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       register,
+      verifyOtp,
       getUser,
       User,
       updateProfile,
@@ -136,6 +157,7 @@ function RegisterProvider({ children }) {
     }),
     [
       register,
+      verifyOtp,
       getUser,
       updateProfile,
       User,

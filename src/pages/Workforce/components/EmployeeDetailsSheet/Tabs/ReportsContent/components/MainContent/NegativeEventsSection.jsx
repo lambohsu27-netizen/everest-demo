@@ -32,9 +32,11 @@ export default function NegativeEventsSection() {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <div className="flex flex-col gap-1 pb-4 border-b border-gray-200">
+      <div className="flex flex-col gap-1">
         <h3 className="text-xl font-bold text-gray-900">Negative events</h3>
-        <p className="text-sm text-gray-500">Breakdown of active and historical credit facilities associated with this individual.</p>
+        <p className="text-sm text-gray-500">
+          Breakdown of active and historical credit facilities associated with this individual.
+        </p>
       </div>
 
       <div className="flex flex-col border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
@@ -91,8 +93,12 @@ export default function NegativeEventsSection() {
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
           <span className="text-sm text-gray-600 font-medium">Page 1 of 4</span>
           <div className="flex gap-3">
-             <MyButton color="secondary" variant="outlined" size="sm">Previous</MyButton>
-             <MyButton color="secondary" variant="outlined" size="sm">Next</MyButton>
+            <MyButton color="secondary" variant="outlined" size="sm">
+              Previous
+            </MyButton>
+            <MyButton color="secondary" variant="outlined" size="sm">
+              Next
+            </MyButton>
           </div>
         </div>
       </div>

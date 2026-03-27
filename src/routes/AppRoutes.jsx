@@ -15,6 +15,7 @@ import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
+import EmployeeDetailsSheet from '@src/pages/Workforce/components/EmployeeDetailsSheet'
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@src/AppContext'
 import NotFound from '@src/pages/NotFound'
@@ -39,14 +40,14 @@ import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
 import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
 
-
 export function AuthenticatedRoutes() {
   const { hasPermission, permissionsLoaded } = useApp()
   const location = useLocation()
   const previousLocationRaw = useRef(location)
   const [backgroundLocation, setBackgroundLocation] = useState(null)
 
-  const isStackedRoute = (path) => path.startsWith('/settings')
+  const isStackedRoute = (path) =>
+    path.startsWith('/settings') || path.startsWith('/workforce/employee')
 
   useEffect(() => {
     if (isStackedRoute(location.pathname)) {
@@ -63,90 +64,90 @@ export function AuthenticatedRoutes() {
     <>
       <Routes location={backgroundLocation || location}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route
-        path="/dashboard"
-        element={
-          <DashboardProvider>
-            <Dashboard />
-          </DashboardProvider>
-        }
-      />
-      <Route
-        path="/report-enquiry"
-        element={
-          <ReportEnquiryProvider>
-            <ReportEnquiry />
-          </ReportEnquiryProvider>
-        }
-      />
-      <Route
-        path="/workforce"
-        element={
-          <WorkforceProvider>
-            <Workforce />
-          </WorkforceProvider>
-        }
-      />
-      <Route
-        path="/company"
-        element={
-          <CompanyProvider>
-            <Company />
-          </CompanyProvider>
-        }
-      />
-      <Route
-        path="/audit-trail"
-        element={
-          <AuditTrailProvider>
-            <AuditTrail />
-          </AuditTrailProvider>
-        }
-      />
-      <Route
-        path="/legal"
-        element={<Legal />}
-      />
-      <Route
-        path="/contact-us"
-        element={<ContactUs />}
-      />
-      <Route path="/settings" element={<Settings />}>
-        <Route index element={<Navigate to="general" replace />} />
-        <Route path="general" element={<GeneralSettings />} />
-        <Route path="user-role-access" element={<UserRoleAccess />} />
-        <Route path="employment-level" element={<EmploymentLevel />} />
-        <Route path="consent-editor" element={<ConsentEditor />} />
-      </Route>
-      <Route path="/login" element={<Navigate to="/" replace />} />
-      <Route
-        path="/profile"
-        element={
-          <ProfileProvider>
-            <Profile />
-          </ProfileProvider>
-        }
-      />
-      <Route
-        path="/enquiry"
-        element={
-          <EnquiryProvider>
-            {!permissionsLoaded ? null : hasPermission(Access.ENQUIRY) ? <Enquiry /> : <NotFound />}
-          </EnquiryProvider>
-        }
-      />
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardProvider>
+              <Dashboard />
+            </DashboardProvider>
+          }
+        />
+        <Route
+          path="/report-enquiry"
+          element={
+            <ReportEnquiryProvider>
+              <ReportEnquiry />
+            </ReportEnquiryProvider>
+          }
+        />
+        <Route
+          path="/workforce"
+          element={
+            <WorkforceProvider>
+              <Workforce />
+            </WorkforceProvider>
+          }
+        >
+          <Route path="employee/:id" element={<EmployeeDetailsSheet />} />
+        </Route>
+        <Route
+          path="/company"
+          element={
+            <CompanyProvider>
+              <Company />
+            </CompanyProvider>
+          }
+        />
+        <Route
+          path="/audit-trail"
+          element={
+            <AuditTrailProvider>
+              <AuditTrail />
+            </AuditTrailProvider>
+          }
+        />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/settings" element={<Settings />}>
+          <Route index element={<Navigate to="general" replace />} />
+          <Route path="general" element={<GeneralSettings />} />
+          <Route path="user-role-access" element={<UserRoleAccess />} />
+          <Route path="employment-level" element={<EmploymentLevel />} />
+          <Route path="consent-editor" element={<ConsentEditor />} />
+        </Route>
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route
+          path="/profile"
+          element={
+            <ProfileProvider>
+              <Profile />
+            </ProfileProvider>
+          }
+        />
+        <Route
+          path="/enquiry"
+          element={
+            <EnquiryProvider>
+              {!permissionsLoaded ? null : hasPermission(Access.ENQUIRY) ? (
+                <Enquiry />
+              ) : (
+                <NotFound />
+              )}
+            </EnquiryProvider>
+          }
+        />
 
-      <Route
-        path="/register-company-info"
-        element={
-          <RegisterCompanyInfoProvider>
-            <RegisterCompanyInfo />
-          </RegisterCompanyInfoProvider>
-        }
-      />
+        <Route
+          path="/register-company-info"
+          element={
+            <RegisterCompanyInfoProvider>
+              <RegisterCompanyInfo />
+            </RegisterCompanyInfoProvider>
+          }
+        />
 
-      <Route path="/404" element={<NotFound />} />
-      <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
 
       {backgroundLocation && isStackedRoute(location.pathname) && (
@@ -158,6 +159,14 @@ export function AuthenticatedRoutes() {
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>
+          <Route
+            path="/workforce/employee/:id"
+            element={
+              <WorkforceProvider>
+                <EmployeeDetailsSheet />
+              </WorkforceProvider>
+            }
+          />
         </Routes>
       )}
     </>

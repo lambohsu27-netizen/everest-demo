@@ -144,6 +144,11 @@ function WorkforceProvider({ children }) {
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
+  const [currentSlider, setCurrentSlider] = useState(null)
+
+  const handleCurrentSlider = useCallback((value) => {
+    setCurrentSlider(value)
+  }, [])
 
   const getEmployeeById = useCallback(
     (id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)),
@@ -205,6 +210,8 @@ function WorkforceProvider({ children }) {
       selectedCategory,
       setSelectedCategory,
       getEmployeeById,
+      currentSlider,
+      handleCurrentSlider,
     }),
     [
       searchTerm,
@@ -215,6 +222,8 @@ function WorkforceProvider({ children }) {
       sortOrder,
       selectedCategory,
       getEmployeeById,
+      currentSlider,
+      handleCurrentSlider,
     ]
   )
 

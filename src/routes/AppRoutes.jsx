@@ -37,7 +37,7 @@ import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
 import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
 import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
-
+import StepEmailVerified from '@src/pages/Register/components/StepEmailVerified'
 
 export function AuthenticatedRoutes() {
   // const { accesses } = useApp()
@@ -85,90 +85,84 @@ export function AuthenticatedRoutes() {
     <>
       <Routes location={backgroundLocation || location}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route
-        path="/dashboard"
-        element={
-          <DashboardProvider>
-            <Dashboard />
-          </DashboardProvider>
-        }
-      />
-      <Route
-        path="/report-enquiry"
-        element={
-          <ReportEnquiryProvider>
-            <ReportEnquiry />
-          </ReportEnquiryProvider>
-        }
-      />
-      <Route
-        path="/workforce"
-        element={
-          <WorkforceProvider>
-            <Workforce />
-          </WorkforceProvider>
-        }
-      />
-      <Route
-        path="/company"
-        element={
-          <CompanyProvider>
-            <Company />
-          </CompanyProvider>
-        }
-      />
-      <Route
-        path="/audit-trail"
-        element={
-          <AuditTrailProvider>
-            <AuditTrail />
-          </AuditTrailProvider>
-        }
-      />
-      <Route
-        path="/legal"
-        element={<Legal />}
-      />
-      <Route
-        path="/contact-us"
-        element={<ContactUs />}
-      />
-      <Route path="/settings" element={<Settings />}>
-        <Route index element={<Navigate to="general" replace />} />
-        <Route path="general" element={<GeneralSettings />} />
-        <Route path="user-role-access" element={<UserRoleAccess />} />
-        <Route path="employment-level" element={<EmploymentLevel />} />
-        <Route path="consent-editor" element={<ConsentEditor />} />
-      </Route>
-      <Route path="/login" element={<Navigate to="/" replace />} />
-      <Route
-        path="/profile"
-        element={
-          <ProfileProvider>
-            {isLoading ? null : isAccessAllowed(Access?.USER) ? <Profile /> : <NotFound />}
-          </ProfileProvider>
-        }
-      />
-      <Route
-        path="/enquiry"
-        element={
-          <EnquiryProvider>
-            {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
-          </EnquiryProvider>
-        }
-      />
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardProvider>
+              <Dashboard />
+            </DashboardProvider>
+          }
+        />
+        <Route
+          path="/report-enquiry"
+          element={
+            <ReportEnquiryProvider>
+              <ReportEnquiry />
+            </ReportEnquiryProvider>
+          }
+        />
+        <Route
+          path="/workforce"
+          element={
+            <WorkforceProvider>
+              <Workforce />
+            </WorkforceProvider>
+          }
+        />
+        <Route
+          path="/company"
+          element={
+            <CompanyProvider>
+              <Company />
+            </CompanyProvider>
+          }
+        />
+        <Route
+          path="/audit-trail"
+          element={
+            <AuditTrailProvider>
+              <AuditTrail />
+            </AuditTrailProvider>
+          }
+        />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/settings" element={<Settings />}>
+          <Route index element={<Navigate to="general" replace />} />
+          <Route path="general" element={<GeneralSettings />} />
+          <Route path="user-role-access" element={<UserRoleAccess />} />
+          <Route path="employment-level" element={<EmploymentLevel />} />
+          <Route path="consent-editor" element={<ConsentEditor />} />
+        </Route>
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route
+          path="/profile"
+          element={
+            <ProfileProvider>
+              {isLoading ? null : isAccessAllowed(Access?.USER) ? <Profile /> : <NotFound />}
+            </ProfileProvider>
+          }
+        />
+        <Route
+          path="/enquiry"
+          element={
+            <EnquiryProvider>
+              {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
+            </EnquiryProvider>
+          }
+        />
 
-      <Route
-        path="/register-company-info"
-        element={
-          <RegisterCompanyInfoProvider>
-            <RegisterCompanyInfo />
-          </RegisterCompanyInfoProvider>
-        }
-      />
+        <Route
+          path="/register-company-info"
+          element={
+            <RegisterCompanyInfoProvider>
+              <RegisterCompanyInfo />
+            </RegisterCompanyInfoProvider>
+          }
+        />
 
-      <Route path="/404" element={<NotFound />} />
-      <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
 
       {backgroundLocation && isStackedRoute(location.pathname) && (
@@ -239,6 +233,7 @@ export function UnauthenticatedRoutes() {
           </ForgetPasswordProvider>
         }
       />
+      <Route path="/email-verified" element={<StepEmailVerified />} />
       <Route path="/welcome" element={<WelcomePageBoilerPlate />} />
       <Route path="/version" element={<VersionPage />} />
       <Route path="/component-review" element={<ComponentReview />} />

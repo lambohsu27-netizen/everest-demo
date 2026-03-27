@@ -5,12 +5,11 @@ import { MyBgPatternDecorativeCube, MyButton } from '@interstellar-component'
 import { useForgetPassword } from '../context'
 
 function CheckYourEmail() {
-  const { sendOTP, resendEmail, navigate, countdown, setCountdown } =
-    useForgetPassword()
+  const { sendEmail, resendEmail, navigate, countdown, setCountdown } = useForgetPassword()
   const localUser_id = localStorage.getItem('user_id')
   const localForgetemail = localStorage.getItem('email_forget_password')
 
-  const numberOfDigits = 6
+  const numberOfDigits = 4
   const [otp, setOtp] = useState(new Array(numberOfDigits).fill(''))
   const otpBoxReference = useRef([])
 
@@ -111,12 +110,10 @@ function CheckYourEmail() {
                 maxLength={1}
                 onChange={(e) => handleChange(e.target.value, index)}
                 onKeyUp={(e) => handleBackspaceAndEnter(e, index)}
-                ref={(reference) =>
-                  (otpBoxReference.current[index] = reference)
-                }
+                ref={(reference) => (otpBoxReference.current[index] = reference)}
                 className={`border ${
-                  digit ? 'border-brand/600' : ''
-                } text-lg-bold z-0 block h-12 w-9 shrink-0 appearance-none rounded-md p-2 text-center text-brand/600 focus:border-2 focus:outline-none md:h-auto md:w-20 md:p-3`}
+                  digit ? 'border-brand/500 border-2' : ''
+                } display-lg-medium z-0 block h-auto w-20 appearance-none rounded-xl px-2 py-2.5 text-center text-brand/600 focus:border-brand/500 focus:border-2 focus:outline-none focus:shadow-focus-rings/ring-brand-mega`}
               />
             ))}
           </div>
@@ -127,16 +124,14 @@ function CheckYourEmail() {
               variant="filled"
               size="lg"
               expanded
-              disabled={stringOTP?.length !== 6}
-              onClick={() => sendOTP(payload)}
+              disabled={stringOTP?.length !== 4}
+              onClick={() => sendEmail(payload)}
             >
-              <p className="text-md-semibold">Verify email</p>
+              <p className="text-md-semibold">Continue</p>
             </MyButton>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-1 text-center md:mt-8">
-            <p className="text-md-regular text-gray-light/600">
-              Didn’t receive the email?
-            </p>
+            <p className="text-md-regular text-gray-light/600">Didn’t receive the email?</p>
             <MyButton
               disabled={seconds !== 0}
               onClick={() => {
@@ -147,9 +142,7 @@ function CheckYourEmail() {
                 })
               }}
             >
-              <p className="text-sm-semibold z-0 mr-2 text-brand/700">
-                Click to resend
-              </p>
+              <p className="text-sm-semibold z-0 mr-2 text-brand/700">Click to resend</p>
             </MyButton>
             <p
               className={`text-sm-semibold z-0 text-red-600 ${
@@ -160,9 +153,7 @@ function CheckYourEmail() {
           <div className="z-0 mt-6 flex items-center justify-center md:mt-8">
             <MyButton onClick={() => navigate('/login')}>
               <ArrowLeft size="15" />
-              <p className="text-sm-semibold z-0 text-center text-gray-600">
-                Back to login
-              </p>
+              <p className="text-sm-semibold z-0 text-center text-gray-600">Back to login</p>
             </MyButton>
           </div>
         </div>

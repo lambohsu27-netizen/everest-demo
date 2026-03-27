@@ -12,7 +12,7 @@ const RegisterContext = createContext()
 
 function RegisterProvider({ children }) {
   const { getSession } = useApp()
-  const [, setCookie] = useCookies(['token-backoffice'])
+  const [cookie, setCookie] = useCookies(['token-backoffice'])
   const [User, setUser] = useState()
   const [isProfileSliderOpen, setIsProfileSliderOpen] = useState(false)
   const [currentModal, setCurrentModal] = useState({
@@ -54,7 +54,7 @@ function RegisterProvider({ children }) {
       return await RegisterService.register(payload)
         .then(myToaster)
         .then((result) => {
-          localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.user_id) // user_id
+          localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.data.user_id) // user_id
 
           // setCookie('token-backoffice', result?.data?.token, {
           //   path: '/',
@@ -80,15 +80,24 @@ function RegisterProvider({ children }) {
   const verifyOtp = useCallback(
     async (otpCode) => {
       const userId = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
+
       const payload = { user_id: userId, code: otpCode }
 
       const result = await RegisterService.verifyOtp(payload)
 
-      setCookie('token-backoffice', result?.data?.token, { path: '/' })
+      setCookie('token-backoffice-temp', result?.data?.access_token)
       return result
     },
     [setCookie]
   )
+
+  const resendOtp = useCallback(async (body) => {
+    const userId = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
+
+    const payload = { user_id: userId }
+
+    return await RegisterService.resendOtp(payload).then(myToaster).catch(myToaster)
+  })
 
   const getUser = useCallback(
     async () =>
@@ -146,10 +155,13 @@ function RegisterProvider({ children }) {
     () => ({
       register,
       verifyOtp,
+      resendOtp,
       getUser,
       User,
       updateProfile,
       changePassword,
+      cookie,
+      setCookie,
       isProfileSliderOpen,
       setIsProfileSliderOpen,
       currentModal,
@@ -158,9 +170,12 @@ function RegisterProvider({ children }) {
     [
       register,
       verifyOtp,
+      resendOtp,
       getUser,
       updateProfile,
       User,
+      cookie,
+      setCookie,
       changePassword,
       isProfileSliderOpen,
       setIsProfileSliderOpen,

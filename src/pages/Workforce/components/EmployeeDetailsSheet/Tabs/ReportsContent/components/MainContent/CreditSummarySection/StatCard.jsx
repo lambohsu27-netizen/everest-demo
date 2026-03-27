@@ -3,7 +3,7 @@ import { TrendDown01, TrendUp01 } from '@untitled-ui/icons-react'
 
 import ReactApexChart from 'react-apexcharts'
 
-export default function StatCard({ title, value, trend, trendUp, chartData }) {
+export default function StatCard({ title, value, trend, trendUp, chartData, className = '' }) {
   const chartOptions = {
     chart: {
       type: 'area',
@@ -42,7 +42,9 @@ export default function StatCard({ title, value, trend, trendUp, chartData }) {
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative overflow-hidden min-h-[190px]">
+    <div
+      className={`bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative overflow-hidden min-h-[190px] flex-1 min-w-[300px] ${className}`}
+    >
       <div className="p-5 flex flex-col gap-2 relative z-10 flex-grow">
         <h4 className="text-sm font-medium text-gray-600">{title}</h4>
         <div className="text-2xl font-bold text-gray-900">{value}</div>

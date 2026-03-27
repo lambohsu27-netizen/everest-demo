@@ -24,10 +24,23 @@ export default function CreditSummarySection() {
         </div>
 
         {/* Row 2: Loan Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          <StatCard title="Total Outstanding Loans" value="Rp 384,500,000" trend="15%" trendUp />
-          <StatCard title="Total Overdue Loans" value="Rp 11,500,000" trend="15%" trendUp={false} />
+        <div className="flex flex-wrap gap-6">
           <StatCard
+            className="min-w-64"
+            title="Total Outstanding Loans"
+            value="Rp 384,500,000"
+            trend="15%"
+            trendUp
+          />
+          <StatCard
+            className="min-w-64"
+            title="Total Overdue Loans"
+            value="Rp 11,500,000"
+            trend="15%"
+            trendUp={false}
+          />
+          <StatCard
+            className="min-w-64"
             title="Total plafon efektif"
             value="Rp 930,280,161"
             trend="15%"

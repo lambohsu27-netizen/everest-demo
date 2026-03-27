@@ -8,7 +8,7 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
+import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
 function WorkforceTable() {
@@ -50,24 +50,39 @@ function WorkforceTable() {
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 focus:outline-none focus:ring-2 focus:ring-error/500 focus:ring-offset-2">
+              <MyButton
+                color="error"
+                variant="outlined"
+                size="md"
+              >
                 <Trash01 className="h-5 w-5" />
-                Delete
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-brand/300 bg-white px-4 py-2 text-sm font-semibold text-brand/700 shadow-sm hover:bg-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <p className="text-sm-semibold">Delete</p>
+              </MyButton>
+              <MyButton
+                color="primary"
+                variant="outlined"
+                size="md"
+              >
                 <DownloadCloud01 className="h-5 w-5" />
-                Download PDF
-              </button>
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <p className="text-sm-semibold">Download PDF</p>
+              </MyButton>
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+              >
                 <UploadCloud01 className="h-5 w-5" />
-                Import
-              </button>
-              <button
+                <p className="text-sm-semibold">Import</p>
+              </MyButton>
+              <MyButton
+                color="primary"
+                variant="filled"
+                size="md"
                 onClick={() => handleCurrentSlider({ status: true, current: 'new-employee' })}
-                className="flex items-center gap-2 rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+              >
                 <Plus className="h-5 w-5" />
-                New employee
-              </button>
+                <p className="text-sm-semibold">New employee</p>
+              </MyButton>
             </div>
           </div>
 
@@ -86,10 +101,14 @@ function WorkforceTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
-                <FilterLines className="h-4 w-4 text-gray-500" />
-                Filters
-              </button>
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+              >
+                <FilterLines className="h-4 w-4" />
+                <p className="text-sm-semibold">Filters</p>
+              </MyButton>
               <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
                 {['All category', 'Employee', 'Candidate'].map((cat) => (
                   <button

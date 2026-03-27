@@ -16,6 +16,7 @@ function Workforce() {
         open={currentSlider?.current === 'new-employee'}
         element={<NewEmployeeSlider />}
         onClose={() => handleCurrentSlider(null)}
+        scrim
       />
 
       <div className="mx-auto w-full max-w-[1372px]">

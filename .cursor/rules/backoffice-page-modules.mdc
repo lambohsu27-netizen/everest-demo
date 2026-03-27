@@ -1,0 +1,32 @@
+---
+description: Page/feature folder structure, data flow, forms, API calls
+globs: src/pages/**/*.{jsx,js}
+alwaysApply: false
+---
+
+# Page module conventions
+
+## Folder layout
+
+Each feature under `src/pages/<Feature>/` typically includes:
+
+- `index.jsx` — route entry / layout shell.
+- `Context.jsx` or `context.jsx` — `createContext` + `*Provider`; holds API calls, modal state, and shared setters (match the casing already used in that folder).
+- `service.js` or `service.jsx` — thin API module exporting an object of async functions; uses `get/post/patch` from `@src/services/NetworkUtils` with paths like ``/v1/...``.
+- `schema.js` / `schema.jsx` — Yup shapes for `react-hook-form` (`yupResolver`).
+- Optional: `modal.jsx`, `RegisterForm.jsx`-style orchestrator, and `components/` for step or section UI.
+
+## Forms and validation
+
+- Use **`useForm`** + **`yupResolver(YourSchema)`** from `react-hook-form` / `@hookform/resolvers/yup`.
+- Submit with **`handleSubmit(handleError(yourSubmitFn, control), checkErrorYup)`** from `@src/services/Helper` so server field errors and Yup scroll behavior stay consistent.
+- Wire inputs through **Interstellar** fields: `MyTextField`, `MyCheckbox`, `MyButton`, etc., with **`control`**, **`name`**, **`errors={errors?.field?.message}`**, and **`trigger`** where the component expects it.
+
+## Side effects and feedback
+
+- Prefer **`myToaster`** from `@interstellar-component` for API success/error toasts (as in existing Context modules).
+- Navigation: **`useNavigate`** from `react-router-dom`.
+
+## Icons
+
+- Use **`@untitled-ui/icons-react`** for icons (e.g. `Eye`, `Mail01`), matching import style in `Login`, `Register`.

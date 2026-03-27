@@ -6,7 +6,7 @@ import SimpleBar from 'simplebar-react'
 // UI Icons
 import { XClose, UserPlus01, User01, Mail01 } from '@untitled-ui/icons-react'
 // Shared Components
-import { MyButton, MyTextField, MyAutocomplete, WhatsApp } from '@interstellar-component'
+import { MyButton, MyTextField, MyAutocomplete, MyDoubleCard, WhatsApp } from '@interstellar-component'
 // Context
 import { useWorkforce } from '../Context'
 
@@ -140,14 +140,8 @@ function NewEmployeeSlider() {
             <div className="flex flex-col gap-6 px-6 py-6">
 
               {/* General Information card */}
-              <div className="rounded-xl border border-gray/200 bg-[#fdfdfd] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
-                {/* Card heading */}
-                <div className="px-4 py-4 border-b border-gray/100">
-                  <p className="text-sm-semibold text-gray/900">General Information</p>
-                </div>
-
-                {/* Card body */}
-                <div className="flex flex-col gap-5 px-4 py-4">
+              <MyDoubleCard heading="General Information" innerClassName="p-4">
+                <div className="flex flex-col gap-5">
 
                   {/* Category toggle */}
                   <div className="flex flex-col gap-1.5">
@@ -252,7 +246,7 @@ function NewEmployeeSlider() {
                   </div>
 
                 </div>
-              </div>
+              </MyDoubleCard>
 
             </div>
           </SimpleBar>

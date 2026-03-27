@@ -11,7 +11,7 @@ import {
 import { useLocation } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 import { myToaster } from '@interstellar-component'
-import { get, post } from './services/NetworkUtils'
+import { get, post, getCookie } from './services/NetworkUtils'
 
 const AppService = {
   getSession: async () => await get('/v1/auth/session'),
@@ -24,8 +24,8 @@ function AppProvider({ children }) {
   const [slider, setSlider] = useState(false)
   const [cookies, , removeCookie] = useCookies(['token-backoffice'])
   const [user, setUser] = useState(null)
-  //   const [accesses, setAccesses] = useState([])
-  //   const [shouldChangePassword, setShouldChangePassword] = useState(false)
+  const [permissions, setPermissions] = useState([])
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false)
   const location = useLocation()
   const timerRef = useRef(null)
 
@@ -33,13 +33,18 @@ function AppProvider({ children }) {
     () =>
       AppService.getSession()
         .then((res) => {
+          const userData = res?.data?.user
           setUser({
-            ...res?.data,
-            photo_url: `${res.data.photo_url}?time=${new Date().getTime()}`,
+            ...userData,
+            photo_url: userData?.avatar_url
+              ? `${userData.avatar_url}?time=${new Date().getTime()}`
+              : null,
           })
-          // setShouldChangePassword(!!res?.data?.should_change_password)
+          setPermissions(res?.data?.permissions ?? [])
+          setPermissionsLoaded(true)
         })
         .catch((err) => {
+          setPermissionsLoaded(true)
           if (location.pathname !== '/login') {
             myToaster(err)
           }
@@ -47,12 +52,19 @@ function AppProvider({ children }) {
     [location.pathname]
   )
 
-  const logoutFunction = useCallback((user_id) => {
-    const formData = new FormData()
+  const hasPermission = useCallback(
+    (moduleKey, subPermission = null) => {
+      const perm = permissions.find((p) => p.module_key === moduleKey)
+      if (!perm) return false
+      if (subPermission === null) return true
+      return perm.sub_permissions.includes(subPermission)
+    },
+    [permissions]
+  )
 
-    formData.append('user_id', user_id)
-    AppService.logout(formData)
-      .then((res) => {})
+  const logoutFunction = useCallback((refreshToken) => {
+    AppService.logout({ refresh_token: refreshToken })
+      .then(() => {})
       .catch((err) => {
         console.warn(err)
       })
@@ -64,16 +76,15 @@ function AppProvider({ children }) {
   //   )
 
   const logout = useCallback(() => {
-    const user_id = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
-    logoutFunction(user_id)
+    const refreshToken = getCookie('refresh-token-backoffice')
+    logoutFunction(refreshToken)
     localStorage.removeItem('user_id')
     localStorage.removeItem('RrwF57&aRMoR5Eq23#Mi') // user_id
     localStorage.removeItem('email_forget_password')
     localStorage.removeItem('countdown_to_new_otp')
-    removeCookie('token-backoffice', {
-      path: '/',
-    })
-  }, [removeCookie])
+    removeCookie('token-backoffice', { path: '/' })
+    removeCookie('refresh-token-backoffice', { path: '/' })
+  }, [logoutFunction, removeCookie])
 
   useEffect(() => {
     if (location.pathname !== '/login' && cookies['token-backoffice']) {
@@ -107,24 +118,15 @@ function AppProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       user,
+      permissions,
+      permissionsLoaded,
+      hasPermission,
       slider,
       setSlider,
-      //   setAccesses,
-      //   accesses,
-      //   getAccess,
       getSession,
       logout,
-      //   shouldChangePassword,
-      //   setShouldChangePassword,
     }),
-    [
-      user,
-      slider,
-      //   accesses, getAccess,
-      getSession,
-      logout,
-      //  shouldChangePassword
-    ]
+    [user, permissions, permissionsLoaded, hasPermission, slider, getSession, logout]
   )
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

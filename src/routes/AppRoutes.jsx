@@ -15,7 +15,9 @@ import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
-import { useEffect, useState, useRef } from 'react'
+import EmployeeDetailsSheet from '@src/pages/Workforce/components/EmployeeDetailsSheet'
+import { useEffect, useRef, useState } from 'react'
+import { useApp } from '@src/AppContext'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
 import Enquiry from '@src/pages/Enquiry'
@@ -37,16 +39,15 @@ import GeneralSettings from '@src/pages/Settings/components/GeneralSettings'
 import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
 import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
-import StepEmailVerified from '@src/pages/Register/components/StepEmailVerified'
 
 export function AuthenticatedRoutes() {
-  // const { accesses } = useApp()
-  const [isLoading, setIsLoading] = useState(true)
+  const { hasPermission, permissionsLoaded } = useApp()
   const location = useLocation()
   const previousLocationRaw = useRef(location)
   const [backgroundLocation, setBackgroundLocation] = useState(null)
 
-  const isStackedRoute = (path) => path.startsWith('/settings')
+  const isStackedRoute = (path) =>
+    path.startsWith('/settings') || path.startsWith('/workforce/employee')
 
   useEffect(() => {
     if (isStackedRoute(location.pathname)) {
@@ -58,28 +59,6 @@ export function AuthenticatedRoutes() {
     }
     previousLocationRaw.current = location
   }, [location])
-
-  const accesses = [
-    {
-      name: Access?.USER,
-      view: true,
-    },
-  ]
-
-  useEffect(() => {
-    if (Access && accesses.length > 0) {
-      setIsLoading(false)
-    }
-  }, [Access, accesses])
-
-  const isAccessAllowed = (accessName) => {
-    const filteredAccess = accesses.filter((acc) => acc.view === true)
-    const access = filteredAccess.find((acces) => acces.name === accessName)
-    if (access) {
-      return access
-    }
-    return false
-  }
 
   return (
     <>
@@ -108,7 +87,9 @@ export function AuthenticatedRoutes() {
               <Workforce />
             </WorkforceProvider>
           }
-        />
+        >
+          <Route path="employee/:id" element={<EmployeeDetailsSheet />} />
+        </Route>
         <Route
           path="/company"
           element={
@@ -139,7 +120,7 @@ export function AuthenticatedRoutes() {
           path="/profile"
           element={
             <ProfileProvider>
-              {isLoading ? null : isAccessAllowed(Access?.USER) ? <Profile /> : <NotFound />}
+              <Profile />
             </ProfileProvider>
           }
         />
@@ -147,7 +128,11 @@ export function AuthenticatedRoutes() {
           path="/enquiry"
           element={
             <EnquiryProvider>
-              {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
+              {!permissionsLoaded ? null : hasPermission(Access.ENQUIRY) ? (
+                <Enquiry />
+              ) : (
+                <NotFound />
+              )}
             </EnquiryProvider>
           }
         />
@@ -174,6 +159,14 @@ export function AuthenticatedRoutes() {
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>
+          <Route
+            path="/workforce/employee/:id"
+            element={
+              <WorkforceProvider>
+                <EmployeeDetailsSheet />
+              </WorkforceProvider>
+            }
+          />
         </Routes>
       )}
     </>
@@ -181,31 +174,6 @@ export function AuthenticatedRoutes() {
 }
 
 export function UnauthenticatedRoutes() {
-  // const { accesses } = useApp()
-  // make this accessess dummy data
-  const accesses = [
-    {
-      name: Access?.USER,
-      view: true,
-    },
-  ]
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (Access && accesses.length > 0) {
-      setIsLoading(false)
-    }
-  }, [Access, accesses])
-
-  const isAccessAllowed = (accessName) => {
-    const filteredAccess = accesses.filter((acc) => acc.view === true)
-    const access = filteredAccess.find((acces) => acces.name === accessName)
-    if (access) {
-      return access
-    }
-    return null
-  }
-
   return (
     <Routes>
       <Route path="*" element={<Navigate to="/login" replace />} />

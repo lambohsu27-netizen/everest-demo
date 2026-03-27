@@ -1,0 +1,15 @@
+---
+description: Everest backoffice — stack, aliases, routing, env
+alwaysApply: true
+---
+
+# Backoffice overview
+
+- **Stack**: React 18, Vite (`@vitejs/plugin-react-swc`), React Router v7, Tailwind 3, ESLint (Airbnb + Prettier).
+- **Design system submodule**: `interstellar-component` is a git submodule (`file:./interstellar-component` in `package.json`). Track branch **`everest`** (see `branch` in `.gitmodules`). After clone: `git submodule update --init --recursive`; to pull latest on that branch: `git submodule update --remote interstellar-component`.
+- **Aliases** (use in new code): `@src`, `@pages`, `@services`, `@assets`, `@interstellar-component` (see `vite.config.js`).
+- **Auth shell**: `App.jsx` switches on cookie `token-backoffice` (or `VITE_APP_BYPASS_AUTH`). Authenticated vs unauthenticated trees live in `src/routes/AppRoutes.jsx` (`AuthenticatedRoutes` / `UnauthenticatedRoutes`).
+- **Global UI**: `react-toastify` (`ToastContainer` in `App.jsx`), `react-cookie` for session cookie names above.
+- **Config**: API base `VITE_API_BASE_URL`; other secrets via `import.meta.env.VITE_*` only—never hardcode production URLs or keys.
+
+When adding routes, mirror existing patterns: wrap feature pages in their `*Provider` from the page’s Context file and register the path next to similar routes in `AppRoutes.jsx`.

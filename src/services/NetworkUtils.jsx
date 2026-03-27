@@ -7,6 +7,7 @@ import { fromObject } from './Helper'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL
 export const instance = axios.create({ baseURL })
+const refreshInstance = axios.create({ baseURL })
 
 // ─── GEOLOCATION INTERCEPTOR ────────────────────────────────────────────────
 // cache last–known coords for this tab
@@ -50,11 +51,76 @@ export const setCookie = (key, value, expiry) => {
 }
 
 const logout = () => {
-  const token = getCookie('token-backoffice')
-  if (!token) return
   setCookie('token-backoffice', null, '-1')
+  setCookie('refresh-token-backoffice', null, '-1')
   window.location.href = '/login'
 }
+
+// ─── SILENT REFRESH ──────────────────────────────────────────────────────────
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error)
+    else resolve(token)
+  })
+  failedQueue = []
+}
+
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error)
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject })
+      })
+        .then((token) => {
+          originalRequest.headers.authorization = `Bearer ${token}`
+          return instance(originalRequest)
+        })
+        .catch((err) => Promise.reject(err))
+    }
+
+    originalRequest._retry = true
+    isRefreshing = true
+
+    const refreshToken = getCookie('refresh-token-backoffice')
+    if (!refreshToken) {
+      isRefreshing = false
+      logout()
+      return Promise.reject(error)
+    }
+
+    try {
+      const { data } = await refreshInstance.post('/v1/auth/refresh', {
+        refresh_token: refreshToken,
+      })
+      const newToken = data?.data?.access_token
+      const newRefreshToken = data?.data?.refresh_token
+
+      setCookie('token-backoffice', newToken, 1)
+      setCookie('refresh-token-backoffice', newRefreshToken, 24 * 30)
+
+      instance.defaults.headers.common.authorization = `Bearer ${newToken}`
+      originalRequest.headers.authorization = `Bearer ${newToken}`
+      processQueue(null, newToken)
+      return instance(originalRequest)
+    } catch (refreshError) {
+      processQueue(refreshError, null)
+      logout()
+      return Promise.reject(refreshError)
+    } finally {
+      isRefreshing = false
+    }
+  }
+)
+// ─────────────────────────────────────────────────────────────────────────────
 
 const getHeader = (type) => {
   const timezone = moment.tz.guess()
@@ -136,6 +202,24 @@ export const patch = async (
       timeout,
       ...config,
     })
+    return response.data
+  } catch (error) {
+    if (error.response?.status === 401) logout()
+    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+  }
+}
+
+export const put = async (
+  endpoint,
+  data,
+  type = 'json',
+  timeout = 60 * 60 * 6000,
+  config = {}
+) => {
+  try {
+    const headers = getHeader(type)
+    const url = `${baseURL}${endpoint}`
+    const response = await instance.put(url, data, { headers, timeout, ...config })
     return response.data
   } catch (error) {
     if (error.response?.status === 401) logout()

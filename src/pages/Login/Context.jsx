@@ -12,7 +12,7 @@ const LoginContext = createContext()
 
 function LoginProvider({ children }) {
   const { getSession } = useApp()
-  const [, setCookie] = useCookies(['token-backoffice'])
+  const [, setCookie] = useCookies(['token-backoffice', 'refresh-token-backoffice'])
   const [User, setUser] = useState()
   const [isProfileSliderOpen, setIsProfileSliderOpen] = useState(false)
   const [currentModal, setCurrentModal] = useState({
@@ -54,8 +54,13 @@ function LoginProvider({ children }) {
           console.log('result', result)
           localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.user_id) // user_id
 
-          setCookie('token-backoffice', result?.data?.token, {
+          setCookie('token-backoffice', result?.data?.access_token, {
             path: '/',
+          })
+
+          setCookie('refresh-token-backoffice', result?.data?.refresh_token, {
+            path: '/',
+            maxAge: body?.remember_me ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
           })
 
           if (body?.remember_me === true) {

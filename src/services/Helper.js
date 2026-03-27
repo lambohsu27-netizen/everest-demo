@@ -141,13 +141,16 @@ export const mimeTypes = {
 }
 
 export const Access = {
-  // SEMUA_MENU: 'Semua menu',
-  DASHBOARD: 'Dashboard',
-  NASABAH: 'Nasabah',
-  AUDIT_TRAIL: 'Audit trail',
-  APPROVAL: 'Approval',
-  USER: 'User',
-  SETTING: 'Pengaturan',
+  DASHBOARD: 'dashboard',
+  ENQUIRY: 'application_enquiry',
+  WORKFORCE: 'workforce',
+  COMPANY: 'company',
+  AUDIT_TRAIL: 'audit_trail',
+  EMPLOYEE_LEVEL: 'employee_level',
+  USER_MANAGEMENT: 'user_management',
+  ROLE_ACCESS: 'role_access',
+  CONSENT_EDITOR: 'consent_editor',
+  GENERAL_SETTINGS: 'general_settings',
 }
 
 export const constantBranch = {

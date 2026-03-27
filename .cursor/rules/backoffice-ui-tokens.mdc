@@ -1,0 +1,31 @@
+---
+description: Tailwind tokens, typography utilities, Interstellar UI primitives
+globs: src/**/*.{jsx,js}
+alwaysApply: false
+---
+
+# UI and styling
+
+## Design tokens (Tailwind)
+
+- **Colors** use slash notation from `tailwind.config.js`: `brand/700`, `gray/600`, `error/500`, etc.—not raw hex unless matching a one-off in an existing screen.
+- **Shadows / focus**: e.g. `shadows/shadow-sm`, `focus-rings/ring-brand` where appropriate.
+- **Breakpoints**: project defines `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`—prefer `md:` for desktop split layouts (see Login).
+
+## Typography
+
+- Use **utility classes from `src/index.css` / `App.css`**: `display-xs-semibold`, `text-md-regular`, `text-sm-medium`, `text-sm-semibold`, etc. Do not default to raw `text-lg font-bold` if a display/text pair exists.
+
+## Components
+
+- Import primitives from **`@interstellar-component`** (`MyButton`, `MyTextField`, `MyCheckbox`, `MyLogo`, `MyStepper`, `MyStep`, …) instead of raw HTML for buttons/inputs when building app screens.
+- **`MyButton`**: use props already used in repo: `color`, `variant`, `size`, `expanded`, `disabled`, `type="submit"` for primary actions.
+
+## Layout patterns
+
+- **Auth / marketing splits**: `flex h-screen`, form column `max-w-[360px]` or similar, decorative side `hidden md:flex` with rounded image container—align with `Login` / `Register`.
+- **Multi-step registration**: purple sidebar `bg-brand/800`, `MyStepper` + `MyStep`, `activeStep` state in parent, content area in a sibling column.
+
+## Accessibility
+
+- Match existing patterns: keyboard handlers on icon toggles where `role="button"` is used; keep labels as visible `text-sm-medium text-gray-700` (or equivalent) above fields.

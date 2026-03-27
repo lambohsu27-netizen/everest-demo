@@ -1,9 +1,29 @@
 import { MyButton } from '@interstellar-component'
+import { useApp } from '@src/AppContext'
+import { Access } from '@src/services/Helper'
 import { useSettings } from '../Context'
 
 export default function GeneralSettings() {
-  const { sessionTimeout, setSessionTimeout, verificationThreshold, setVerificationThreshold } =
-    useSettings()
+  const { hasPermission } = useApp()
+  const {
+    sessionTimeout,
+    setSessionTimeout,
+    verificationThreshold,
+    setVerificationThreshold,
+    isLoadingGeneral,
+    updateGeneralSettings,
+    cancelGeneralSettings,
+  } = useSettings()
+
+  const canEdit = hasPermission(Access.GENERAL_SETTINGS, 'edit')
+
+  if (isLoadingGeneral) {
+    return (
+      <div className="flex items-center justify-center pt-16">
+        <span className="text-sm text-[#535862]">Loading...</span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col pt-8">
@@ -74,14 +94,16 @@ export default function GeneralSettings() {
       </div>
 
       {/* Footer Buttons */}
-      <div className="flex w-full justify-end gap-3 pt-6 pb-2">
-        <MyButton color="secondary" size="md" variant="outlined">
-          Cancel
-        </MyButton>
-        <MyButton color="primary" size="md" variant="filled" type="submit">
-          Save
-        </MyButton>
-      </div>
+      {canEdit && (
+        <div className="flex w-full justify-end gap-3 pt-6 pb-2">
+          <MyButton color="secondary" size="md" variant="outlined" onClick={cancelGeneralSettings}>
+            Cancel
+          </MyButton>
+          <MyButton color="primary" size="md" variant="filled" onClick={updateGeneralSettings}>
+            Save
+          </MyButton>
+        </div>
+      )}
     </div>
   )
 }

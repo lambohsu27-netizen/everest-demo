@@ -1,4 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { myToaster } from '@interstellar-component'
+import { SettingsService } from './service'
 
 const SettingsContext = createContext()
 
@@ -95,8 +97,47 @@ const INITIAL_POSITIONS = [
 
 function SettingsProvider({ children }) {
   // General Settings State
-  const [sessionTimeout, setSessionTimeout] = useState('30')
-  const [verificationThreshold, setVerificationThreshold] = useState('85')
+  const [sessionTimeout, setSessionTimeout] = useState('')
+  const [verificationThreshold, setVerificationThreshold] = useState('')
+  const [isLoadingGeneral, setIsLoadingGeneral] = useState(false)
+  const savedGeneral = useRef({ session_timeout: '', verification_threshold: '' })
+
+  const fetchGeneralSettings = useCallback(async () => {
+    setIsLoadingGeneral(true)
+    try {
+      const res = await SettingsService.getGeneral()
+      const { session_timeout, verification_threshold } = res.data
+      setSessionTimeout(String(session_timeout))
+      setVerificationThreshold(String(verification_threshold))
+      savedGeneral.current = { session_timeout: String(session_timeout), verification_threshold: String(verification_threshold) }
+    } catch (err) {
+      myToaster(err)
+    } finally {
+      setIsLoadingGeneral(false)
+    }
+  }, [])
+
+  const updateGeneralSettings = useCallback(async () => {
+    try {
+      const res = await SettingsService.updateGeneral({
+        session_timeout: Number(sessionTimeout),
+        verification_threshold: Number(verificationThreshold),
+      })
+      myToaster(res)
+      savedGeneral.current = { session_timeout: sessionTimeout, verification_threshold: verificationThreshold }
+    } catch (err) {
+      myToaster(err)
+    }
+  }, [sessionTimeout, verificationThreshold])
+
+  const cancelGeneralSettings = useCallback(() => {
+    setSessionTimeout(savedGeneral.current.session_timeout)
+    setVerificationThreshold(savedGeneral.current.verification_threshold)
+  }, [])
+
+  useEffect(() => {
+    fetchGeneralSettings()
+  }, [fetchGeneralSettings])
 
   // User Role Access State
   const [users, setUsers] = useState(INITIAL_USERS)
@@ -270,6 +311,9 @@ function SettingsProvider({ children }) {
     setSessionTimeout,
     verificationThreshold,
     setVerificationThreshold,
+    isLoadingGeneral,
+    updateGeneralSettings,
+    cancelGeneralSettings,
 
     // User Role Access
     users: filteredUsers,
@@ -311,6 +355,9 @@ function SettingsProvider({ children }) {
   }), [
     sessionTimeout,
     verificationThreshold,
+    isLoadingGeneral,
+    updateGeneralSettings,
+    cancelGeneralSettings,
     filteredUsers,
     filteredRoles,
     filteredEmpLevels,

@@ -1,6 +1,7 @@
 import { myToaster } from '@interstellar-component'
 import $ from 'jquery'
 import moment from 'moment'
+import CryptoJS from 'crypto-js'
 
 export const handleError =
   (func, control, config = {}) =>
@@ -13,9 +14,7 @@ export const handleError =
       e.errors?.forEach((err, index) => {
         control.setError(err.path, { message: err.msg })
         if (index === 0)
-          $(`[name=${err.path}]`)
-            ?.get(0)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+          $(`[name=${err.path}]`)?.get(0)?.scrollIntoView({ behavior: 'smooth', block: 'end' })
       })
     })
   }
@@ -28,14 +27,10 @@ export const checkErrorYup = (errors) => {
     if (Array.isArray(errors[error])) {
       const _error = Object.keys(errors[error]).find((e) => e)
       if ($(`#input-${error}-${_error}`).length) {
-        $(`#input-${error}-${_error}`)
-          .get(0)
-          .scrollIntoView({ behavior: 'smooth', block: 'end' })
+        $(`#input-${error}-${_error}`).get(0).scrollIntoView({ behavior: 'smooth', block: 'end' })
       }
     } else if ($(`#input-${error}`).length) {
-      $(`#input-${error}`)
-        .get(0)
-        .scrollIntoView({ behavior: 'smooth', block: 'end' })
+      $(`#input-${error}`).get(0).scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
   }
 }
@@ -55,6 +50,19 @@ export const appendFormdata = (FormData, data, name) => {
   }
 }
 
+// 32 chars
+
+export function encryptPassword(plainPassword) {
+  const key = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_APP_SECRET_KEY)
+  const iv = CryptoJS.lib.WordArray.random(16)
+  const encrypted = CryptoJS.AES.encrypt(plainPassword, key, {
+    iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  })
+  return iv.toString(CryptoJS.enc.Base64) + ':' + encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+}
+
 export const mimeTypes = {
   '.aac': 'audio/aac',
   '.abw': 'application/x-abiword',
@@ -72,8 +80,7 @@ export const mimeTypes = {
   '.css': 'text/css',
   '.csv': 'text/csv',
   '.doc': 'application/msword',
-  '.docx':
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   '.eot': 'application/vnd.ms-fontobject',
   '.epub': 'application/epub+zip',
   '.gz': 'application/gzip',
@@ -105,8 +112,7 @@ export const mimeTypes = {
   '.pdf': 'application/pdf',
   '.php': 'application/x-httpd-php',
   '.ppt': 'application/vnd.ms-powerpoint',
-  '.pptx':
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   '.rar': 'application/vnd.rar',
   '.rtf': 'application/rtf',
   '.sh': 'application/x-sh',
@@ -166,9 +172,7 @@ export const convertToMimeDict = (fileExtensions) => {
 }
 
 export const formatFileExtensions = (fileExtensions) => {
-  let text = fileExtensions
-    .map((ext) => ext.replace('.', '').toUpperCase())
-    .join(', ')
+  let text = fileExtensions.map((ext) => ext.replace('.', '').toUpperCase()).join(', ')
   text = text.replace(/,(?=[^,]*$)/, ' or ')
 
   return text

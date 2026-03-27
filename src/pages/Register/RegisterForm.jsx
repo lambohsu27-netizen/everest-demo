@@ -12,7 +12,7 @@ import RegisterSchema from './schema'
 import TermsConditions from './components/TermsConditions'
 
 function RegisterForm({ activeStep, setActiveStep }) {
-  const { register } = useRegister()
+  const { register, verifyOtp } = useRegister()
   const nav = useNavigate()
   const [acceptedTerms, setAcceptedTerms] = useState(false)
 
@@ -97,14 +97,22 @@ function RegisterForm({ activeStep, setActiveStep }) {
     resolver: yupResolver(RegisterSchema),
   })
 
-  const onSubmit = handleSubmit((data) => {
-    if (activeStep < 3) {
-      setActiveStep(activeStep + 1)
-    } else {
-      handleError(register, control)(data)
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      if (activeStep === 1) {
+        setActiveStep(2)
+      } else if (activeStep === 2) {
+        await register(data)
+        setActiveStep(3)
+      } else if (activeStep === 3) {
+        const otpCode = otp.join('')
+        await verifyOtp(otpCode)
+        setActiveStep(4)
+      }
+    } catch (err) {
+      console.error(err)
     }
-  }, checkErrorYup)
-
+  })
   return (
     <form id="right" className="flex-1 overflow-y-hidden h-full" onSubmit={onSubmit}>
       {activeStep === 1 && (
@@ -122,6 +130,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
         <TermsConditions
           onBack={() => setActiveStep(1)}
           onAccept={() => setActiveStep(3)}
+          watch={watch}
           accepted={acceptedTerms}
           setAccepted={setAcceptedTerms}
         />

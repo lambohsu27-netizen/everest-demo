@@ -47,7 +47,7 @@ export default function CreditUtilizationCard() {
       description="Percentage of total available credit currently in use."
       onViewReport={() => {}} // TODO: Define action
     >
-      <div className="flex flex-col items-center justify-center pt-2 pb-6">
+      <div className="flex flex-col items-start justify-center">
         {/*
           Figma: outer frame 200×110, ring frame 180×180.
           We render the full 180px ring (height=180) and clip to the top half (h-[90px]).

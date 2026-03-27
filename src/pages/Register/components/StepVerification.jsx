@@ -79,6 +79,7 @@ function StepVerification({
               size="lg"
               expanded
               disabled={isSubmitting}
+              onClick={() => setOtpMode(true)}
             >
               <p className="text-md-semibold">Verify email</p>
             </MyButton>
@@ -89,7 +90,7 @@ function StepVerification({
               variant="filled"
               size="lg"
               expanded
-              disabled={isSubmitting}
+              // disabled={isSubmitting}
               onClick={() => setOtpMode(true)}
             >
               <p className="text-md-semibold">Enter code manually</p>

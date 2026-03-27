@@ -201,6 +201,7 @@ export function UnauthenticatedRoutes() {
           </ForgetPasswordProvider>
         }
       />
+      <Route path="/email-verified" element={<StepEmailVerified />} />
       <Route path="/welcome" element={<WelcomePageBoilerPlate />} />
       <Route path="/version" element={<VersionPage />} />
       <Route path="/component-review" element={<ComponentReview />} />

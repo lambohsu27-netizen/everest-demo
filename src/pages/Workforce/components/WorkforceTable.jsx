@@ -70,6 +70,7 @@ function WorkforceTable() {
                 color="secondary"
                 variant="outlined"
                 size="md"
+                onClick={() => handleCurrentSlider({ status: true, current: 'import-workforce' })}
               >
                 <UploadCloud01 className="h-5 w-5" />
                 <p className="text-sm-semibold">Import</p>

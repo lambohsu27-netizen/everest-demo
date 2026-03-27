@@ -5,6 +5,7 @@ import { MyModalSlider } from '@interstellar-component'
 import WorkforceHeader from './components/WorkforceHeader'
 import WorkforceTable from './components/WorkforceTable'
 import NewEmployeeSlider from './Sliders/NewEmployeeSlider'
+import ImportWorkforceSlider from './Sliders/ImportWorkforceSlider'
 import { useWorkforce } from './Context'
 
 function Workforce() {
@@ -15,6 +16,12 @@ function Workforce() {
       <MyModalSlider
         open={currentSlider?.current === 'new-employee'}
         element={<NewEmployeeSlider />}
+        onClose={() => handleCurrentSlider(null)}
+        scrim
+      />
+      <MyModalSlider
+        open={currentSlider?.current === 'import-workforce'}
+        element={<ImportWorkforceSlider />}
         onClose={() => handleCurrentSlider(null)}
         scrim
       />

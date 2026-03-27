@@ -43,10 +43,9 @@ export default function GeneralInfoCard({ employee }) {
                 <MyChip
                   label={field.value || 'Active'}
                   color="success"
-                  variant="modern"
+                  variant="filled"
                   size="sm"
-                  rounded="lg"
-                  dot
+                  rounded="full"
                 />
               ) : (
                 <>
@@ -63,4 +62,3 @@ export default function GeneralInfoCard({ employee }) {
     </div>
   )
 }
-

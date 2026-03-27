@@ -11,7 +11,7 @@ import {
 import { useLocation } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 import { myToaster } from '@interstellar-component'
-import { get, post } from './services/NetworkUtils'
+import { get, post, getCookie } from './services/NetworkUtils'
 
 const AppService = {
   getSession: async () => await get('/v1/auth/session'),
@@ -47,12 +47,9 @@ function AppProvider({ children }) {
     [location.pathname]
   )
 
-  const logoutFunction = useCallback((user_id) => {
-    const formData = new FormData()
-
-    formData.append('user_id', user_id)
-    AppService.logout(formData)
-      .then((res) => {})
+  const logoutFunction = useCallback((refreshToken) => {
+    AppService.logout({ refresh_token: refreshToken })
+      .then(() => {})
       .catch((err) => {
         console.warn(err)
       })
@@ -64,16 +61,15 @@ function AppProvider({ children }) {
   //   )
 
   const logout = useCallback(() => {
-    const user_id = localStorage.getItem('RrwF57&aRMoR5Eq23#Mi')
-    logoutFunction(user_id)
+    const refreshToken = getCookie('refresh-token-backoffice')
+    logoutFunction(refreshToken)
     localStorage.removeItem('user_id')
     localStorage.removeItem('RrwF57&aRMoR5Eq23#Mi') // user_id
     localStorage.removeItem('email_forget_password')
     localStorage.removeItem('countdown_to_new_otp')
-    removeCookie('token-backoffice', {
-      path: '/',
-    })
-  }, [removeCookie])
+    removeCookie('token-backoffice', { path: '/' })
+    removeCookie('refresh-token-backoffice', { path: '/' })
+  }, [logoutFunction, removeCookie])
 
   useEffect(() => {
     if (location.pathname !== '/login' && cookies['token-backoffice']) {

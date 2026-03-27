@@ -15,7 +15,8 @@ import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useApp } from '@src/AppContext'
 import NotFound from '@src/pages/NotFound'
 import { Access } from '@src/services/Helper'
 import Enquiry from '@src/pages/Enquiry'
@@ -40,8 +41,7 @@ import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
 
 
 export function AuthenticatedRoutes() {
-  // const { accesses } = useApp()
-  const [isLoading, setIsLoading] = useState(true)
+  const { hasPermission, permissionsLoaded } = useApp()
   const location = useLocation()
   const previousLocationRaw = useRef(location)
   const [backgroundLocation, setBackgroundLocation] = useState(null)
@@ -58,28 +58,6 @@ export function AuthenticatedRoutes() {
     }
     previousLocationRaw.current = location
   }, [location])
-
-  const accesses = [
-    {
-      name: Access?.USER,
-      view: true,
-    },
-  ]
-
-  useEffect(() => {
-    if (Access && accesses.length > 0) {
-      setIsLoading(false)
-    }
-  }, [Access, accesses])
-
-  const isAccessAllowed = (accessName) => {
-    const filteredAccess = accesses.filter((acc) => acc.view === true)
-    const access = filteredAccess.find((acces) => acces.name === accessName)
-    if (access) {
-      return access
-    }
-    return false
-  }
 
   return (
     <>
@@ -145,7 +123,7 @@ export function AuthenticatedRoutes() {
         path="/profile"
         element={
           <ProfileProvider>
-            {isLoading ? null : isAccessAllowed(Access?.USER) ? <Profile /> : <NotFound />}
+            <Profile />
           </ProfileProvider>
         }
       />
@@ -153,7 +131,7 @@ export function AuthenticatedRoutes() {
         path="/enquiry"
         element={
           <EnquiryProvider>
-            {isLoading ? null : isAccessAllowed(Access?.ENQUIRY) ? <Enquiry /> : <NotFound />}
+            {!permissionsLoaded ? null : hasPermission(Access.ENQUIRY) ? <Enquiry /> : <NotFound />}
           </EnquiryProvider>
         }
       />
@@ -187,31 +165,6 @@ export function AuthenticatedRoutes() {
 }
 
 export function UnauthenticatedRoutes() {
-  // const { accesses } = useApp()
-  // make this accessess dummy data
-  const accesses = [
-    {
-      name: Access?.USER,
-      view: true,
-    },
-  ]
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (Access && accesses.length > 0) {
-      setIsLoading(false)
-    }
-  }, [Access, accesses])
-
-  const isAccessAllowed = (accessName) => {
-    const filteredAccess = accesses.filter((acc) => acc.view === true)
-    const access = filteredAccess.find((acces) => acces.name === accessName)
-    if (access) {
-      return access
-    }
-    return null
-  }
-
   return (
     <Routes>
       <Route path="*" element={<Navigate to="/login" replace />} />

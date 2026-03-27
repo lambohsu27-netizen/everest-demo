@@ -24,8 +24,8 @@ function AppProvider({ children }) {
   const [slider, setSlider] = useState(false)
   const [cookies, , removeCookie] = useCookies(['token-backoffice'])
   const [user, setUser] = useState(null)
-  //   const [accesses, setAccesses] = useState([])
-  //   const [shouldChangePassword, setShouldChangePassword] = useState(false)
+  const [permissions, setPermissions] = useState([])
+  const [permissionsLoaded, setPermissionsLoaded] = useState(false)
   const location = useLocation()
   const timerRef = useRef(null)
 
@@ -33,18 +33,33 @@ function AppProvider({ children }) {
     () =>
       AppService.getSession()
         .then((res) => {
+          const userData = res?.data?.user
           setUser({
-            ...res?.data,
-            photo_url: `${res.data.photo_url}?time=${new Date().getTime()}`,
+            ...userData,
+            photo_url: userData?.avatar_url
+              ? `${userData.avatar_url}?time=${new Date().getTime()}`
+              : null,
           })
-          // setShouldChangePassword(!!res?.data?.should_change_password)
+          setPermissions(res?.data?.permissions ?? [])
+          setPermissionsLoaded(true)
         })
         .catch((err) => {
+          setPermissionsLoaded(true)
           if (location.pathname !== '/login') {
             myToaster(err)
           }
         }),
     [location.pathname]
+  )
+
+  const hasPermission = useCallback(
+    (moduleKey, subPermission = null) => {
+      const perm = permissions.find((p) => p.module_key === moduleKey)
+      if (!perm) return false
+      if (subPermission === null) return true
+      return perm.sub_permissions.includes(subPermission)
+    },
+    [permissions]
   )
 
   const logoutFunction = useCallback((refreshToken) => {
@@ -103,24 +118,15 @@ function AppProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       user,
+      permissions,
+      permissionsLoaded,
+      hasPermission,
       slider,
       setSlider,
-      //   setAccesses,
-      //   accesses,
-      //   getAccess,
       getSession,
       logout,
-      //   shouldChangePassword,
-      //   setShouldChangePassword,
     }),
-    [
-      user,
-      slider,
-      //   accesses, getAccess,
-      getSession,
-      logout,
-      //  shouldChangePassword
-    ]
+    [user, permissions, permissionsLoaded, hasPermission, slider, getSession, logout]
   )
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

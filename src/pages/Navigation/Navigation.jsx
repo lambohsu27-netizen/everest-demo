@@ -26,30 +26,22 @@ import { useApp } from '../../AppContext'
 import { Access } from '../../services/Helper'
 
 function Navigation({ childs }) {
-  const { user, accesses, setAccesses } = useApp()
-  const [cookies, setCookie, removeCookie] = useCookies(['token-backoffice'])
+  const { user, hasPermission } = useApp()
+  const [, , removeCookie] = useCookies(['token-backoffice'])
 
   const location = useLocation()
 
-  const isAccessAllowed = (accessName) => true // dummy value to allow showing all pages
+  const isAccessAllowed = (moduleKey) => !moduleKey || hasPermission(moduleKey)
+
+  const hasSettingsAccess =
+    hasPermission(Access.GENERAL_SETTINGS) ||
+    hasPermission(Access.EMPLOYEE_LEVEL) ||
+    hasPermission(Access.USER_MANAGEMENT) ||
+    hasPermission(Access.ROLE_ACCESS) ||
+    hasPermission(Access.CONSENT_EDITOR)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLogoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
-
-  useEffect(() => {
-    if (user && user.role && user.role.access) {
-      const accessNames = user.role.access.map((access) => {
-        const permissions = access?.menu_access?.access || []
-        return {
-          name: access.name,
-          view: permissions?.view || false,
-          edit_delete: permissions?.edit_delete || false,
-          force_change_status: permissions?.fcs || false,
-        }
-      })
-      setAccesses(accessNames)
-    }
-  }, [user])
 
   const logout = () => {
     localStorage.removeItem('user_id')
@@ -129,31 +121,31 @@ function Navigation({ childs }) {
                 icon={<BarChartSquare02 />}
                 path="/dashboard"
                 label="Dashboard"
-                isAccess={Access?.USER}
+                isAccess={Access.DASHBOARD}
               />
               <NavItem
                 icon={<Rows01 />}
                 path="/report-enquiry"
                 label="Report Enquiry"
-                isAccess={Access?.USER}
+                isAccess={Access.ENQUIRY}
               />
               <NavItem
                 icon={<Users01 />}
                 path="/workforce"
                 label="Workforce"
-                isAccess={Access?.USER}
+                isAccess={Access.WORKFORCE}
               />
               <NavItem
                 icon={<Building07 />}
                 path="/company"
                 label="Company"
-                isAccess={Access?.APPROVAL}
+                isAccess={Access.COMPANY}
               />
               <NavItem
                 icon={<PackageSearch />}
                 path="/audit-trail"
                 label="Audit Trail"
-                isAccess={Access?.DASHBOARD}
+                isAccess={Access.AUDIT_TRAIL}
               />
             </div>
           </div>
@@ -161,19 +153,21 @@ function Navigation({ childs }) {
           {/* BOTTOM */}
           <div className="flex w-full flex-col items-center gap-y-4">
             <div className="flex flex-col gap-0.5 px-3">
-              <NavItem
-                icon={<Settings01 />}
-                path="/settings"
-                label="Settings"
-                isAccess={Access?.SETTING}
-              />
+              {hasSettingsAccess && (
+                <NavItem
+                  icon={<Settings01 />}
+                  path="/settings"
+                  label="Settings"
+                  isAccess={null}
+                />
+              )}
               <NavItem
                 icon={<MessageSmileSquare />}
                 path="/contact-us"
                 label="Contact us"
-                isAccess={Access?.USER}
+                isAccess={null}
               />
-              <NavItem icon={<FileLock02 />} path="/legal" label="Legal" isAccess={Access?.USER} />
+              <NavItem icon={<FileLock02 />} path="/legal" label="Legal" isAccess={null} />
             </div>
 
             <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { SearchMd } from '@untitled-ui/icons-react'
+import { SearchMd, XClose } from '@untitled-ui/icons-react'
 import { useSettings } from '../Context'
-import SettingsPanel from './SettingsPanel'
 
 export default function RoleForm({ mode }) {
   const {
@@ -22,6 +21,17 @@ export default function RoleForm({ mode }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [nameError, setNameError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setIsVisible(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  const animateClose = (callback) => {
+    setIsVisible(false)
+    setTimeout(callback, 300)
+  }
 
   // Pre-fill when editing
   useEffect(() => {
@@ -83,9 +93,11 @@ export default function RoleForm({ mode }) {
   }
 
   const handleBack = () => {
-    if (isEdit) openRoleDetail(activePanelRoleId)
-    else closeRolePanel()
+    if (isEdit) animateClose(() => openRoleDetail(activePanelRoleId))
+    else animateClose(closeRolePanel)
   }
+
+  const handleClose = () => animateClose(closeRolePanel)
 
   const filteredPermissions = allPermissions.filter((module) => {
     if (!searchTerm) return true
@@ -96,152 +108,174 @@ export default function RoleForm({ mode }) {
   })
 
   return (
-    <SettingsPanel
-      onBack={handleBack}
-      onClose={closeRolePanel}
-      backLabel={isEdit ? roleDetail?.name ?? 'Role detail' : 'Role access'}
-    >
-      <form onSubmit={handleSubmit} className="flex h-full flex-col">
-        {/* Two-column layout */}
-        <div className="flex flex-1 gap-8 min-h-0">
-          {/* Left: Access menu */}
-          <div className="flex w-1/2 flex-col border-r border-gray-200 pr-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Access menu</h3>
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={handleClose}
+      />
 
-            {/* Search */}
-            <div className="relative mb-4">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                placeholder="Search for feature"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* Permissions list */}
-            <div className="flex-1 overflow-y-auto -mr-2 pr-2">
-              {allPermissions.length === 0 ? (
-                <div className="flex items-center justify-center py-10">
-                  <div className="h-6 w-6 animate-spin rounded-full border-4 border-brand-300 border-t-brand-600" />
-                </div>
-              ) : (
-                <div className="flex flex-col">
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Result</p>
-                  {filteredPermissions.map((module) => {
-                    const moduleKey = module.module_key
-                    const subKeys = module.sub_permissions?.map((s) => s.key ?? s) ?? []
-                    const currentSet = selected[moduleKey] ?? new Set()
-                    const allChecked = subKeys.length > 0 && subKeys.every((k) => currentSet.has(k))
-                    const someChecked = subKeys.some((k) => currentSet.has(k))
-
-                    return (
-                      <div key={moduleKey} className="py-3">
-                        {/* Module header */}
-                        <label className="flex cursor-pointer items-start gap-3">
-                          <input
-                            type="checkbox"
-                            checked={allChecked}
-                            ref={(el) => { if (el) el.indeterminate = !allChecked && someChecked }}
-                            onChange={() => toggleModule(moduleKey, subKeys)}
-                            className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-gray-900">
-                              {module.label ?? moduleKey.replace(/_/g, ' ')}
-                            </span>
-                            {module.description && (
-                              <span className="text-xs text-gray-500 mt-0.5">{module.description}</span>
-                            )}
-                          </div>
-                        </label>
-
-                        {/* Sub-permissions */}
-                        <div className="ml-7 mt-2 flex flex-col gap-1.5">
-                          {module.sub_permissions?.map((sub) => {
-                            const subKey = sub.key ?? sub
-                            const subLabel = sub.label ?? subKey
-                            return (
-                              <label key={subKey} className="flex cursor-pointer items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={currentSet.has(subKey)}
-                                  onChange={() => toggleSub(moduleKey, subKey)}
-                                  className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                                />
-                                <span className="text-sm text-gray-600">{subLabel}</span>
-                              </label>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right: Form */}
-          <div className="flex w-1/2 flex-col">
-            <div className="flex flex-col gap-1 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {isEdit ? 'Edit role' : 'Add role'}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {isEdit
-                  ? 'Please provide the details you would like to edit.'
-                  : 'Please provide the details for a new case.'}
-              </p>
-            </div>
-
-            {/* Role section */}
-            <div className="flex flex-col gap-4">
-              <p className="text-sm font-semibold text-gray-900">Role</p>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Role name <span className="text-error-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); if (nameError) setNameError('') }}
-                  placeholder="e.g. Customer Service Team"
-                  className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-1 ${
-                    nameError
-                      ? 'border-error-300 focus:border-error-500 focus:ring-error-500'
-                      : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500'
-                  }`}
-                />
-                {nameError && <p className="text-xs text-error-600">{nameError}</p>}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer actions */}
-        <div className="flex justify-end gap-3 border-t border-gray-200 pt-5 mt-8">
+      {/* Drawer */}
+      <div
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-3xl flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+          isVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {/* Close button */}
+        <div className="flex justify-end px-6 pt-5">
           <button
             type="button"
-            onClick={handleBack}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            onClick={handleClose}
+            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:text-gray-600"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
-          >
-            {isSubmitting ? 'Saving…' : 'Submit'}
+            <XClose size={20} />
           </button>
         </div>
-      </form>
-    </SettingsPanel>
+
+        <form onSubmit={handleSubmit} className="flex flex-1 flex-col min-h-0">
+          {/* Two-column content */}
+          <div className="flex flex-1 min-h-0 px-6 gap-8">
+            {/* Left: Access menu */}
+            <div className="flex w-1/2 flex-col min-h-0">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Access menu</h3>
+
+              {/* Search */}
+              <div className="relative my-3">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <SearchMd className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  placeholder="Search for feature"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {/* Permissions list (scrollable) */}
+              <div className="flex-1 overflow-y-auto -mr-2 pr-2">
+                {allPermissions.length === 0 ? (
+                  <div className="flex items-center justify-center py-10">
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-brand-300 border-t-brand-600" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Result</p>
+                    {filteredPermissions.map((module) => {
+                      const moduleKey = module.module_key
+                      const subKeys = module.sub_permissions?.map((s) => s.key ?? s) ?? []
+                      const currentSet = selected[moduleKey] ?? new Set()
+                      const allChecked = subKeys.length > 0 && subKeys.every((k) => currentSet.has(k))
+                      const someChecked = subKeys.some((k) => currentSet.has(k))
+
+                      return (
+                        <div key={moduleKey} className="py-3">
+                          <label className="flex cursor-pointer items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={allChecked}
+                              ref={(el) => { if (el) el.indeterminate = !allChecked && someChecked }}
+                              onChange={() => toggleModule(moduleKey, subKeys)}
+                              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold text-gray-900">
+                                {module.label ?? moduleKey.replace(/_/g, ' ')}
+                              </span>
+                              {module.description && (
+                                <span className="text-xs text-gray-500 mt-0.5">{module.description}</span>
+                              )}
+                            </div>
+                          </label>
+
+                          <div className="ml-7 mt-2 flex flex-col gap-1.5">
+                            {module.sub_permissions?.map((sub) => {
+                              const subKey = sub.key ?? sub
+                              const subLabel = sub.label ?? subKey
+                              return (
+                                <label key={subKey} className="flex cursor-pointer items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={currentSet.has(subKey)}
+                                    onChange={() => toggleSub(moduleKey, subKey)}
+                                    className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                                  />
+                                  <span className="text-sm text-gray-600">{subLabel}</span>
+                                </label>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="w-px bg-gray-200" />
+
+            {/* Right: Form */}
+            <div className="flex w-1/2 flex-col">
+              <div className="flex flex-col gap-1 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {isEdit ? 'Edit role' : 'Add role'}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {isEdit
+                    ? 'Please provide the details you would like to edit.'
+                    : 'Please provide the details for a new case.'}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <p className="text-sm font-semibold text-gray-900">Role</p>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-gray-700">
+                    Role name <span className="text-error-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => { setName(e.target.value); if (nameError) setNameError('') }}
+                    placeholder="e.g. Customer Service Team"
+                    className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-1 ${
+                      nameError
+                        ? 'border-error-300 focus:border-error-500 focus:ring-error-500'
+                        : 'border-gray-300 focus:border-brand-500 focus:ring-brand-500'
+                    }`}
+                  />
+                  {nameError && <p className="text-xs text-error-600">{nameError}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-60"
+            >
+              {isSubmitting ? 'Saving…' : 'Submit'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   )
 }
 

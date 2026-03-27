@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Edit01, Trash01 } from '@untitled-ui/icons-react'
 import { MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import { useSettings } from '../Context'
-import SettingsPanel from './SettingsPanel'
 
 function formatDate(dateString) {
   if (!dateString) return ''
@@ -30,6 +29,17 @@ export default function RoleDetail() {
   } = useSettings()
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setIsVisible(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  const animateClose = () => {
+    setIsVisible(false)
+    setTimeout(closeRolePanel, 300)
+  }
 
   const canEdit = hasPermission(Access.ROLE_ACCESS, 'edit')
   const canDelete = hasPermission(Access.ROLE_ACCESS, 'delete')
@@ -58,37 +68,47 @@ export default function RoleDetail() {
         onConfirm={handleConfirmDelete}
       />
 
-      <SettingsPanel onBack={closeRolePanel} onClose={closeRolePanel} backLabel="Role access">
-        {isLoadingRoleDetail ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-300 border-t-brand-600" />
-          </div>
-        ) : !roleDetail ? (
-          <div className="py-20 text-center text-sm text-gray-500">Role not found.</div>
-        ) : (
-          <div className="flex flex-col h-full">
-            {/* Content */}
-            <div className="flex-1 flex flex-col gap-8">
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={animateClose}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-white shadow-xl transition-transform duration-300 ease-in-out ${
+          isVisible ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-1 flex-col overflow-y-auto px-6 py-8">
+          {isLoadingRoleDetail ? (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-300 border-t-brand-600" />
+            </div>
+          ) : !roleDetail ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-gray-500">Role not found.</div>
+          ) : (
+            <>
               {/* Title */}
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900">{roleDetail.name}</h2>
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900">{roleDetail.name}</h2>
                 <p className="mt-0.5 text-sm text-gray-500">Role</p>
               </div>
 
               {/* Information Section */}
-              <div className="flex flex-col gap-5">
-                <h3 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">Information</h3>
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-3 mb-4">Information</h3>
 
-                {/* Role name */}
-                <div className="flex items-center justify-between py-2">
+                <div className="flex items-center justify-between py-3">
                   <span className="text-sm text-gray-500">Role name</span>
                   <span className="text-sm font-medium text-gray-900">{roleDetail.name}</span>
                 </div>
 
-                {/* Access */}
-                <div className="flex items-start justify-between py-2">
+                <div className="flex items-start justify-between py-3">
                   <span className="text-sm text-gray-500">Access</span>
-                  <div className="flex flex-wrap justify-end gap-2 max-w-[280px]">
+                  <div className="flex flex-wrap justify-end gap-1.5 max-w-[240px]">
                     {accessLabels.map((label) => (
                       <span
                         key={label}
@@ -102,72 +122,72 @@ export default function RoleDetail() {
               </div>
 
               {/* Changes Section */}
-              <div className="flex flex-col gap-5">
-                <h3 className="text-base font-semibold text-gray-900 border-b border-gray-200 pb-3">Changes</h3>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 border-b border-gray-200 pb-3 mb-4">Changes</h3>
 
-                {/* Last modified */}
                 {changes?.last_modified?.timestamp && (
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-gray-500">Last modified</span>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <div className="flex flex-col items-end">
                         <span className="text-sm font-medium text-gray-900">{changes.last_modified.actor_name ?? '-'}</span>
                         <span className="text-xs text-gray-500">{changes.last_modified.actor_role ?? ''}</span>
                         <span className="text-xs text-gray-400">{formatDate(changes.last_modified.timestamp)}</span>
                       </div>
                       {changes.last_modified.actor_avatar_url ? (
-                        <img src={changes.last_modified.actor_avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+                        <img src={changes.last_modified.actor_avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-gray-200" />
+                        <div className="w-8 h-8 rounded-full bg-gray-200" />
                       )}
                     </div>
                   </div>
                 )}
 
-                {/* Created */}
                 {changes?.created?.timestamp && (
-                  <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-gray-500">Created</span>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2.5">
                       <div className="flex flex-col items-end">
                         <span className="text-sm font-medium text-gray-900">{changes.created.actor_name ?? '-'}</span>
                         <span className="text-xs text-gray-500">{changes.created.actor_role ?? ''}</span>
                         <span className="text-xs text-gray-400">{formatDate(changes.created.timestamp)}</span>
                       </div>
                       {changes.created.actor_avatar_url ? (
-                        <img src={changes.created.actor_avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+                        <img src={changes.created.actor_avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-gray-200" />
+                        <div className="w-8 h-8 rounded-full bg-gray-200" />
                       )}
                     </div>
                   </div>
                 )}
               </div>
-            </div>
+            </>
+          )}
+        </div>
 
-            {/* Footer actions */}
-            <div className="flex items-center justify-between border-t border-gray-200 pt-5 mt-8">
-              {canDelete ? (
-                <MyButton
-                  color="error"
-                  size="md"
-                  variant="text"
-                  onClick={() => setDeleteConfirmOpen(true)}
-                >
-                  <Trash01 className="w-4 h-4" stroke="currentColor" />
-                  Delete
-                </MyButton>
-              ) : <div />}
-              {canEdit && (
-                <MyButton color="secondary" size="md" variant="outlined" onClick={openEditRole}>
-                  <Edit01 className="w-4 h-4" stroke="currentColor" />
-                  Edit
-                </MyButton>
-              )}
-            </div>
+        {/* Footer */}
+        {roleDetail && !isLoadingRoleDetail && (
+          <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+            {canDelete ? (
+              <MyButton
+                color="error"
+                size="md"
+                variant="text"
+                onClick={() => setDeleteConfirmOpen(true)}
+              >
+                <Trash01 className="w-4 h-4" stroke="currentColor" />
+                Delete
+              </MyButton>
+            ) : <div />}
+            {canEdit ? (
+              <MyButton color="secondary" size="md" variant="outlined" onClick={openEditRole}>
+                <Edit01 className="w-4 h-4" stroke="currentColor" />
+                Edit
+              </MyButton>
+            ) : <div />}
           </div>
         )}
-      </SettingsPanel>
+      </div>
     </>
   )
 }

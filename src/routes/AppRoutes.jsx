@@ -41,6 +41,7 @@ import UserTab from '@src/pages/Settings/components/UserTab'
 import RoleTab from '@src/pages/Settings/components/RoleTab'
 import EmploymentLevel from '@src/pages/Settings/components/EmploymentLevel'
 import ConsentEditor from '@src/pages/Settings/components/ConsentEditor'
+import StepEmailVerified from '@src/pages/Register/components/StepEmailVerified'
 
 export function AuthenticatedRoutes() {
   const { hasPermission, permissionsLoaded } = useApp()
@@ -160,10 +161,10 @@ export function AuthenticatedRoutes() {
             <Route index element={<Navigate to="general" replace />} />
             <Route path="general" element={<GeneralSettings />} />
             <Route path="user-role-access" element={<UserRoleAccess />}>
-          <Route index element={<Navigate to="user" replace />} />
-          <Route path="user" element={<UserTab />} />
-          <Route path="role" element={<RoleTab />} />
-        </Route>
+              <Route index element={<Navigate to="user" replace />} />
+              <Route path="user" element={<UserTab />} />
+              <Route path="role" element={<RoleTab />} />
+            </Route>
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />
           </Route>

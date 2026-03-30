@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
+import CreditUtilizationModal from './CreditUtilizationModal'
 
 export default function CreditUtilizationCard() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const percentage = 73
 
   const options = {
@@ -45,7 +47,7 @@ export default function CreditUtilizationCard() {
     <ReportSummaryCard
       title="Credit Utilization"
       description="Percentage of total available credit currently in use."
-      onViewReport={() => {}} // TODO: Define action
+      onViewReport={() => setIsModalOpen(true)}
     >
       <div className="flex flex-col items-start justify-center">
         {/*
@@ -76,6 +78,7 @@ export default function CreditUtilizationCard() {
           utilization level.
         </p>
       </div>
+      <CreditUtilizationModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </ReportSummaryCard>
   )
 }

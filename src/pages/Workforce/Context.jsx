@@ -138,17 +138,128 @@ const INITIAL_WORKFORCE = [
   },
 ]
 
+export const LOAN_CATEGORIES = [
+  {
+    kolBadge: 'KOL 5',
+    title: 'Credit card',
+    accountCount: '3 account',
+    amount: 'Rp 52,000,000',
+    color: 'Error',
+    icon: 'CreditCard02',
+  },
+  {
+    kolBadge: 'KOL 4',
+    title: 'Paylater',
+    accountCount: '2 account',
+    amount: 'Rp 6,400,000',
+    color: 'Warning',
+    icon: 'ShoppingBag03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KKB',
+    accountCount: '1 account',
+    amount: 'Rp 172,000,000',
+    color: 'Orange',
+    icon: 'Car01',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KPR',
+    accountCount: 'No active loan',
+    amount: 'Rp 0',
+    color: 'Blue',
+    icon: 'Home03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KTA',
+    accountCount: '2 account',
+    amount: 'Rp 154,100,000',
+    color: 'Success',
+    icon: 'CoinsStacked03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'Other',
+    accountCount: 'No active loan',
+    amount: 'Rp 0',
+    color: 'Gray',
+    icon: 'DotsVertical',
+  },
+]
+
+export const LOAN_ACCOUNTS = {
+  'Credit card': [
+    { id: 1, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 1,523,000', isActive: false },
+    { id: 2, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 5,000,000', isActive: true },
+    { id: 3, bank: 'CIMB', name: 'CIMB Niaga Card', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 45,477,000', isActive: false },
+  ],
+  'Paylater': [
+    { id: 1, bank: 'SP', name: 'Shopee Paylater', kol: 'Kol 4', label: 'Jumlah pinjaman', amount: 'Rp 4,000,000', isActive: false },
+    { id: 2, bank: 'TR', name: 'Traveloka Paylater', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 2,400,000', isActive: true },
+  ],
+  'KKB': [
+    { id: 1, bank: 'BCA', name: 'BCA Finance - Toyota Avanza', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 172,000,000', isActive: true },
+  ],
+  'KPR': [],
+  'KTA': [
+    { id: 1, bank: 'MN', name: 'Mandiri KTA', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 100,000,000', isActive: false },
+    { id: 2, bank: 'BRI', name: 'BRI KTA', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 54,100,000', isActive: true },
+  ],
+  'Other': [],
+}
+
 function WorkforceProvider({ children }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [workforce, setWorkforce] = useState(INITIAL_WORKFORCE)
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
-  const [currentSlider, setCurrentSlider] = useState(null)
+  const [sliderStack, setSliderStack] = useState([])
+  const [activeAccountId, setActiveAccountId] = useState(null)
+
+  const pushSlider = useCallback((slider) => {
+    setSliderStack((prev) => [...prev, slider])
+  }, [])
+
+  const popSlider = useCallback(() => {
+    setSliderStack((prev) => {
+      const newStack = prev.slice(0, -1)
+      if (newStack.length === 1) { // We went back to the base slider
+        setActiveAccountId(null)
+      }
+      return newStack
+    })
+  }, [])
+
+  /**
+   * Specifically for account detail - ensures we only have ONE detail slider open
+   * and replaces its content if another account is clicked.
+   */
+  const handleAccountDetail = useCallback((acc) => {
+    setActiveAccountId(acc.id)
+    setSliderStack((prev) => {
+      const base = prev[0]
+      const detail = { current: 'loan-account-detail', data: acc }
+      return [base, detail]
+    })
+  }, [])
 
   const handleCurrentSlider = useCallback((value) => {
-    setCurrentSlider(value)
+    if (value === null) {
+      setSliderStack([])
+      setActiveAccountId(null)
+    } else {
+      setSliderStack([value])
+      setActiveAccountId(null)
+    }
   }, [])
+
+  const currentSlider = useMemo(
+    () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
+    [sliderStack]
+  )
 
   const getEmployeeById = useCallback(
     (id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)),
@@ -211,7 +322,14 @@ function WorkforceProvider({ children }) {
       setSelectedCategory,
       getEmployeeById,
       currentSlider,
+      activeAccountId,
+      sliderStack,
       handleCurrentSlider,
+      pushSlider,
+      popSlider,
+      handleAccountDetail,
+      loanCategories: LOAN_CATEGORIES,
+      loanAccounts: LOAN_ACCOUNTS,
     }),
     [
       searchTerm,
@@ -223,7 +341,12 @@ function WorkforceProvider({ children }) {
       selectedCategory,
       getEmployeeById,
       currentSlider,
+      activeAccountId,
+      sliderStack,
       handleCurrentSlider,
+      pushSlider,
+      popSlider,
+      handleAccountDetail,
     ]
   )
 

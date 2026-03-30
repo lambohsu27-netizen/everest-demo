@@ -16,6 +16,7 @@ import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
 import ContactUs from '@src/pages/ContactUs'
 import EmployeeDetailsSheet from '@src/pages/Workforce/components/EmployeeDetailsSheet'
+import RiskSignalsDetailsSheet from '@src/pages/Workforce/components/RiskSignalsDetailsSheet'
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@src/AppContext'
 import NotFound from '@src/pages/NotFound'
@@ -91,7 +92,9 @@ export function AuthenticatedRoutes() {
             </WorkforceProvider>
           }
         >
-          <Route path="employee/:id" element={<EmployeeDetailsSheet />} />
+          <Route path="employee/:id" element={<EmployeeDetailsSheet />}>
+            <Route path="risk-signals" element={<RiskSignalsDetailsSheet />} />
+          </Route>
         </Route>
         <Route
           path="/company"
@@ -175,7 +178,9 @@ export function AuthenticatedRoutes() {
                 <EmployeeDetailsSheet />
               </WorkforceProvider>
             }
-          />
+          >
+            <Route path="risk-signals" element={<RiskSignalsDetailsSheet />} />
+          </Route>
         </Routes>
       )}
     </>

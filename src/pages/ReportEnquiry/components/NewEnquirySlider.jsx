@@ -1,19 +1,18 @@
 // Libraries
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import SimpleBar from 'simplebar-react'
 // UI Icons
 import {
   XClose,
-  FilePlus02,
   User01,
   Mail01,
   Building07,
   Briefcase02,
   Calendar,
-  RefreshCw01,
   RefreshCcw05,
+  Edit01,
 } from '@untitled-ui/icons-react'
 // Shared Components
 import {
@@ -22,6 +21,7 @@ import {
   MyAutocomplete,
   MyDoubleCard,
   MyHorizontalTabV2,
+  WhatsApp,
 } from '@interstellar-component'
 // Context
 import { useReportEnquiry } from '../Context'
@@ -33,11 +33,24 @@ const schema = yup.object({
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
     .required('Entity is required'),
-  fullName: yup.string().required('Full name is required'),
+  fullName: yup.mixed().required('Full name is required'),
   level: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
     .required('Level is required'),
+  position: yup
+    .object({ label: yup.string(), value: yup.string() })
+    .nullable()
+    .when('category', {
+      is: 'Employee',
+      then: (yupSchema) => yupSchema.required('Position is required'),
+      otherwise: (yupSchema) => yupSchema.optional(),
+    }),
+  whatsapp: yup.string().when('category', {
+    is: 'Employee',
+    then: (yupSchema) => yupSchema.required('WhatsApp is required'),
+    otherwise: (yupSchema) => yupSchema.optional(),
+  }),
   email: yup.string().email('Invalid email').required('Email is required'),
   consentExpiry: yup
     .object({ label: yup.string(), value: yup.string() })
@@ -61,6 +74,36 @@ const LEVEL_OPTIONS = [
   { label: 'Supervisor', value: 'supervisor' },
   { label: 'Manager', value: 'manager' },
   { label: 'Director', value: 'director' },
+]
+
+const POSITION_OPTIONS = [
+  { label: 'Product Designer', value: 'product-designer' },
+  { label: 'Frontend Engineer', value: 'frontend-engineer' },
+  { label: 'Backend Engineer', value: 'backend-engineer' },
+  { label: 'HR Manager', value: 'hr-manager' },
+]
+
+const EMPLOYEE_OPTIONS = [
+  {
+    label: 'Phoenix Baker',
+    value: '1',
+    supportingText: 'Product Manager',
+    email: 'phoenix.baker@everest.com',
+    entity: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
+    level: { label: 'Supervisor', value: 'supervisor' },
+    position: { label: 'Product Designer', value: 'product-designer' },
+    whatsapp: '08123456789',
+  },
+  {
+    label: 'Lana Steiner',
+    value: '2',
+    supportingText: 'Frontend Engineer',
+    email: 'lana.steiner@everest.com',
+    entity: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
+    level: { label: 'Staff', value: 'staff' },
+    position: { label: 'Software Engineer', value: 'software-engineer' },
+    whatsapp: '08123456780',
+  },
 ]
 
 const CONSENT_EXPIRY_OPTIONS = [
@@ -96,6 +139,8 @@ function SelectField({
   placeholder,
   errors,
   startAdornment,
+  renderOption,
+  getOptionLabel,
 }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -107,6 +152,8 @@ function SelectField({
         placeholder={placeholder}
         errors={errors}
         startAdornment={startAdornment}
+        renderOption={renderOption}
+        getOptionLabel={getOptionLabel}
       />
     </div>
   )
@@ -119,6 +166,7 @@ function NewEnquirySlider() {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
@@ -127,11 +175,15 @@ function NewEnquirySlider() {
       entity: null,
       fullName: '',
       level: null,
+      position: null,
+      whatsapp: '',
       email: '',
-      consentExpiry: { label: 'One time request', value: 'one-time' },
-      repeatEvery: { label: 'None', value: 'none' },
+      consentExpiry: null,
+      repeatEvery: null,
     },
   })
+
+  const category = useWatch({ control, name: 'category' })
 
   const onSubmit = handleSubmit(() => {
     // TODO: wire to real API
@@ -139,6 +191,16 @@ function NewEnquirySlider() {
   })
 
   const handleClose = () => handleCurrentSlider(null)
+
+  const handleEmployeeChange = (e, val) => {
+    if (val) {
+      setValue('entity', val.entity)
+      setValue('level', val.level)
+      setValue('position', val.position)
+      setValue('whatsapp', val.whatsapp)
+      setValue('email', val.email)
+    }
+  }
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white shadow-xl">
@@ -169,7 +231,7 @@ function NewEnquirySlider() {
                 <div className="flex flex-col gap-5">
                   {/* Category toggle */}
                   <div className="flex flex-col gap-1.5">
-                    <FieldLabel>Category</FieldLabel>
+                    <FieldLabel>Target</FieldLabel>
                     <Controller
                       name="category"
                       control={control}
@@ -177,7 +239,16 @@ function NewEnquirySlider() {
                         <MyHorizontalTabV2
                           fitContent
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(val) => {
+                            field.onChange(val)
+                            // Clear fields when toggling
+                            setValue('fullName', '')
+                            setValue('entity', null)
+                            setValue('level', null)
+                            setValue('position', null)
+                            setValue('whatsapp', '')
+                            setValue('email', '')
+                          }}
                           tabs={[
                             { label: 'Candidate', value: 'Candidate' },
                             { label: 'Employee', value: 'Employee' },
@@ -187,6 +258,54 @@ function NewEnquirySlider() {
                     />
                     {errors.category && (
                       <p className="text-xs text-red-500 mt-0.5">{errors.category.message}</p>
+                    )}
+                  </div>
+
+                  {/* Full name - Searchable if Employee, text if Candidate */}
+                  <div className="flex flex-col gap-0.5">
+                    <FieldLabel required>Full name</FieldLabel>
+                    {category === 'Employee' ? (
+                      <Controller
+                        name="fullName"
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                          <MyAutocomplete
+                            name="fullName"
+                            control={control}
+                            options={EMPLOYEE_OPTIONS}
+                            placeholder="Search employee"
+                            value={value}
+                            onChange={(e, val) => {
+                              onChange(val)
+                              handleEmployeeChange(e, val)
+                            }}
+                            errors={errors.fullName?.message}
+                            renderOption={(option) => (
+                              <div className="flex items-center gap-3">
+                                <div className="size-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                  <User01 className="size-4 text-gray-500" />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {option.label}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {option.supportingText}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <MyTextField
+                        name="fullName"
+                        control={control}
+                        placeholder="e.g. Kania Elfira"
+                        errors={errors?.fullName?.message}
+                        startAdornment={<User01 className="size-4 text-gray-400" />}
+                      />
                     )}
                   </div>
 
@@ -202,18 +321,6 @@ function NewEnquirySlider() {
                     startAdornment={<Building07 className="size-4 text-gray-400" />}
                   />
 
-                  {/* Full name */}
-                  <div className="flex flex-col gap-0.5">
-                    <FieldLabel required>Full name</FieldLabel>
-                    <MyTextField
-                      name="fullName"
-                      control={control}
-                      placeholder="e.g. Kania Elfira"
-                      errors={errors?.fullName?.message}
-                      startAdornment={<User01 className="size-4 text-gray-400" />}
-                    />
-                  </div>
-
                   {/* Level */}
                   <SelectField
                     label="Level"
@@ -226,6 +333,34 @@ function NewEnquirySlider() {
                     startAdornment={<Briefcase02 className="size-4 text-gray-400" />}
                   />
 
+                  {/* Position (Employee only) */}
+                  {category === 'Employee' && (
+                    <SelectField
+                      label="Position"
+                      required
+                      name="position"
+                      control={control}
+                      options={POSITION_OPTIONS}
+                      placeholder="Select position"
+                      errors={errors?.position?.message ?? errors?.position?.value?.message}
+                      startAdornment={<Building07 className="size-4 text-gray-400" />}
+                    />
+                  )}
+
+                  {/* WhatsApp (Employee only) */}
+                  {category === 'Employee' && (
+                    <div className="flex flex-col gap-0.5">
+                      <FieldLabel required>WhatsApp</FieldLabel>
+                      <MyTextField
+                        name="whatsapp"
+                        control={control}
+                        placeholder="e.g. 0817766544"
+                        errors={errors?.whatsapp?.message}
+                        startAdornment={<WhatsApp className="size-4 text-green-500" />}
+                      />
+                    </div>
+                  )}
+
                   {/* Email */}
                   <div className="flex flex-col gap-0.5">
                     <FieldLabel required>Email</FieldLabel>
@@ -236,10 +371,23 @@ function NewEnquirySlider() {
                       errors={errors?.email?.message}
                       startAdornment={<Mail01 className="size-4 text-gray-400" />}
                     />
-                    <p className="text-xs text-gray-500 mt-1.5">
-                      Used as an alternative method for sending the form link.
+                    <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                      {category === 'Employee'
+                        ? 'This email will be used to send the Credit Report form link to the employee.'
+                        : 'Used as an alternative method for sending the form link.'}
                     </p>
                   </div>
+
+                  {/* Edit action for employee */}
+                  {category === 'Employee' && (
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 text-sm font-semibold text-brand/700 hover:text-brand/800 w-max"
+                    >
+                      <Edit01 className="size-4" />
+                      Edit employee details
+                    </button>
+                   )}
                 </div>
               </MyDoubleCard>
 
@@ -252,7 +400,7 @@ function NewEnquirySlider() {
                     name="consentExpiry"
                     control={control}
                     options={CONSENT_EXPIRY_OPTIONS}
-                    placeholder="One time request"
+                    placeholder="Select date"
                     errors={errors?.consentExpiry?.message ?? errors?.consentExpiry?.value?.message}
                     startAdornment={<Calendar className="size-4 text-gray-400" />}
                   />
@@ -263,7 +411,7 @@ function NewEnquirySlider() {
                     name="repeatEvery"
                     control={control}
                     options={REPEAT_EVERY_OPTIONS}
-                    placeholder="None"
+                    placeholder="Select interval"
                     errors={errors?.repeatEvery?.message ?? errors?.repeatEvery?.value?.message}
                     startAdornment={<RefreshCcw05 className="size-4 text-gray-400" />}
                   />

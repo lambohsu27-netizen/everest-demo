@@ -216,11 +216,28 @@ function WorkforceProvider({ children }) {
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
-  const [currentSlider, setCurrentSlider] = useState(null)
+  const [sliderStack, setSliderStack] = useState([])
+
+  const pushSlider = useCallback((slider) => {
+    setSliderStack((prev) => [...prev, slider])
+  }, [])
+
+  const popSlider = useCallback(() => {
+    setSliderStack((prev) => prev.slice(0, -1))
+  }, [])
 
   const handleCurrentSlider = useCallback((value) => {
-    setCurrentSlider(value)
+    if (value === null) {
+      setSliderStack([])
+    } else {
+      setSliderStack([value])
+    }
   }, [])
+
+  const currentSlider = useMemo(
+    () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
+    [sliderStack]
+  )
 
   const getEmployeeById = useCallback(
     (id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)),
@@ -283,7 +300,10 @@ function WorkforceProvider({ children }) {
       setSelectedCategory,
       getEmployeeById,
       currentSlider,
+      sliderStack,
       handleCurrentSlider,
+      pushSlider,
+      popSlider,
       loanCategories: LOAN_CATEGORIES,
       loanAccounts: LOAN_ACCOUNTS,
     }),
@@ -297,7 +317,10 @@ function WorkforceProvider({ children }) {
       selectedCategory,
       getEmployeeById,
       currentSlider,
+      sliderStack,
       handleCurrentSlider,
+      pushSlider,
+      popSlider,
     ]
   )
 

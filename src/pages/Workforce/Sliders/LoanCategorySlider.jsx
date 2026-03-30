@@ -5,7 +5,7 @@ import { MyChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
 export default function LoanCategorySlider() {
-  const { handleCurrentSlider, currentSlider, loanCategories, loanAccounts } = useWorkforce()
+  const { popSlider, pushSlider, currentSlider, loanCategories, loanAccounts } = useWorkforce()
   
   // Initialize with category from currentSlider if available, otherwise 'Credit card'
   const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || 'Credit card')
@@ -18,12 +18,16 @@ export default function LoanCategorySlider() {
     }
   }, [currentSlider])
 
-  const handleClose = () => handleCurrentSlider(null)
+  const handleClose = () => popSlider()
 
   const currentCategoryData = loanCategories.find((c) => c.title === selectedCategory) || loanCategories[0]
   const accounts = loanAccounts[selectedCategory] || []
 
   const categoryTabs = loanCategories.map((c) => ({ label: c.title, value: c.title }))
+
+  const handleAccountClick = (acc) => {
+    pushSlider({ current: 'loan-account-detail', data: acc })
+  }
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white">
@@ -105,11 +109,12 @@ export default function LoanCategorySlider() {
             <div className="flex flex-col gap-3">
               {accounts.length > 0 ? (
                 accounts.map((acc) => (
-                  <div
+                  <button
                     key={acc.id}
-                    className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${
+                    onClick={() => handleAccountClick(acc)}
+                    className={`flex flex-col gap-4 p-4 rounded-xl border transition-all text-left w-full outline-none hover:bg-gray/25 ${
                       acc.isActive
-                        ? 'border-primary-600 ring-4 ring-primary-50'
+                        ? 'border-primary-600 ring-4 ring-primary-50 px-4'
                         : 'border-gray-200 shadow-xs'
                     }`}
                   >
@@ -134,7 +139,7 @@ export default function LoanCategorySlider() {
                       <span className="text-sm-medium text-gray/500">{acc.label}</span>
                       <span className="text-sm-semibold text-gray/900">{acc.amount}</span>
                     </div>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <div className="py-8 flex flex-col items-center justify-center gap-2 text-center border-2 border-dashed border-gray-100 rounded-xl">

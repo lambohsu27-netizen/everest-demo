@@ -1,44 +1,45 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 
-import { MyModalSlider } from '@interstellar-component'
+import { MyStackedModalSlider } from '@interstellar-component'
 import WorkforceHeader from './components/WorkforceHeader'
 import WorkforceTable from './components/WorkforceTable'
 import NewEmployeeSlider from './Sliders/NewEmployeeSlider'
 import ImportWorkforceSlider from './Sliders/ImportWorkforceSlider'
 import CreditCompositionSlider from './Sliders/CreditCompositionSlider'
 import LoanCategorySlider from './Sliders/LoanCategorySlider'
+import LoanAccountSlider from './Sliders/LoanAccountSlider'
 import { useWorkforce } from './Context'
 
+const SLIDER_COMPONENTS = {
+  'new-employee': NewEmployeeSlider,
+  'import-workforce': ImportWorkforceSlider,
+  'credit-composition': CreditCompositionSlider,
+  'loan-category': LoanCategorySlider,
+  'loan-account-detail': LoanAccountSlider,
+}
+
 function Workforce() {
-  const { currentSlider, handleCurrentSlider } = useWorkforce()
+  const { sliderStack, popSlider } = useWorkforce()
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-gray-50/50">
-      <MyModalSlider
-        open={currentSlider?.current === 'new-employee'}
-        element={<NewEmployeeSlider />}
-        onClose={() => handleCurrentSlider(null)}
-        scrim
-      />
-      <MyModalSlider
-        open={currentSlider?.current === 'import-workforce'}
-        element={<ImportWorkforceSlider />}
-        onClose={() => handleCurrentSlider(null)}
-        scrim
-      />
-      <MyModalSlider
-        open={currentSlider?.current === 'credit-composition'}
-        element={<CreditCompositionSlider />}
-        onClose={() => handleCurrentSlider(null)}
-        scrim
-      />
-      <MyModalSlider
-        open={currentSlider?.current === 'loan-category'}
-        element={<LoanCategorySlider />}
-        onClose={() => handleCurrentSlider(null)}
-        scrim
-      />
+      {/* Dynamic Stacked Sliders */}
+      {sliderStack.map((slider, index) => {
+        const Component = SLIDER_COMPONENTS[slider.current]
+        if (!Component) return null
+
+        return (
+          <MyStackedModalSlider
+            key={`${slider.current}-${index}`}
+            open
+            offset={index * 420}
+            element={<Component />}
+            onClose={popSlider}
+            scrim={index === 0}
+          />
+        )
+      })}
 
       <div className="mx-auto w-full max-w-[1372px]">
         <WorkforceHeader />

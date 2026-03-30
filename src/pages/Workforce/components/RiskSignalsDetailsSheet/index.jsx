@@ -231,6 +231,62 @@ export default function RiskSignalsDetailsSheet() {
       searchPlaceholder: 'Search for cases',
       showSecondaryTabs: false,
     },
+    Footprints: {
+      title: 'Credit enquiry activity',
+      description:
+        'Breakdown of active and historical credit facilities associated with this individual.',
+      takeaway:
+        'Credit records show multiple enquiries from financial institutions and organizations, primarily related to loan applications and employment verification processes. Most enquiries appear to be associated with standard credit checks and monitoring activities.',
+      indicators: [
+        { label: 'Total enquiries', value: '5' },
+        { label: 'Overall risk', badge: 'Low', badgeColor: 'success' },
+      ],
+      metrics: [
+        { label: '1 month', value: '334' },
+        { label: '3 months', value: '1,201' },
+        { label: '6 months', value: '382' },
+        { label: '12 months', value: '2,201' },
+      ],
+      tableColumns: [
+        { header: 'Institution', field: 'name', isPrimary: true, hasSubtext: true },
+        { header: 'Purpose', field: 'purpose' },
+        { header: 'Enquiry Date', field: 'date' },
+      ],
+      tableData: [
+        {
+          name: 'CLIK',
+          subtext: 'New Application Enquiry',
+          purpose: 'Supporting the loan process',
+          date: '8 Jan 2024',
+        },
+        {
+          name: 'PT Anugerah TexIndotama',
+          subtext: 'New Application Enquiry',
+          purpose: 'Supporting the loan process',
+          date: '8 Jan 2024',
+        },
+        {
+          name: 'CLIK',
+          subtext: 'Monitoring Enquiry',
+          purpose: 'Supporting the loan process',
+          date: '8 Jan 2024',
+        },
+        {
+          name: 'Bank Central Asia',
+          subtext: 'New Application Enquiry',
+          purpose: 'Human resource management at financial institution',
+          date: '8 Jan 2024',
+        },
+        {
+          name: 'PT Tirtayasa',
+          subtext: 'Monitoring Enquiry',
+          purpose: 'Human resource management at financial institution',
+          date: '8 Jan 2024',
+        },
+      ],
+      searchPlaceholder: 'Search for footprints',
+      showSecondaryTabs: false,
+    },
   }
 
   const currentData = tabData[activeTab] || tabData['Phone numbers']
@@ -296,6 +352,23 @@ export default function RiskSignalsDetailsSheet() {
               <h3 className="text-lg font-semibold text-gray-900">{currentData.title}</h3>
               <p className="text-sm-regular text-gray-600">{currentData.description}</p>
             </div>
+
+            {/* Metrics Group */}
+            {currentData.metrics && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {currentData.metrics.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="flex flex-col gap-1 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+                  >
+                    <span className="text-xs-semibold text-gray-500 uppercase tracking-wider">
+                      {metric.label}
+                    </span>
+                    <span className="text-2xl font-semibold text-gray-900">{metric.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="flex flex-col gap-0 border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden">
               {/* Table Controls */}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { SearchMd, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable } from '@interstellar-component'
+import { MyColumn, MyDataTable, MyButton } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
 
 function getBadgeColor(status) {
@@ -72,11 +72,21 @@ function ReportEnquiryTable() {
               </span>
             </div>
             <div className="flex gap-3">
-              <button className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2 flex items-center gap-2">
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+                customClassname="gap-2"
+              >
                 <PackagePlus />
                 Bulk enquiry
-              </button>
-              <button className="rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2 flex items-center gap-2">
+              </MyButton>
+              <MyButton
+                color="primary"
+                variant="filled"
+                size="md"
+                customClassname="gap-2"
+              >
                 <svg
                   width="20"
                   height="20"
@@ -93,7 +103,7 @@ function ReportEnquiryTable() {
                   />
                 </svg>
                 New enquiry
-              </button>
+              </MyButton>
             </div>
           </div>
 
@@ -112,20 +122,40 @@ function ReportEnquiryTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="md"
+                customClassname="gap-2"
+              >
                 <FilterLines className="h-4 w-4 text-gray-500" />
                 Filters
-              </button>
+              </MyButton>
               <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-                <button className="rounded-md bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-900 shadow-none">
+                <MyButton
+                  variant="filledTonal"
+                  color="secondary"
+                  size="sm"
+                  rounded="md"
+                >
                   All type
-                </button>
-                <button className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                </MyButton>
+                <MyButton
+                  variant="text"
+                  color="secondary"
+                  size="sm"
+                  rounded="md"
+                >
                   Employee
-                </button>
-                <button className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+                </MyButton>
+                <MyButton
+                  variant="text"
+                  color="secondary"
+                  size="sm"
+                  rounded="md"
+                >
                   Candidate
-                </button>
+                </MyButton>
               </div>
             </div>
           </div>

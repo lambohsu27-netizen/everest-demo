@@ -4,14 +4,6 @@ import { SettingsService } from './service'
 
 const SettingsContext = createContext()
 
-const INITIAL_USERS = [
-  { id: 1, name: 'Drew Cano', role: 'Field Technician', status: 'Active', email: 'drew.cano@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=1' },
-  { id: 2, name: 'Natali Craig', role: 'Help Desk', status: 'Active', email: 'natali.craig@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=2' },
-  { id: 3, name: 'Ammar Foley', role: 'Field Technician', status: 'Inactive', email: 'ammar.foley@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=3' },
-  { id: 4, name: 'Loki Bright', role: 'Field Technician', status: 'Inactive', email: 'loki.bright@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=4' },
-  { id: 5, name: 'Julius Vaughan', role: 'Field Technician', status: 'Inactive', email: 'julius.vaughan@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=5' },
-  { id: 6, name: 'Mathilde Lewis', role: 'Help Desk', status: 'Inactive', email: 'mathilder.lewis@everest.io', phone: '+62 817 8817 3723', company: 'Everest', avatar: 'https://i.pravatar.cc/150?u=6' },
-]
 
 const INITIAL_EMPLOYMENT_LEVELS = [
   { id: 1, level: 'Staff', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '5 years', repeatEvery: 'Every month' },
@@ -189,45 +181,100 @@ function SettingsProvider({ children }) {
   }, [])
 
 
-  // ── User Role Access State (dummy, user tab unchanged) ───────────────────────
-  const [users, setUsers] = useState(INITIAL_USERS)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortField, setSortField] = useState(null)
-  const [sortOrder, setSortOrder] = useState(null)
-  const [selectedStatus, setSelectedStatus] = useState('Active')
+  // ── User Management (API-backed) ────────────────────────────────────────────
+  const [users, setUsers] = useState([])
+  const [userPagination, setUserPagination] = useState({ total: 0, page: 1, limit: 10, total_pages: 1 })
+  const [userPage, setUserPage] = useState(1)
+  const [userSearchTerm, setUserSearchTerm] = useState('')
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false)
+  const [selectedUserIds, setSelectedUserIds] = useState([])
+  const [userSortField, setUserSortField] = useState(null)
+  const [userSortOrder, setUserSortOrder] = useState(null)
 
-  const handleSort = useCallback(({ sort, order }) => {
-    setSortField(sort)
-    setSortOrder(order)
-    if (!sort || !order) { setUsers(INITIAL_USERS); return }
-    const sortedData = [...users].sort((a, b) => {
-      const valA = a[sort] || ''
-      const valB = b[sort] || ''
-      if (valA < valB) return order === 'asc' ? -1 : 1
-      if (valA > valB) return order === 'asc' ? 1 : -1
-      return 0
-    })
-    setUsers(sortedData)
-  }, [users])
+  // Panel state: null | 'detail' | 'create' | 'edit'
+  const [userPanel, setUserPanel] = useState(null)
+  const [activePanelUserId, setActivePanelUserId] = useState(null)
+  const [userDetail, setUserDetail] = useState(null)
+  const [isLoadingUserDetail, setIsLoadingUserDetail] = useState(false)
 
-  const handleSelectionChange = useCallback((updated) => {
-    setUsers(updated.data)
+  const fetchUsers = useCallback(async (page = 1, search = '') => {
+    setIsLoadingUsers(true)
+    try {
+      const res = await SettingsService.getUsers({ page, limit: 10, ...(search ? { search } : {}) })
+      setUsers(res.data.users)
+      setUserPagination(res.data.pagination)
+    } catch (err) {
+      myToaster(err)
+    } finally {
+      setIsLoadingUsers(false)
+    }
   }, [])
 
-  const filteredUsers = useMemo(() => {
-    let result = users
-    if (selectedStatus) result = result.filter((u) => u.status === selectedStatus)
-    if (searchTerm) {
-      const lower = searchTerm.toLowerCase()
-      result = result.filter(
-        (u) =>
-          u.name.toLowerCase().includes(lower) ||
-          u.email.toLowerCase().includes(lower) ||
-          u.role.toLowerCase().includes(lower)
-      )
+  const fetchUserDetail = useCallback(async (id) => {
+    setIsLoadingUserDetail(true)
+    try {
+      const res = await SettingsService.getUserDetail(id)
+      setUserDetail(res.data)
+    } catch (err) {
+      myToaster(err)
+    } finally {
+      setIsLoadingUserDetail(false)
     }
-    return result
-  }, [users, selectedStatus, searchTerm])
+  }, [])
+
+  const openUserDetail = useCallback((id) => {
+    setActivePanelUserId(id)
+    setUserPanel('detail')
+    fetchUserDetail(id)
+  }, [fetchUserDetail])
+
+  const openCreateUser = useCallback(() => {
+    setActivePanelUserId(null)
+    setUserDetail(null)
+    setUserPanel('create')
+  }, [])
+
+  const openEditUser = useCallback(() => {
+    setUserPanel('edit')
+  }, [])
+
+  const closeUserPanel = useCallback(() => {
+    setUserPanel(null)
+    setActivePanelUserId(null)
+    setUserDetail(null)
+  }, [])
+
+  const createUser = useCallback(async (formData) => {
+    const res = await SettingsService.createUser(formData)
+    myToaster(res)
+    fetchUsers(userPage, userSearchTerm)
+    closeUserPanel()
+  }, [userPage, userSearchTerm, fetchUsers, closeUserPanel])
+
+  const updateUser = useCallback(async (id, formData) => {
+    const res = await SettingsService.updateUser(id, formData)
+    myToaster(res)
+    fetchUsers(userPage, userSearchTerm)
+    fetchUserDetail(id)
+    setUserPanel('detail')
+  }, [userPage, userSearchTerm, fetchUsers, fetchUserDetail])
+
+  const deleteUsers = useCallback(async (ids) => {
+    const res = await SettingsService.deleteUsers(ids)
+    myToaster(res)
+    setSelectedUserIds([])
+    fetchUsers(userPage, userSearchTerm)
+  }, [userPage, userSearchTerm, fetchUsers])
+
+  const handleUserSort = useCallback(({ sort, order }) => {
+    setUserSortField(sort)
+    setUserSortOrder(order)
+  }, [])
+
+  const handleUserSelectionChange = useCallback((updated) => {
+    setUsers(updated.data)
+    setSelectedUserIds(updated.data.filter((u) => u.checked).map((u) => u.id))
+  }, [])
 
   // ── Employment Level State (dummy, unchanged) ────────────────────────────────
   const [employmentLevels, setEmploymentLevels] = useState(INITIAL_EMPLOYMENT_LEVELS)
@@ -307,12 +354,21 @@ function SettingsProvider({ children }) {
       openRoleDetail, openCreateRole, openEditRole, closeRolePanel,
       createRole, updateRole, deleteRoles,
 
-      // User tab
-      users: filteredUsers,
-      searchTerm, setSearchTerm,
-      sortField, sortOrder, handleSort,
-      handleSelectionChange,
-      selectedStatus, setSelectedStatus,
+      // User Management
+      users,
+      userPagination,
+      userPage, setUserPage,
+      userSearchTerm, setUserSearchTerm,
+      isLoadingUsers,
+      selectedUserIds,
+      userSortField, userSortOrder,
+      handleUserSort, handleUserSelectionChange,
+      userPanel,
+      activePanelUserId,
+      userDetail, isLoadingUserDetail,
+      fetchUsers,
+      openUserDetail, openCreateUser, openEditUser, closeUserPanel,
+      createUser, updateUser, deleteUsers,
 
       // Employment Level
       employmentLevels: filteredEmpLevels,
@@ -334,8 +390,13 @@ function SettingsProvider({ children }) {
       allPermissions, fetchRoles,
       openRoleDetail, openCreateRole, openEditRole, closeRolePanel,
       createRole, updateRole, deleteRoles,
-      filteredUsers, searchTerm, sortField, sortOrder,
-      handleSort, handleSelectionChange, selectedStatus,
+      users, userPagination, userPage, userSearchTerm, isLoadingUsers,
+      selectedUserIds, userSortField, userSortOrder,
+      handleUserSort, handleUserSelectionChange,
+      userPanel, activePanelUserId, userDetail, isLoadingUserDetail,
+      fetchUsers,
+      openUserDetail, openCreateUser, openEditUser, closeUserPanel,
+      createUser, updateUser, deleteUsers,
       filteredEmpLevels, filteredPositions,
       empSearchTerm, posSearchTerm,
       empSortField, empSortOrder, handleEmpSort,

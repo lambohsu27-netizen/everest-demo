@@ -91,8 +91,8 @@ function SettingsProvider({ children }) {
     setIsLoadingRoles(true)
     try {
       const res = await SettingsService.getRoles({ page, limit: 10, ...(search ? { search } : {}) })
-      setRoles(res.data.roles)
-      setRolePagination(res.data.pagination)
+      setRoles(res.data)
+      setRolePagination(res.paginator)
     } catch (err) {
       myToaster(err)
     } finally {
@@ -201,8 +201,8 @@ function SettingsProvider({ children }) {
     setIsLoadingUsers(true)
     try {
       const res = await SettingsService.getUsers({ page, limit: 10, ...(search ? { search } : {}) })
-      setUsers(res.data.users)
-      setUserPagination(res.data.pagination)
+      setUsers(res.data)
+      setUserPagination(res.paginator)
     } catch (err) {
       myToaster(err)
     } finally {

@@ -5,7 +5,9 @@ import { MyBgPatternDecorativeCube, MyButton } from '@interstellar-component'
 import { useForgetPassword } from '../context'
 
 function CheckYourEmail() {
-  const { sendEmail, sendOTP, resendEmail, navigate, countdown, setCountdown } = useForgetPassword()
+  const { sendEmail, continueWithOtp, sendOTP, resendEmail, navigate, countdown, setCountdown } =
+    useForgetPassword()
+
   const localUser_id = localStorage.getItem('user_id')
   const localForgetemail = localStorage.getItem('email_forget_password')
 
@@ -14,8 +16,6 @@ function CheckYourEmail() {
   const otpBoxReference = useRef([])
 
   const stringOTP = otp.toString().replace(/,/g, '')
-
-  const payload = { otp: stringOTP, user_id: localUser_id }
 
   function handleChange(value, index) {
     value = value.replace(/\D/, '')
@@ -96,7 +96,7 @@ function CheckYourEmail() {
               Check your email
             </p>
             <p className="text-md-regular text-center text-gray-light/600">
-              We sent a verification link to {localForgetemail || '-'}
+              We sent a verification code to {localForgetemail || '-'}
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ function CheckYourEmail() {
               size="lg"
               expanded
               disabled={stringOTP?.length !== 4}
-              onClick={() => sendOTP(payload)}
+              onClick={() => continueWithOtp(stringOTP)}
             >
               <p className="text-md-semibold">Continue</p>
             </MyButton>

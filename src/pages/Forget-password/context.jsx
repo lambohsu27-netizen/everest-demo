@@ -2,13 +2,13 @@ import React, { createContext, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { myToaster } from '@interstellar-component'
 import Service from './service'
+import { encryptPassword } from '../../services/Helper'
+import { post } from '../../services/NetworkUtils'
 
 const ForgetPasswordContext = createContext()
 
 function ForgetPasswordProvider(props) {
   const navigate = useNavigate()
-  const localUser_id = localStorage.getItem('user_id')
-  const localOtp_number = localStorage.getItem('otp_number')
 
   const [currentStep, setCurrentStep] = useState({
     step_1: true,
@@ -17,20 +17,27 @@ function ForgetPasswordProvider(props) {
     step_4: false,
   })
 
-  // SEND OTP TO EMAIL
+  // SEND OTP TO EMAIL — API returns top-level user_id + countdown_to_new_otp (Forget-password / Argus shape)
   const sendEmail = async (body) => {
     await Service.sendEmail(body)
       .then(myToaster)
       .then((res) => {
-        localStorage.setItem('user_id', res?.data?.user_id)
+        if (res?.user_id) localStorage.setItem('user_id', res.user_id)
         localStorage.setItem('email_forget_password', body.email)
-        localStorage.setItem('countdown_to_new_otp', res?.countdown_to_new_otp)
+        if (res?.countdown_to_new_otp) {
+          localStorage.setItem('countdown_to_new_otp', res.countdown_to_new_otp)
+          setCountdown(res.countdown_to_new_otp)
+        }
         setCurrentStep({ step_2: true, step_1: false })
-        setCountdown(res?.countdown_to_new_otp)
       })
       .catch((res) => {
         myToaster(res)
-        if (res.message === 'an OTP for such user has already exist and still not expired') {
+        if (res?.message === 'an OTP for such user has already exist and still not expired') {
+          const nextCountdown = res?.resend_eligible_at || res?.countdown_to_new_otp
+          if (nextCountdown) {
+            localStorage.setItem('countdown_to_new_otp', nextCountdown)
+            setCountdown(nextCountdown)
+          }
           setTimeout(() => {
             setCurrentStep({ step_2: true, step_1: false })
             localStorage.setItem('email_forget_password', body.email)
@@ -39,48 +46,24 @@ function ForgetPasswordProvider(props) {
       })
   }
 
-  // SEND OTP RECEIVED TO SERVER
-  const sendOTP = async (body) => {
-    localStorage.setItem('otp_number', body.otp)
-
-    await Service.sendOTP(body)
-      .then(myToaster)
-      .then((res) => setCurrentStep({ step_1: false, step_2: false, step_3: true }))
-      .catch(myToaster)
-  }
-
-  // RESET USER PASSWORD AFTER OTP MATCH
-  const updatePassword = async (body) => {
-    const formData = new FormData()
-    formData.append('password', body.password)
-    formData.append('user_id', localUser_id)
-    formData.append('otp_number', localOtp_number)
-
-    await Service.updateForgottenPassword(formData)
-      .then(myToaster)
-      .then((res) => {
-        if (res.status === 500) return
-        setCurrentStep({
-          step_1: false,
-          step_2: false,
-          step_3: false,
-          step_4: true,
-        })
-        localStorage.removeItem('user_id')
-        localStorage.removeItem('otp_number')
-      })
-      .catch(myToaster)
+  // OTP is checked on final reset-password; only advance UI here
+  const continueWithOtp = (otpDigits) => {
+    localStorage.setItem('otp_number', otpDigits)
+    setCurrentStep({ step_1: false, step_2: false, step_3: true })
   }
 
   const [countdown, setCountdown] = useState(null)
 
-  // RESEND OTP to EMAIL
+  // RESEND OTP — body: { user_email, user_id } per CheckYourEmail
   const resendEmail = async (body) => {
     await Service.resendEmail(body)
       .then((res) => {
-        // console.log(res);
         myToaster(res)
-        if (res?.countdown_to_new_otp) setCountdown(res?.countdown_to_new_otp)
+        if (res?.countdown_to_new_otp) {
+          setCountdown(res.countdown_to_new_otp)
+          localStorage.setItem('countdown_to_new_otp', res.countdown_to_new_otp)
+        }
+        if (res?.user_id) localStorage.setItem('user_id', res.user_id)
         setCurrentStep({
           step_1: false,
           step_2: true,
@@ -90,7 +73,41 @@ function ForgetPasswordProvider(props) {
       })
       .catch((res) => {
         myToaster(res)
+        if (res?.countdown_to_new_otp) {
+          setCountdown(res.countdown_to_new_otp)
+          localStorage.setItem('countdown_to_new_otp', res.countdown_to_new_otp)
+        }
       })
+  }
+
+  const updatePassword = async (body) => {
+    const email = localStorage.getItem('email_forget_password')
+    const code = localStorage.getItem('otp_number')
+    if (!email || !code) {
+      myToaster({ status: 400, message: 'Session expired. Please start forgot password again.' })
+      return
+    }
+
+    await post('/v1/auth/reset-password', {
+      email,
+      code,
+      password: encryptPassword(body.password),
+    })
+      .then(myToaster)
+      .then((res) => {
+        if (res?.status === 500) return
+        setCurrentStep({
+          step_1: false,
+          step_2: false,
+          step_3: false,
+          step_4: true,
+        })
+        localStorage.removeItem('user_id')
+        localStorage.removeItem('otp_number')
+        localStorage.removeItem('countdown_to_new_otp')
+        localStorage.removeItem('email_forget_password')
+      })
+      .catch(myToaster)
   }
 
   return (
@@ -98,7 +115,7 @@ function ForgetPasswordProvider(props) {
       value={{
         sendEmail,
         currentStep,
-        sendOTP,
+        continueWithOtp,
         updatePassword,
         navigate,
         resendEmail,
@@ -107,7 +124,6 @@ function ForgetPasswordProvider(props) {
         setCurrentStep,
       }}
     >
-      {' '}
       {props.children}
     </ForgetPasswordContext.Provider>
   )

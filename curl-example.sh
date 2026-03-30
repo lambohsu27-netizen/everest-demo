@@ -118,13 +118,12 @@ curl -sS "${API}/auth/session" \
 # FORGOT / RESET PASSWORD FLOW
 # ──────────────────────────────────────────────────────────────────────────────
 
-# 10. Forgot password — always returns 200 (prevents email enumeration)
-#    Rate limited: max 3 requests per email per 15 minutes
+# 10. Forgot password — OTP flow; 409 if a code is already valid; generic 200 if email not registered
 curl -sS -X POST "${API}/auth/forgot-password" \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@example.com"}' | python3 -m json.tool
 
-# 11. Resend forgot password — invalidates old token, issues new one
+# 11. Resend forgot password — new OTP after 1-minute cooldown (429 + retry_after if too soon)
 curl -sS -X POST "${API}/auth/forgot-password/resend" \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@example.com"}' | python3 -m json.tool
@@ -167,28 +166,28 @@ curl -sS -X PUT "${API}/settings/general" \
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# USERS (requires auth; POST requires user_management.add_new permission)
+# SETTINGS / USERS (under /v1/settings/users — requires auth; POST needs user_management.add_new)
 # ──────────────────────────────────────────────────────────────────────────────
 
 # 15. List users — paginated, with search and status filter
-curl -sS "${API}/users?page=1&limit=10" \
+curl -sS "${API}/settings/users?page=1&limit=10" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 16. List users — search by name or email, filter by status
-curl -sS "${API}/users?search=admin&status=active" \
+curl -sS "${API}/settings/users?search=admin&status=active" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 17. Get user detail (includes PIC info + audit trail)
-curl -sS "${API}/users/REPLACE_WITH_USER_UUID" \
+curl -sS "${API}/settings/users/REPLACE_WITH_USER_UUID" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 18. Generate a random secure password (12 chars)
-curl -sS "${API}/users/generate-password" \
+curl -sS "${API}/settings/users/generate-password" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 19. Create user (multipart form with optional avatar upload)
 #     password must be AES-256-CBC encrypted (see encryption section above)
-curl -sS -X POST "${API}/users" \
+curl -sS -X POST "${API}/settings/users" \
   -H "Authorization: Bearer ${TOKEN}" \
   -F "name=Jane Doe" \
   -F "email=jane@example.com" \
@@ -210,16 +209,16 @@ curl -sS "${API}/permissions" \
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# ROLES (requires auth; POST requires role_access.add_new, DELETE requires role_access.delete)
+# SETTINGS / ROLES (under /v1/settings/roles — auth; POST/DELETE need role_access.*)
 # ──────────────────────────────────────────────────────────────────────────────
 
 # 21. List roles — paginated with search
-curl -sS "${API}/roles?page=1&limit=10&search=" \
+curl -sS "${API}/settings/roles?page=1&limit=10&search=" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 22. Create role with permissions
 #     permissions = array of { module_key, sub_permissions: [key, ...] }
-curl -sS -X POST "${API}/roles" \
+curl -sS -X POST "${API}/settings/roles" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -232,12 +231,12 @@ curl -sS -X POST "${API}/roles" \
   }' | python3 -m json.tool
 
 # 23. Get role detail (permissions grouped by module + audit trail)
-curl -sS "${API}/roles/REPLACE_WITH_ROLE_UUID" \
+curl -sS "${API}/settings/roles/REPLACE_WITH_ROLE_UUID" \
   -H "Authorization: Bearer ${TOKEN}" | python3 -m json.tool
 
 # 24. Update role — full replace of name + permissions
 #     permissions = array of { module_key, sub_permissions: [key, ...] }
-curl -sS -X PUT "${API}/roles/REPLACE_WITH_ROLE_UUID" \
+curl -sS -X PUT "${API}/settings/roles/REPLACE_WITH_ROLE_UUID" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -250,7 +249,7 @@ curl -sS -X PUT "${API}/roles/REPLACE_WITH_ROLE_UUID" \
   }' | python3 -m json.tool
 
 # 25. Bulk delete roles (blocked if any role is assigned to active users)
-curl -sS -X DELETE "${API}/roles" \
+curl -sS -X DELETE "${API}/settings/roles" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{

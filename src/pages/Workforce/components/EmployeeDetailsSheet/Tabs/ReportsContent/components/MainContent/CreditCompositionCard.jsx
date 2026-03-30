@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
+import { useWorkforce } from '../../../../../../Context'
 
 // Figma: Size=sm, Series=5, Legend=True
 // Chart: 200×200, Hole=50%, horizontal layout with 24px gap to vertical legend
@@ -44,11 +45,13 @@ export default function CreditCompositionCard() {
 
   const series = SERIES_DATA.map((s) => s.value)
 
+  const { handleCurrentSlider } = useWorkforce()
+
   return (
     <ReportSummaryCard
       title="Credit Composition"
       description="Breakdown of credit types associated with the individual."
-      onViewReport={() => {}} // TODO: Define action
+      onViewReport={() => handleCurrentSlider({ current: 'credit-composition' })}
     >
       {/* Figma: horizontal layout, itemSpacing=24, chart 200×200 + legend 132×116 */}
       <div className="flex items-start gap-6 py-4">

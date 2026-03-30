@@ -3,8 +3,9 @@ import { MyChip, MyDoubleCard } from '@interstellar-component'
 import { HelpCircle } from '@untitled-ui/icons-react'
 import { useEmployeeDetailsSheet } from '../../../../Context'
 
-export default function RiskAssessmentTable() {
-  const { indicators } = useEmployeeDetailsSheet()
+export default function RiskAssessmentTable({ data }) {
+  const context = useEmployeeDetailsSheet()
+  const indicators = data || context.indicators
 
   return (
     <MyDoubleCard heading="Risk Assessment Indicators" innerClassName="p-0">

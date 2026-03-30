@@ -7,6 +7,7 @@ export default function RiskSignalCard({
   description,
   highlightText,
   color = 'text-brand/600',
+  onClick,
 }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col gap-4">
@@ -27,7 +28,10 @@ export default function RiskSignalCard({
       </section>
 
       <div className="p-4 pr-5 border-t border-gray-200 flex justify-end">
-        <button className="text-sm font-semibold text-brand/600 transition-colors opacity-90 hover:opacity-100">
+        <button
+          onClick={onClick}
+          className="text-sm font-semibold text-brand/600 transition-colors opacity-90 hover:opacity-100"
+        >
           View details
         </button>
       </div>
@@ -42,4 +46,11 @@ RiskSignalCard.propTypes = {
   description: PropTypes.string.isRequired,
   highlightText: PropTypes.string,
   color: PropTypes.string,
+  onClick: PropTypes.func,
+}
+
+RiskSignalCard.defaultProps = {
+  highlightText: '',
+  color: 'text-brand/600',
+  onClick: () => {},
 }

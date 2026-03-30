@@ -15,6 +15,7 @@ import {
 } from '@interstellar-component'
 // Context
 import { useReportEnquiry } from '../Context'
+import EmployeeDetailHoverCard from './EmployeeDetailHoverCard'
 
 // ── static data ────────────────────────────────────────────────────────────────
 const EMPLOYEES_GROUPED = [
@@ -32,6 +33,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
         level: { label: 'Supervisor', value: 'supervisor' },
         positionObj: { label: 'Product Designer', value: 'product-designer' },
+        division: 'Design',
       },
       {
         id: '357233',
@@ -44,6 +46,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
       {
         id: '357234',
@@ -56,6 +59,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UI Designer', value: 'ui-designer' },
+        division: 'UI',
       },
       {
         id: '357235',
@@ -68,6 +72,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
     ],
   },
@@ -85,6 +90,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Supervisor', value: 'supervisor' },
         positionObj: { label: 'Product Designer', value: 'product-designer' },
+        division: 'Design',
       },
       {
         id: '357237',
@@ -97,6 +103,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
       {
         id: '357238',
@@ -109,6 +116,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UI Designer', value: 'ui-designer' },
+        division: 'UI',
       },
       {
         id: '357239',
@@ -121,6 +129,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
       {
         id: '357240',
@@ -133,6 +142,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UI Designer', value: 'ui-designer' },
+        division: 'UI',
       },
       {
         id: '357241',
@@ -145,6 +155,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
       {
         id: '357242',
@@ -157,6 +168,7 @@ const EMPLOYEES_GROUPED = [
         entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
         level: { label: 'Staff', value: 'staff' },
         positionObj: { label: 'UX Designer', value: 'ux-designer' },
+        division: 'UX',
       },
     ],
   },
@@ -164,11 +176,37 @@ const EMPLOYEES_GROUPED = [
 
 // ── main component ─────────────────────────────────────────────────────────────
 function EmployeeListSlider({ onSelect }) {
-  const { popSlider } = useReportEnquiry()
+  const { popSlider, sliderStack } = useReportEnquiry()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusTab, setStatusTab] = useState('All status')
 
+  // Hover Card state
+  const [hoveredEmployee, setHoveredEmployee] = useState(null)
+  const [isHoverCardVisible, setIsHoverCardVisible] = useState(false)
+  const hoverTimeoutRef = React.useRef(null)
+
+  // Find this slider's index in the stack to determine horizontal positioning
+  const sliderIndex = sliderStack.findIndex((s) => s.current === 'employee-list')
+  const currentOffset = sliderIndex >= 0 ? sliderIndex * 420 : 0
+
   const handleClose = () => popSlider()
+
+  const handleMouseEnter = (emp) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    setHoveredEmployee(emp)
+    setIsHoverCardVisible(true)
+  }
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHoverCardVisible(false)
+    }, 300)
+  }
+
+  const handleModalKeepAlive = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+    setIsHoverCardVisible(true)
+  }
 
   const handleSelectEmployee = (emp) => {
     onSelect?.({
@@ -264,6 +302,8 @@ function EmployeeListSlider({ onSelect }) {
                     key={`${group.entity}-${emp.id}`}
                     type="button"
                     onClick={() => handleSelectEmployee(emp)}
+                    onMouseEnter={() => handleMouseEnter(emp)}
+                    onMouseLeave={handleMouseLeave}
                     className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 border-b border-gray-50 text-left transition-colors"
                   >
                     <MyAvatar
@@ -296,6 +336,19 @@ function EmployeeListSlider({ onSelect }) {
           </div>
         </SimpleBar>
       </div>
+
+      {/* ── Hover Modal ─────────────────────────────────────────────────────── */}
+      <EmployeeDetailHoverCard
+        employee={hoveredEmployee}
+        isVisible={isHoverCardVisible}
+        onMouseEnter={handleModalKeepAlive}
+        onMouseMove={handleModalKeepAlive}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          right: `${currentOffset + 416}px`, // Slight 4px overlap to ensure no hover gap
+          top: '24px',
+        }}
+      />
     </div>
   )
 }

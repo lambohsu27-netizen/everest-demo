@@ -1,8 +1,11 @@
 import React from 'react'
+import { useWorkforce } from '../../../../../../Context'
 
 import LoanCategoryCard from './LoanCategoryCard'
 
 export default function LoanCategorySection() {
+  const { handleCurrentSlider } = useWorkforce()
+
   const categories = [
     {
       kolBadge: 'KOL 5',
@@ -65,7 +68,15 @@ export default function LoanCategorySection() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 flex-wrap">
         {categories.map((cat, index) => (
-          <LoanCategoryCard key={index} {...cat} />
+          <LoanCategoryCard
+            key={index}
+            {...cat}
+            onViewDetails={
+              cat.title === 'Credit Card'
+                ? () => handleCurrentSlider({ current: 'credit-card-loan' })
+                : undefined
+            }
+          />
         ))}
       </div>
     </div>

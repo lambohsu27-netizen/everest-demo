@@ -7,6 +7,7 @@ import WorkforceTable from './components/WorkforceTable'
 import NewEmployeeSlider from './Sliders/NewEmployeeSlider'
 import ImportWorkforceSlider from './Sliders/ImportWorkforceSlider'
 import CreditCompositionSlider from './Sliders/CreditCompositionSlider'
+import CreditCardLoanSlider from './Sliders/CreditCardLoanSlider'
 import { useWorkforce } from './Context'
 
 function Workforce() {
@@ -29,6 +30,12 @@ function Workforce() {
       <MyModalSlider
         open={currentSlider?.current === 'credit-composition'}
         element={<CreditCompositionSlider />}
+        onClose={() => handleCurrentSlider(null)}
+        scrim
+      />
+      <MyModalSlider
+        open={currentSlider?.current === 'credit-card-loan'}
+        element={<CreditCardLoanSlider />}
         onClose={() => handleCurrentSlider(null)}
         scrim
       />

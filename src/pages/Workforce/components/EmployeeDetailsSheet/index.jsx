@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Outlet } from 'react-router-dom'
 import StackedPageSheet from '@src/components/StackedPageSheet'
 import { useWorkforce } from '../../Context'
 import { EmployeeDetailsSheetProvider } from './Context'
@@ -15,6 +15,7 @@ export default function EmployeeDetailsSheet() {
     <EmployeeDetailsSheetProvider>
       <StackedPageSheet backUrl="/workforce" closeUrl="/workforce">
         {employee ? <RenderEmployeeData employee={employee} /> : <NoEmployeeData />}
+        <Outlet />
       </StackedPageSheet>
     </EmployeeDetailsSheetProvider>
   )

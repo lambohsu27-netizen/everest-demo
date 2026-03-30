@@ -1,3 +1,4 @@
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Briefcase02,
   FileSearch02,
@@ -10,6 +11,13 @@ import {
 import RiskSignalCard from './RiskSignalCard'
 
 export default function RiskSignalsSection() {
+  const navigate = useNavigate()
+  const { id } = useParams()
+
+  const handleViewDetails = (signal) => {
+    // Navigate to the details sheet with the correct tab selected
+    navigate(`/workforce/employee/${id}/risk-signals?tab=${signal.title}`)
+  }
   const signals = [
     {
       icon: Phone,
@@ -70,7 +78,7 @@ export default function RiskSignalsSection() {
 
       <div className="flex flex-col gap-5">
         {signals.map((signal, index) => (
-          <RiskSignalCard key={index} {...signal} />
+          <RiskSignalCard key={index} {...signal} onClick={() => handleViewDetails(signal)} />
         ))}
       </div>
     </div>

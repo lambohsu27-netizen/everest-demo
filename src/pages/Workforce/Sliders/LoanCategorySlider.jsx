@@ -5,7 +5,7 @@ import { MyChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
 export default function LoanCategorySlider() {
-  const { popSlider, pushSlider, currentSlider, loanCategories, loanAccounts } = useWorkforce()
+  const { popSlider, handleAccountDetail, currentSlider, activeAccountId, loanCategories, loanAccounts } = useWorkforce()
   
   // Initialize with category from currentSlider if available, otherwise 'Credit card'
   const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || 'Credit card')
@@ -26,7 +26,7 @@ export default function LoanCategorySlider() {
   const categoryTabs = loanCategories.map((c) => ({ label: c.title, value: c.title }))
 
   const handleAccountClick = (acc) => {
-    pushSlider({ current: 'loan-account-detail', data: acc })
+    handleAccountDetail(acc)
   }
 
   return (
@@ -113,7 +113,7 @@ export default function LoanCategorySlider() {
                     key={acc.id}
                     onClick={() => handleAccountClick(acc)}
                     className={`flex flex-col gap-4 p-4 rounded-xl border transition-all text-left w-full outline-none hover:bg-gray/25 ${
-                      acc.isActive
+                      acc.id === activeAccountId
                         ? 'border-primary-600 ring-4 ring-primary-50 px-4'
                         : 'border-gray-200 shadow-xs'
                     }`}

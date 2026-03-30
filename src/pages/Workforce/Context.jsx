@@ -217,20 +217,42 @@ function WorkforceProvider({ children }) {
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
   const [sliderStack, setSliderStack] = useState([])
+  const [activeAccountId, setActiveAccountId] = useState(null)
 
   const pushSlider = useCallback((slider) => {
     setSliderStack((prev) => [...prev, slider])
   }, [])
 
   const popSlider = useCallback(() => {
-    setSliderStack((prev) => prev.slice(0, -1))
+    setSliderStack((prev) => {
+      const newStack = prev.slice(0, -1)
+      if (newStack.length === 1) { // We went back to the base slider
+        setActiveAccountId(null)
+      }
+      return newStack
+    })
+  }, [])
+
+  /**
+   * Specifically for account detail - ensures we only have ONE detail slider open
+   * and replaces its content if another account is clicked.
+   */
+  const handleAccountDetail = useCallback((acc) => {
+    setActiveAccountId(acc.id)
+    setSliderStack((prev) => {
+      const base = prev[0]
+      const detail = { current: 'loan-account-detail', data: acc }
+      return [base, detail]
+    })
   }, [])
 
   const handleCurrentSlider = useCallback((value) => {
     if (value === null) {
       setSliderStack([])
+      setActiveAccountId(null)
     } else {
       setSliderStack([value])
+      setActiveAccountId(null)
     }
   }, [])
 
@@ -300,10 +322,12 @@ function WorkforceProvider({ children }) {
       setSelectedCategory,
       getEmployeeById,
       currentSlider,
+      activeAccountId,
       sliderStack,
       handleCurrentSlider,
       pushSlider,
       popSlider,
+      handleAccountDetail,
       loanCategories: LOAN_CATEGORIES,
       loanAccounts: LOAN_ACCOUNTS,
     }),
@@ -317,10 +341,12 @@ function WorkforceProvider({ children }) {
       selectedCategory,
       getEmployeeById,
       currentSlider,
+      activeAccountId,
       sliderStack,
       handleCurrentSlider,
       pushSlider,
       popSlider,
+      handleAccountDetail,
     ]
   )
 

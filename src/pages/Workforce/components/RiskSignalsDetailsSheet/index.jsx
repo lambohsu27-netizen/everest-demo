@@ -9,7 +9,7 @@ import {
 } from '@untitled-ui/icons-react'
 import StackedPageSheet from '@src/components/StackedPageSheet'
 
-import PhoneNumbersTab from './Tabs/PhoneNumbersTab'
+import PhoneNumbersTab from './Tabs/PhoneNumbers'
 import AddressRecordsTab from './Tabs/AddressRecordsTab'
 import EmploymentRecordsTab from './Tabs/EmploymentRecordsTab'
 import CourtDecisionTab from './Tabs/CourtDecisionTab'

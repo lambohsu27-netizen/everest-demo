@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
 import { SearchMd, FilterLines, Stars01 } from '@untitled-ui/icons-react'
-import {
-  MyButton,
-  MyDataTable,
-  MyColumn,
-  MyDoubleCard,
-  MyChip,
-} from '@interstellar-component'
-import RiskAssessmentTable from '../../EmployeeDetailsSheet/Tabs/ReportsContent/components/Sidebar/RiskAssessmentTable'
+import { MyButton, MyDoubleCard } from '@interstellar-component'
+import RiskAssessmentTable from '../../../EmployeeDetailsSheet/Tabs/ReportsContent/components/Sidebar/RiskAssessmentTable'
+import ListedNumberTable from './ListedNumberTable'
+import DiscoveredContactTable from './DiscoveredContactTable'
 
 export default function PhoneNumbersTab() {
   const [contentTab, setContentTab] = useState('Listed number')
@@ -34,9 +30,31 @@ export default function PhoneNumbersTab() {
     { number: '+62 877 9089 6531', aging: '1 month', lastUpdate: '7 Aug 2023' },
   ]
 
+  const discoveredContactData = [
+    {
+      label: 'Phoenix Baker',
+      count: 15,
+      numbers: ['+62 811 8822 1222', '+62 811 8822 1222', '+62 811 0000 1222'],
+      extra: 4,
+    },
+    { label: 'Phoenix Office', count: 12, numbers: ['+62 811 8822 1222', '+62 811 0000 1222'] },
+    { label: 'Phoenix Marketing', count: 8, numbers: ['+62 811 0000 1222'] },
+    { label: 'Phoenix Kantor', count: 2, numbers: ['+62 811 8822 1222'] },
+    { label: 'Debt Collector', count: 12, numbers: ['+62 811 8822 1222'] },
+    {
+      label: 'Loan Agent',
+      count: 6,
+      numbers: ['+62 811 8822 1222', '+62 811 8822 1222', '+62 811 0000 1222'],
+      extra: 2,
+    },
+    { label: 'Phoenix Main', count: 1, numbers: ['+62 811 8822 1222', '+62 811 0000 1222'] },
+    { label: 'Spam', count: 8, numbers: ['+62 811 8822 1222'] },
+  ]
+
+  const isListed = contentTab === 'Listed number'
+
   return (
     <div className="grid lg:grid-cols-12 gap-8 pt-4">
-      {/* Sidebar */}
       <div className="lg:col-span-4 flex flex-col gap-8 h-full lg:border-r lg:border-gray-200 lg:pr-8">
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -56,23 +74,23 @@ export default function PhoneNumbersTab() {
               recognition by others.
             </p>
           </MyDoubleCard>
-
           <RiskAssessmentTable data={indicators} />
         </div>
       </div>
 
-      {/* Main Table Content */}
       <div className="lg:col-span-8 flex flex-col gap-6">
         <div className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-900">Associated phone number</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {isListed ? 'Associated phone number' : 'Contact labels'}
+          </h3>
           <p className="text-sm-regular text-gray-600">
-            List of phone numbers linked to the individual across credit bureau records and external
-            contact sources.
+            {isListed
+              ? 'List of phone numbers linked to the individual across credit bureau records and external contact sources.'
+              : 'Labels used by external contacts to save the individual’s phone numbers.'}
           </p>
         </div>
 
         <div className="flex flex-col gap-0 border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden">
-          {/* Table Controls */}
           <div className="flex p-4 items-center justify-between border-b border-gray-200 gap-4">
             <div className="relative flex-1 max-w-sm">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -81,23 +99,24 @@ export default function PhoneNumbersTab() {
               <input
                 type="text"
                 className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
-                placeholder="Search for number"
+                placeholder={isListed ? 'Search for number' : 'Search'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
             <div className="flex items-center gap-3">
               <MyButton color="secondary" variant="outlined" size="md">
                 <FilterLines className="h-4 w-4" />
                 Filters
               </MyButton>
-
               <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-0.5">
                 {['Listed number', 'Discovered contact'].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setContentTab(tab)}
+                    onClick={() => {
+                      setContentTab(tab)
+                      setSearchTerm('')
+                    }}
                     className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-all ${
                       contentTab === tab
                         ? 'bg-white text-gray-900 shadow-sm'
@@ -111,43 +130,12 @@ export default function PhoneNumbersTab() {
             </div>
           </div>
 
-          {/* Table */}
-          <MyDataTable values={{ data: phoneData }} className="border-none shadow-none">
-            <MyColumn
-              header="Phone Number"
-              field="number"
-              body={(row) => (
-                <div className="flex items-center gap-3 py-1">
-                  <span className="text-sm-semibold text-gray-900">{row.number}</span>
-                  {row.status === 'Current' && (
-                    <MyChip
-                      label="Current"
-                      color="success"
-                      variant="filled"
-                      size="sm"
-                      rounded="full"
-                    />
-                  )}
-                </div>
-              )}
-            />
-            <MyColumn
-              header="Aging"
-              field="aging"
-              body={(row) => (
-                <span className="text-sm-regular text-gray-600 block py-1">{row.aging}</span>
-              )}
-            />
-            <MyColumn
-              header="Last Update Date"
-              field="lastUpdate"
-              body={(row) => (
-                <span className="text-sm-regular text-gray-600 block py-1">{row.lastUpdate}</span>
-              )}
-            />
-          </MyDataTable>
+          {isListed ? (
+            <ListedNumberTable data={phoneData} searchTerm={searchTerm} />
+          ) : (
+            <DiscoveredContactTable data={discoveredContactData} searchTerm={searchTerm} />
+          )}
 
-          {/* Footer / Pagination Placeholder */}
           <div className="flex items-center justify-between p-4 border-t border-gray-200">
             <span className="text-sm-regular text-gray-600">Page 1 of 4</span>
             <div className="flex items-center gap-2">

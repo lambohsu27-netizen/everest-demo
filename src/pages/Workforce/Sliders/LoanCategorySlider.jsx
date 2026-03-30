@@ -1,36 +1,29 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import SimpleBar from 'simplebar-react'
-import { XClose, CreditCard02 } from '@untitled-ui/icons-react'
+import { XClose } from '@untitled-ui/icons-react'
 import { MyChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
-export default function CreditCardLoanSlider() {
-  const { handleCurrentSlider } = useWorkforce()
-  const [selectedStatus, setSelectedStatus] = React.useState('All')
-  const [selectedCategory, setSelectedCategory] = React.useState('Credit card')
+export default function LoanCategorySlider() {
+  const { handleCurrentSlider, currentSlider, loanCategories, loanAccounts } = useWorkforce()
+  
+  // Initialize with category from currentSlider if available, otherwise 'Credit card'
+  const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || 'Credit card')
+  const [selectedStatus, setSelectedStatus] = useState('All')
+
+  // Sync state if currentSlider changes (e.g. user clicks another card while slider is open)
+  useEffect(() => {
+    if (currentSlider?.category) {
+      setSelectedCategory(currentSlider.category)
+    }
+  }, [currentSlider])
 
   const handleClose = () => handleCurrentSlider(null)
 
-  const accounts = [
-    {
-      id: 1,
-      bank: 'BCA',
-      name: 'BCA Master Card',
-      kol: 'Kol 2',
-      label: 'Jumlah pinjaman',
-      amount: 'Rp 1,523,000',
-      isActive: false,
-    },
-    {
-      id: 2,
-      bank: 'BCA',
-      name: 'BCA Master Card',
-      kol: 'Kol 2',
-      label: 'Jumlah pinjaman',
-      amount: 'Rp 5,000,000',
-      isActive: true,
-    },
-  ]
+  const currentCategoryData = loanCategories.find((c) => c.title === selectedCategory) || loanCategories[0]
+  const accounts = loanAccounts[selectedCategory] || []
+
+  const categoryTabs = loanCategories.map((c) => ({ label: c.title, value: c.title }))
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white">
@@ -89,20 +82,14 @@ export default function CreditCardLoanSlider() {
                 fitContent
                 value={selectedCategory}
                 onChange={setSelectedCategory}
-                tabs={[
-                  { label: 'Credit card', value: 'Credit card' },
-                  { label: 'Paylater', value: 'Paylater' },
-                  { label: 'KKB', value: 'KKB' },
-                  { label: 'KPR', value: 'KPR' },
-                  { label: 'KTA', value: 'KTA' },
-                ]}
+                tabs={categoryTabs}
               />
             </div>
 
             {/* Total Credit Section */}
             <div className="flex flex-col gap-1">
               <span className="text-sm-medium text-gray/600">Total credit</span>
-              <h2 className="text-2xl-semibold text-gray/900">Rp 52,000,000</h2>
+              <h2 className="text-2xl-semibold text-gray/900">{currentCategoryData.amount}</h2>
             </div>
 
             {/* Divider */}
@@ -110,49 +97,55 @@ export default function CreditCardLoanSlider() {
 
             {/* Section label */}
             <div className="flex items-center justify-between pb-2">
-              <span className="text-sm-semibold text-gray/900">Daftar akun kartu kredit</span>
-              <span className="text-sm-medium text-gray/600">2 account</span>
+              <span className="text-sm-semibold text-gray/900">Daftar akun {selectedCategory.toLowerCase()}</span>
+              <span className="text-sm-medium text-gray/600">{currentCategoryData.accountCount}</span>
             </div>
 
             {/* Account list */}
             <div className="flex flex-col gap-3">
-              {accounts.map((acc) => (
-                <div
-                  key={acc.id}
-                  className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${
-                    acc.isActive
-                      ? 'border-primary-600 ring-4 ring-primary-50'
-                      : 'border-gray-200 shadow-xs'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {/* Logo placeholder - using skeuomorphic style */}
-                      <div className="size-10 rounded-lg border border-gray/300 bg-white p-2 shadow-xs flex items-center justify-center">
-                        <span className="text-xs-bold text-[#0060AF]">BCA</span>
+              {accounts.length > 0 ? (
+                accounts.map((acc) => (
+                  <div
+                    key={acc.id}
+                    className={`flex flex-col gap-4 p-4 rounded-xl border transition-all ${
+                      acc.isActive
+                        ? 'border-primary-600 ring-4 ring-primary-50'
+                        : 'border-gray-200 shadow-xs'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        {/* Logo placeholder - using skeuomorphic style */}
+                        <div className="size-10 rounded-lg border border-gray/300 bg-white p-2 shadow-xs flex items-center justify-center">
+                          <span className="text-xs-bold text-[#0060AF]">{acc.bank}</span>
+                        </div>
+                        <span className="text-sm-semibold text-gray/900">{acc.name}</span>
                       </div>
-                      <span className="text-sm-semibold text-gray/900">{acc.name}</span>
+                      <MyChip
+                        label={acc.kol}
+                        color={acc.kol === 'Kol 5' ? 'error' : 'warning'}
+                        variant="outlined"
+                        size="sm"
+                        rounded="full"
+                      />
                     </div>
-                    <MyChip
-                      label={acc.kol}
-                      color="warning"
-                      variant="outlined"
-                      size="sm"
-                      rounded="full"
-                    />
-                  </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm-medium text-gray/500">{acc.label}</span>
-                    <span className="text-sm-semibold text-gray/900">{acc.amount}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm-medium text-gray/500">{acc.label}</span>
+                      <span className="text-sm-semibold text-gray/900">{acc.amount}</span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="py-8 flex flex-col items-center justify-center gap-2 text-center border-2 border-dashed border-gray-100 rounded-xl">
+                  <p className="text-sm-medium text-gray/900">No active loan</p>
+                  <p className="text-xs text-gray-500 max-w-[200px]">There are no active loans or credit facilities found for this category.</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </SimpleBar>
       </section>
-
     </div>
   )
 }

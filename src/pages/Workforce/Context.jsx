@@ -138,6 +138,78 @@ const INITIAL_WORKFORCE = [
   },
 ]
 
+export const LOAN_CATEGORIES = [
+  {
+    kolBadge: 'KOL 5',
+    title: 'Credit card',
+    accountCount: '3 account',
+    amount: 'Rp 52,000,000',
+    color: 'Error',
+    icon: 'CreditCard02',
+  },
+  {
+    kolBadge: 'KOL 4',
+    title: 'Paylater',
+    accountCount: '2 account',
+    amount: 'Rp 6,400,000',
+    color: 'Warning',
+    icon: 'ShoppingBag03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KKB',
+    accountCount: '1 account',
+    amount: 'Rp 172,000,000',
+    color: 'Orange',
+    icon: 'Car01',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KPR',
+    accountCount: 'No active loan',
+    amount: 'Rp 0',
+    color: 'Blue',
+    icon: 'Home03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'KTA',
+    accountCount: '2 account',
+    amount: 'Rp 154,100,000',
+    color: 'Success',
+    icon: 'CoinsStacked03',
+  },
+  {
+    kolBadge: 'KOL 5',
+    title: 'Other',
+    accountCount: 'No active loan',
+    amount: 'Rp 0',
+    color: 'Gray',
+    icon: 'DotsVertical',
+  },
+]
+
+export const LOAN_ACCOUNTS = {
+  'Credit card': [
+    { id: 1, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 1,523,000', isActive: false },
+    { id: 2, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 5,000,000', isActive: true },
+    { id: 3, bank: 'CIMB', name: 'CIMB Niaga Card', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 45,477,000', isActive: false },
+  ],
+  'Paylater': [
+    { id: 1, bank: 'SP', name: 'Shopee Paylater', kol: 'Kol 4', label: 'Jumlah pinjaman', amount: 'Rp 4,000,000', isActive: false },
+    { id: 2, bank: 'TR', name: 'Traveloka Paylater', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 2,400,000', isActive: true },
+  ],
+  'KKB': [
+    { id: 1, bank: 'BCA', name: 'BCA Finance - Toyota Avanza', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 172,000,000', isActive: true },
+  ],
+  'KPR': [],
+  'KTA': [
+    { id: 1, bank: 'MN', name: 'Mandiri KTA', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 100,000,000', isActive: false },
+    { id: 2, bank: 'BRI', name: 'BRI KTA', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 54,100,000', isActive: true },
+  ],
+  'Other': [],
+}
+
 function WorkforceProvider({ children }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [workforce, setWorkforce] = useState(INITIAL_WORKFORCE)
@@ -212,6 +284,8 @@ function WorkforceProvider({ children }) {
       getEmployeeById,
       currentSlider,
       handleCurrentSlider,
+      loanCategories: LOAN_CATEGORIES,
+      loanAccounts: LOAN_ACCOUNTS,
     }),
     [
       searchTerm,

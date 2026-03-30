@@ -92,6 +92,28 @@ function ReportEnquiryProvider({ children }) {
   const [enquiries, setEnquiries] = useState(INITIAL_ENQUIRIES)
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
+  const [sliderStack, setSliderStack] = useState([])
+
+  const pushSlider = useCallback((slider) => {
+    setSliderStack((prev) => [...prev, slider])
+  }, [])
+
+  const popSlider = useCallback(() => {
+    setSliderStack((prev) => prev.slice(0, -1))
+  }, [])
+
+  const handleCurrentSlider = useCallback((value) => {
+    if (value === null) {
+      setSliderStack([])
+    } else {
+      setSliderStack([value])
+    }
+  }, [])
+
+  const currentSlider = useMemo(
+    () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
+    [sliderStack]
+  )
 
   const handleMetricClick = useCallback((label) => {
     setMetrics((prev) =>
@@ -141,6 +163,11 @@ function ReportEnquiryProvider({ children }) {
       handleSelectionChange,
       sortField,
       sortOrder,
+      sliderStack,
+      currentSlider,
+      pushSlider,
+      popSlider,
+      handleCurrentSlider,
     }),
     [
       searchTerm,
@@ -151,6 +178,11 @@ function ReportEnquiryProvider({ children }) {
       handleSelectionChange,
       sortField,
       sortOrder,
+      sliderStack,
+      currentSlider,
+      pushSlider,
+      popSlider,
+      handleCurrentSlider,
     ]
   )
 

@@ -46,6 +46,7 @@ function ReportEnquiryTable() {
     sortOrder,
     handleSort,
     handleSelectionChange,
+    handleCurrentSlider,
   } = useReportEnquiry()
 
   const values = {
@@ -77,6 +78,7 @@ function ReportEnquiryTable() {
                 variant="outlined"
                 size="md"
                 customClassname="gap-2"
+                onClick={() => handleCurrentSlider({ current: 'import-enquiry' })}
               >
                 <PackagePlus />
                 Bulk enquiry

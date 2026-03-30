@@ -148,7 +148,7 @@ export default function RoleForm({ mode }) {
             <div className="flex flex-1 min-h-0">
 
               {/* ── Left: Access menu ── */}
-              <div className="flex w-[404px] flex-col gap-8 border-r border-gray/200 pt-8">
+              <div className="flex w-[375px] flex-col gap-8 border-r border-gray/200 pt-8">
                 {/* Header */}
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col gap-5 px-4">
@@ -274,7 +274,7 @@ export default function RoleForm({ mode }) {
               </div>
 
               {/* ── Right: Form ── */}
-              <div className="flex flex-col">
+              <div className="flex flex-col w-[375px]">
                 {/* Content */}
                 <div className="flex flex-1 flex-col gap-8 pt-8">
                   {/* Header */}
@@ -296,7 +296,7 @@ export default function RoleForm({ mode }) {
                   {/* Card section */}
                   <div className="flex flex-col gap-6 px-4">
                     {/* Outer card – gray/25 bg */}
-                    <div className="w-[343px] rounded-xl border border-gray/200 bg-gray/25 shadow-shadows/shadow-xs">
+                    <div className=" rounded-xl border border-gray/200 bg-gray/25 shadow-shadows/shadow-xs">
                       {/* Heading */}
                       <div className="flex items-center gap-4 px-5 pb-2 pt-3">
                         <span className="text-sm font-semibold leading-5 text-gray/900 font-inter">

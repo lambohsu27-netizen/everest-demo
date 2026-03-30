@@ -11,4 +11,10 @@ export const SettingsService = {
   deleteRoles: async (ids) => await remove('/v1/roles', { ids }),
 
   getPermissions: async () => await get('/v1/permissions'),
+
+  getUsers: async (params) => await get('/v1/users', params),
+  getUserDetail: async (id) => await get(`/v1/users/${id}`),
+  createUser: async (data) => await post('/v1/users', data, 'form-data'),
+  updateUser: async (id, data) => await put(`/v1/users/${id}`, data, 'form-data'),
+  deleteUsers: async (ids) => await remove('/v1/users', { ids }),
 }

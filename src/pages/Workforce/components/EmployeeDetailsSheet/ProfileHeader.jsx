@@ -1,4 +1,5 @@
 import { MyButton, MyButtonGroup, MyChip, MyContextMenu, MyPopper } from '@interstellar-component'
+import { useState } from 'react'
 import {
   Calendar,
   ChevronDown,
@@ -10,9 +11,11 @@ import {
 } from '@untitled-ui/icons-react'
 import PropTypes from 'prop-types'
 import { useEmployeeDetailsSheet } from './Context'
+import RevokeReportForm from './RevokeReportForm'
 
 export default function ProfileHeader({ employee }) {
   const { currentTabs, setCurrentTabs } = useEmployeeDetailsSheet()
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false)
 
   const tabs = ['Report', 'Personal information']
 
@@ -75,7 +78,7 @@ export default function ProfileHeader({ employee }) {
                     label: 'Revoke',
                     color: '#b42318',
                     onClick: () => {
-                      // console.log('Revoke')
+                      setIsRevokeModalOpen(true)
                       close()
                     },
                   },
@@ -132,6 +135,13 @@ export default function ProfileHeader({ employee }) {
           </MyButton>
         </div>
       </div>
+      <RevokeReportForm
+        open={isRevokeModalOpen}
+        onClose={() => setIsRevokeModalOpen(false)}
+        onRevoke={() => {
+          // Handle revoke logic here (e.g., call API)
+        }}
+      />
     </div>
   )
 }

@@ -196,6 +196,41 @@ export default function RiskSignalsDetailsSheet() {
       searchPlaceholder: 'Search for employment',
       showSecondaryTabs: false,
     },
+    'Court decision': {
+      title: 'Legal case records',
+      description:
+        'Court decisions and legal disputes linked to the individual across public legal records.',
+      takeaway:
+        '2 court decisions were found in public legal records associated with this individual. The cases indicate minor financial disputes with no severe criminal or high-risk legal involvement',
+      indicators: [
+        { label: 'Total case found', value: '2' },
+        { label: 'Overall risk', badge: 'Low', badgeColor: 'success' },
+      ],
+      tableColumns: [
+        { header: 'Case ID', field: 'id', isPrimary: true },
+        { header: 'Case Type', field: 'type', renderType: 'badge' },
+        { header: 'Remark', field: 'remark' },
+        { header: 'Filling Date', field: 'date' },
+      ],
+      tableData: [
+        {
+          id: '67389263',
+          type: 'Customer dispute',
+          badgeColor: 'warning',
+          remark: 'Small debt collection claim related to unpaid personal loan.',
+          date: '8 Jan 2024',
+        },
+        {
+          id: '57863479',
+          type: 'Contract violation',
+          badgeColor: 'warning',
+          remark: 'Breach of contract dispute involving overdue payment.',
+          date: '8 Jan 2024',
+        },
+      ],
+      searchPlaceholder: 'Search for cases',
+      showSecondaryTabs: false,
+    },
   }
 
   const currentData = tabData[activeTab] || tabData['Phone numbers']
@@ -314,29 +349,42 @@ export default function RiskSignalsDetailsSheet() {
                     key={col.field}
                     header={col.header}
                     field={col.field}
-                    body={(row) => (
-                      <div className="flex flex-col gap-0.5 py-1">
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`text-sm text-gray-900 ${col.isPrimary ? 'font-semibold' : 'font-normal'}`}
-                          >
-                            {row[col.field]}
-                          </span>
-                          {col.isPrimary && row.status === 'Current' && (
-                            <MyChip
-                              label="Current"
-                              color="success"
-                              variant="filled"
-                              size="sm"
-                              rounded="full"
-                            />
+                    body={(row) => {
+                      if (col.renderType === 'badge') {
+                        return (
+                          <MyChip
+                            label={row[col.field]}
+                            color={row.badgeColor || 'gray'}
+                            variant="outlined"
+                            size="sm"
+                          />
+                        )
+                      }
+
+                      return (
+                        <div className="flex flex-col gap-0.5 py-1">
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`text-sm text-gray-900 ${col.isPrimary ? 'font-semibold' : 'font-normal'}`}
+                            >
+                              {row[col.field]}
+                            </span>
+                            {col.isPrimary && row.status === 'Current' && (
+                              <MyChip
+                                label="Current"
+                                color="success"
+                                variant="filled"
+                                size="sm"
+                                rounded="full"
+                              />
+                            )}
+                          </div>
+                          {col.hasSubtext && row.subtext && (
+                            <span className="text-xs text-gray-500 font-normal">{row.subtext}</span>
                           )}
                         </div>
-                        {col.hasSubtext && row.subtext && (
-                          <span className="text-xs text-gray-500 font-normal">{row.subtext}</span>
-                        )}
-                      </div>
-                    )}
+                      )
+                    }}
                   />
                 ))}
               </MyDataTable>

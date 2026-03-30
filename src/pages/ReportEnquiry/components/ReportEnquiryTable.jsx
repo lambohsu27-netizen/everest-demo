@@ -88,6 +88,7 @@ function ReportEnquiryTable() {
                 variant="filled"
                 size="md"
                 customClassname="gap-2"
+                onClick={() => handleCurrentSlider({ current: 'new-enquiry' })}
               >
                 <svg
                   width="20"

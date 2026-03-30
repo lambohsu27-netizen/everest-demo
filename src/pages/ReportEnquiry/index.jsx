@@ -6,9 +6,11 @@ import ReportEnquiryHeader from './components/ReportEnquiryHeader'
 import ReportEnquiryMetrics from './components/ReportEnquiryMetrics'
 import ReportEnquiryTable from './components/ReportEnquiryTable'
 import ImportEnquirySlider from './components/ImportEnquirySlider'
+import NewEnquirySlider from './components/NewEnquirySlider'
 
 const SLIDER_COMPONENTS = {
   'import-enquiry': ImportEnquirySlider,
+  'new-enquiry': NewEnquirySlider,
 }
 
 function ReportEnquiry() {

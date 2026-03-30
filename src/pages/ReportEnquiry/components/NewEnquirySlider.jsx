@@ -13,6 +13,7 @@ import {
   Calendar,
   RefreshCcw05,
   Edit01,
+  Plus,
 } from '@untitled-ui/icons-react'
 // Shared Components
 import {
@@ -83,29 +84,6 @@ const POSITION_OPTIONS = [
   { label: 'HR Manager', value: 'hr-manager' },
 ]
 
-const EMPLOYEE_OPTIONS = [
-  {
-    label: 'Phoenix Baker',
-    value: '1',
-    supportingText: 'Product Manager',
-    email: 'phoenix.baker@everest.com',
-    entity: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-    level: { label: 'Supervisor', value: 'supervisor' },
-    position: { label: 'Product Designer', value: 'product-designer' },
-    whatsapp: '08123456789',
-  },
-  {
-    label: 'Lana Steiner',
-    value: '2',
-    supportingText: 'Frontend Engineer',
-    email: 'lana.steiner@everest.com',
-    entity: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-    level: { label: 'Staff', value: 'staff' },
-    position: { label: 'Software Engineer', value: 'software-engineer' },
-    whatsapp: '08123456780',
-  },
-]
-
 const CONSENT_EXPIRY_OPTIONS = [
   { label: 'One time request', value: 'one-time' },
   { label: '3 months', value: '3m' },
@@ -161,7 +139,7 @@ function SelectField({
 
 // ── main component ─────────────────────────────────────────────────────────────
 function NewEnquirySlider() {
-  const { handleCurrentSlider } = useReportEnquiry()
+  const { pushSlider, handleCurrentSlider } = useReportEnquiry()
 
   const {
     control,
@@ -268,34 +246,67 @@ function NewEnquirySlider() {
                       <Controller
                         name="fullName"
                         control={control}
-                        render={({ field: { onChange, value } }) => (
-                          <MyAutocomplete
-                            name="fullName"
-                            control={control}
-                            options={EMPLOYEE_OPTIONS}
-                            placeholder="Search employee"
-                            value={value}
-                            onChange={(e, val) => {
-                              onChange(val)
-                              handleEmployeeChange(e, val)
-                            }}
-                            errors={errors.fullName?.message}
-                            renderOption={(option) => (
-                              <div className="flex items-center gap-3">
-                                <div className="size-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                                  <User01 className="size-4 text-gray-500" />
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {option.label}
-                                  </span>
-                                  <span className="text-xs text-gray-500">
-                                    {option.supportingText}
-                                  </span>
-                                </div>
+                        render={({ field: { value } }) => (
+                          <div className="flex flex-col gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                pushSlider({
+                                  current: 'employee-list',
+                                  props: {
+                                    onSelect: (emp) => {
+                                      setValue('fullName', emp)
+                                      handleEmployeeChange(null, emp)
+                                    },
+                                  },
+                                })
+                              }
+                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${
+                                errors.fullName
+                                  ? 'border-red-300 ring-1 ring-red-300'
+                                  : 'border-gray-300 hover:border-brand/400 hover:ring-1 hover:ring-brand/400'
+                              }`}
+                            >
+                              <div className="size-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-200 overflow-hidden shrink-0">
+                                {value?.avatar ? (
+                                  <img
+                                    src={value.avatar}
+                                    alt={value.label}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <User01 className="size-4 text-gray-400" />
+                                )}
                               </div>
+                              <div className="flex flex-1 flex-col overflow-hidden">
+                                {value ? (
+                                  <div className="flex items-baseline gap-2 truncate">
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {value.label}
+                                    </span>
+                                    {value.supportingText && (
+                                      <span className="text-xs text-gray-500 truncate">
+                                        {value.supportingText}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-gray-400">
+                                    Search employee
+                                  </span>
+                                )}
+                              </div>
+                              <XClose
+                                className="size-5 text-gray-400 rotate-[-90deg]"
+                                strokeWidth={2}
+                              />
+                            </button>
+                            {errors.fullName && (
+                              <p className="text-xs text-red-500">
+                                {errors.fullName.message}
+                              </p>
                             )}
-                          />
+                          </div>
                         )}
                       />
                     ) : (
@@ -380,13 +391,24 @@ function NewEnquirySlider() {
 
                   {/* Edit action for employee */}
                   {category === 'Employee' && (
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 text-sm font-semibold text-brand/700 hover:text-brand/800 w-max"
-                    >
-                      <Edit01 className="size-4" />
-                      Edit employee details
-                    </button>
+                    <div className="flex flex-col gap-2">
+                      <MyButton
+                        variant="text"
+                        color="primary"
+                        size="sm"
+                        customClassname="gap-2 w-max px-0 font-semibold"
+                      >
+                        <Plus className="size-4" />
+                        Add new employee
+                      </MyButton>
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 text-sm font-semibold text-brand/700 hover:text-brand/800 w-max"
+                      >
+                        <Edit01 className="size-4" />
+                        Edit employee details
+                      </button>
+                    </div>
                    )}
                 </div>
               </MyDoubleCard>

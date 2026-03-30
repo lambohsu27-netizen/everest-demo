@@ -95,7 +95,11 @@ function ReportEnquiryProvider({ children }) {
   const [sliderStack, setSliderStack] = useState([])
 
   const pushSlider = useCallback((slider) => {
-    setSliderStack((prev) => [...prev, slider])
+    setSliderStack((prev) => {
+      // Prevent duplicate sliders of the same type
+      if (prev.some((s) => s.current === slider.current)) return prev
+      return [...prev, slider]
+    })
   }, [])
 
   const popSlider = useCallback(() => {

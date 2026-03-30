@@ -7,10 +7,12 @@ import ReportEnquiryMetrics from './components/ReportEnquiryMetrics'
 import ReportEnquiryTable from './components/ReportEnquiryTable'
 import ImportEnquirySlider from './components/ImportEnquirySlider'
 import NewEnquirySlider from './components/NewEnquirySlider'
+import EmployeeListSlider from './components/EmployeeListSlider'
 
 const SLIDER_COMPONENTS = {
   'import-enquiry': ImportEnquirySlider,
   'new-enquiry': NewEnquirySlider,
+  'employee-list': EmployeeListSlider,
 }
 
 function ReportEnquiry() {
@@ -29,7 +31,7 @@ function ReportEnquiry() {
             open
             offset={index * 420}
             zIndex={1000 - index * 10}
-            element={<Component />}
+            element={<Component {...(slider.props || {})} />}
             onClose={popSlider}
             scrim={index === 0}
           />

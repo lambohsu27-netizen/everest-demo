@@ -6,6 +6,7 @@ import WorkforceHeader from './components/WorkforceHeader'
 import WorkforceTable from './components/WorkforceTable'
 import NewEmployeeSlider from './Sliders/NewEmployeeSlider'
 import ImportWorkforceSlider from './Sliders/ImportWorkforceSlider'
+import CreditCompositionSlider from './Sliders/CreditCompositionSlider'
 import { useWorkforce } from './Context'
 
 function Workforce() {
@@ -22,6 +23,12 @@ function Workforce() {
       <MyModalSlider
         open={currentSlider?.current === 'import-workforce'}
         element={<ImportWorkforceSlider />}
+        onClose={() => handleCurrentSlider(null)}
+        scrim
+      />
+      <MyModalSlider
+        open={currentSlider?.current === 'credit-composition'}
+        element={<CreditCompositionSlider />}
         onClose={() => handleCurrentSlider(null)}
         scrim
       />

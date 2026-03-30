@@ -34,6 +34,7 @@ function Workforce() {
             key={`${slider.current}-${index}`}
             open
             offset={index * 420}
+            zIndex={1000 - index * 10}
             element={<Component />}
             onClose={popSlider}
             scrim={index === 0}

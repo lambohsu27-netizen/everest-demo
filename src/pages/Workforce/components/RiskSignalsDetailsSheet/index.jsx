@@ -134,6 +134,68 @@ export default function RiskSignalsDetailsSheet() {
       searchPlaceholder: 'Search for address',
       showSecondaryTabs: false,
     },
+    'Employment records': {
+      title: 'Employment records',
+      description: 'Employment records associated with the individual reporting sources.',
+      takeaway:
+        'The employment analysis identified 10 employment records associated with this individual across multiple institutions and reporting periods. The latest employment record indicates the individual is currently associated with PT Anugerah Texindo, working as a Product Manager in the Other / Mixed Industry sector, based in Mega Kuningan.',
+      indicators: [
+        { label: 'Employment consistency', value: '3 / 10' },
+        { label: 'Employment records found', value: '14' },
+        { label: 'Overall risk', badge: 'Low', badgeColor: 'success' },
+      ],
+      tableColumns: [
+        { header: 'Occupation', field: 'occupation', isPrimary: true, hasSubtext: true },
+        { header: 'Industry', field: 'industry' },
+        { header: 'Workplace', field: 'location' },
+        { header: 'Count', field: 'count' },
+        { header: 'Last Update Date', field: 'lastUpdate' },
+      ],
+      tableData: [
+        {
+          occupation: 'Product Manager',
+          subtext: 'PT Anugerah TexIndotama',
+          industry: 'Other / Mixed Industry',
+          location: 'Mega Kuningan',
+          count: '2',
+          lastUpdate: '8 Jan 2024',
+        },
+        {
+          occupation: 'Product Manager',
+          subtext: 'PT Anugerah TexIndotama',
+          industry: 'Other / Mixed Industry',
+          location: 'Mega Kuningan',
+          count: '1',
+          lastUpdate: '8 Jan 2024',
+        },
+        {
+          occupation: 'Customer Service',
+          subtext: 'PT Anugerah TexIndotama',
+          industry: 'Other / Mixed Industry',
+          location: 'Jakarta',
+          count: '1',
+          lastUpdate: '8 Jan 2024',
+        },
+        {
+          occupation: 'Customer Service',
+          subtext: 'Bank Central Asia',
+          industry: 'Not Other business Fields',
+          location: 'Jakarta',
+          count: '4',
+          lastUpdate: '12 Des 2023',
+        },
+        {
+          occupation: 'Marketing',
+          subtext: 'PT Tirtayasa',
+          industry: 'Other / Mixed Industry',
+          location: 'Mega Kuningan',
+          count: '2',
+          lastUpdate: '10 Des 2023',
+        },
+      ],
+      searchPlaceholder: 'Search for employment',
+      showSecondaryTabs: false,
+    },
   }
 
   const currentData = tabData[activeTab] || tabData['Phone numbers']
@@ -253,20 +315,25 @@ export default function RiskSignalsDetailsSheet() {
                     header={col.header}
                     field={col.field}
                     body={(row) => (
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`text-sm text-gray-900 ${col.isPrimary ? 'font-semibold' : 'font-normal'}`}
-                        >
-                          {row[col.field]}
-                        </span>
-                        {col.isPrimary && row.status === 'Current' && (
-                          <MyChip
-                            label="Current"
-                            color="success"
-                            variant="filled"
-                            size="sm"
-                            rounded="full"
-                          />
+                      <div className="flex flex-col gap-0.5 py-1">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`text-sm text-gray-900 ${col.isPrimary ? 'font-semibold' : 'font-normal'}`}
+                          >
+                            {row[col.field]}
+                          </span>
+                          {col.isPrimary && row.status === 'Current' && (
+                            <MyChip
+                              label="Current"
+                              color="success"
+                              variant="filled"
+                              size="sm"
+                              rounded="full"
+                            />
+                          )}
+                        </div>
+                        {col.hasSubtext && row.subtext && (
+                          <span className="text-xs text-gray-500 font-normal">{row.subtext}</span>
                         )}
                       </div>
                     )}

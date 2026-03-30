@@ -62,8 +62,11 @@ export default function UserForm({ mode }) {
       setEmail(userDetail.email ?? '')
       setPhone(userDetail.phone ?? '')
       const matchedRole = roles.find((r) => r.id === userDetail.role_id) ?? null
-      console.log(matchedRole)
-      setSelectedRole({ label: matchedRole.name, value: matchedRole.id })
+      if (matchedRole) {
+        setSelectedRole({ label: matchedRole.name, value: matchedRole.id })
+      } else {
+        setSelectedRole(null)
+      }
       setIsActive(userDetail.is_active ?? true)
       setAvatarPreview(userDetail.avatar_url ?? null)
       const companies = userDetail.user_companies?.map((c) => {

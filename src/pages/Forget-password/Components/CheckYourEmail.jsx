@@ -5,7 +5,7 @@ import { MyBgPatternDecorativeCube, MyButton } from '@interstellar-component'
 import { useForgetPassword } from '../context'
 
 function CheckYourEmail() {
-  const { sendEmail, resendEmail, navigate, countdown, setCountdown } = useForgetPassword()
+  const { sendEmail, sendOTP, resendEmail, navigate, countdown, setCountdown } = useForgetPassword()
   const localUser_id = localStorage.getItem('user_id')
   const localForgetemail = localStorage.getItem('email_forget_password')
 
@@ -125,7 +125,7 @@ function CheckYourEmail() {
               size="lg"
               expanded
               disabled={stringOTP?.length !== 4}
-              onClick={() => sendEmail(payload)}
+              onClick={() => sendOTP(payload)}
             >
               <p className="text-md-semibold">Continue</p>
             </MyButton>

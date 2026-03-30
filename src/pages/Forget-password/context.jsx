@@ -22,8 +22,7 @@ function ForgetPasswordProvider(props) {
     await Service.sendEmail(body)
       .then(myToaster)
       .then((res) => {
-        // console.log(res);
-        localStorage.setItem('user_id', res?.user_id)
+        localStorage.setItem('user_id', res?.data?.user_id)
         localStorage.setItem('email_forget_password', body.email)
         localStorage.setItem('countdown_to_new_otp', res?.countdown_to_new_otp)
         setCurrentStep({ step_2: true, step_1: false })
@@ -31,10 +30,7 @@ function ForgetPasswordProvider(props) {
       })
       .catch((res) => {
         myToaster(res)
-        if (
-          res.message ===
-          'an OTP for such user has already exist and still not expired'
-        ) {
+        if (res.message === 'an OTP for such user has already exist and still not expired') {
           setTimeout(() => {
             setCurrentStep({ step_2: true, step_1: false })
             localStorage.setItem('email_forget_password', body.email)
@@ -49,9 +45,7 @@ function ForgetPasswordProvider(props) {
 
     await Service.sendOTP(body)
       .then(myToaster)
-      .then((res) =>
-        setCurrentStep({ step_1: false, step_2: false, step_3: true })
-      )
+      .then((res) => setCurrentStep({ step_1: false, step_2: false, step_3: true }))
       .catch(myToaster)
   }
 
@@ -110,6 +104,7 @@ function ForgetPasswordProvider(props) {
         resendEmail,
         countdown,
         setCountdown,
+        setCurrentStep,
       }}
     >
       {' '}
@@ -121,9 +116,7 @@ function ForgetPasswordProvider(props) {
 const useForgetPassword = () => {
   const context = useContext(ForgetPasswordContext)
   if (context === undefined) {
-    throw new Error(
-      'useForgetPassword must be used within a ForgetPasswordProvider'
-    )
+    throw new Error('useForgetPassword must be used within a ForgetPasswordProvider')
   }
   return context
 }

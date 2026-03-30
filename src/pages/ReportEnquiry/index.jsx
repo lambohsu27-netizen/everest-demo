@@ -30,7 +30,8 @@ function ReportEnquiry() {
             key={`${slider.current}-${index}`}
             open
             offset={index * 420}
-            zIndex={1000 - index * 10}
+            zIndex={1000 + index * 10}
+            direction={index > 0 ? 'bottom' : 'right'}
             element={<Component {...(slider.props || {})} />}
             onClose={popSlider}
             scrim={index === 0}

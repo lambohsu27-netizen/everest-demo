@@ -141,7 +141,7 @@ function ReportEnquiryTable() {
           currentSortOrderFromParams={sortOrder}
           onClick={(row) => {
             if (row.slaStatus === 'Awaiting Admin Approval') {
-              handleCurrentSlider({ current: 'awaiting-admin-approval', props: { data: row } })
+              handleCurrentSlider({ current: 'admin-verification', props: { data: row } })
             } else if (row.slaStatus === 'Awaiting Consent') {
               handleCurrentSlider({ current: 'awaiting-consent', props: { data: row } })
             }

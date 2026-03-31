@@ -7,9 +7,11 @@ import MySLAStatusChip from './MySLAStatusChip'
 import MyTextField from '../../../../interstellar-component/components/TextField/MyTextField'
 import MyTextArea from '../../../../interstellar-component/components/TextField/MyTextArea'
 import VerificationOCRModal from './VerificationOCRModal'
+import JobApplicationLetterModal from './JobApplicationLetterModal'
 
 export default function AdminVerificationSlider({ data }) {
   const { popSlider } = useReportEnquiry()
+  const [isLetterModalOpen, setIsLetterModalOpen] = React.useState(false)
 
   // Use provided data or defaults from screenshot/JSON for illustration
   const displayData = data || {
@@ -74,6 +76,7 @@ export default function AdminVerificationSlider({ data }) {
               variant="outlined"
               size="md"
               customClassname="gap-2"
+              onClick={() => setIsLetterModalOpen(true)}
             >
               <File02 size={20} className="text-gray-500" />
               View Job Application Letter
@@ -350,6 +353,12 @@ export default function AdminVerificationSlider({ data }) {
           Resend form
         </MyButton>
       </footer>
+
+      <JobApplicationLetterModal 
+        open={isLetterModalOpen} 
+        onClose={() => setIsLetterModalOpen(false)} 
+        zIndex={4000}
+      />
     </div>
   )
 }

@@ -121,6 +121,7 @@ function ForgetPasswordProvider(props) {
         resendEmail,
         countdown,
         setCountdown,
+        setCurrentStep,
       }}
     >
       {props.children}

@@ -9,7 +9,7 @@ const INITIAL_COMPANY = [
     companyId: 'ID-00192',
     memberStatus: 'Waiting CLIK approval',
     quotaLeft: '0',
-    avatar: null
+    avatar: null,
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const INITIAL_COMPANY = [
     companyId: 'ID-00193',
     memberStatus: 'Document submission',
     quotaLeft: '23.407',
-    avatar: null
+    avatar: null,
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const INITIAL_COMPANY = [
     companyId: 'ID-00194',
     memberStatus: 'Active',
     quotaLeft: '23.407',
-    avatar: null
+    avatar: null,
   },
   {
     id: 4,
@@ -33,7 +33,7 @@ const INITIAL_COMPANY = [
     companyId: 'ID-00194',
     memberStatus: 'Rejected',
     quotaLeft: '23.407',
-    avatar: null
+    avatar: null,
   },
 ]
 
@@ -43,6 +43,21 @@ function CompanyProvider({ children }) {
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedStatus, setSelectedStatus] = useState('All status')
+  const [currentSlider, setCurrentSlider] = useState({
+    status: false,
+    current: null,
+  })
+
+  const handleCurrentSlider = (slider, id) => {
+    if (slider && slider.current) {
+      setCurrentSlider({ status: true, current: slider.current, id })
+    } else {
+      setCurrentSlider((value) => ({ ...value, current: null }))
+      setTimeout(() => {
+        setCurrentSlider({ current: null })
+      }, 200)
+    }
+  }
 
   const handleSort = useCallback(
     ({ sort, order }) => {
@@ -75,12 +90,13 @@ function CompanyProvider({ children }) {
   const filteredCompanies = useMemo(() => {
     let result = companies
     if (selectedStatus !== 'All status') {
-      result = result.filter(c => c.memberStatus === selectedStatus)
+      result = result.filter((c) => c.memberStatus === selectedStatus)
     }
     if (searchTerm) {
-      result = result.filter(c => 
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        c.companyId.toLowerCase().includes(searchTerm.toLowerCase())
+      result = result.filter(
+        (c) =>
+          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          c.companyId.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
     return result
@@ -97,8 +113,12 @@ function CompanyProvider({ children }) {
       sortOrder,
       selectedStatus,
       setSelectedStatus,
+      currentSlider,
+      handleCurrentSlider,
     }),
     [
+      currentSlider,
+      handleCurrentSlider,
       searchTerm,
       filteredCompanies,
       handleSort,

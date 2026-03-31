@@ -44,6 +44,19 @@ function RegisterForm({ activeStep, setActiveStep }) {
     }
   }, [])
 
+  useEffect(() => {
+    const savedStep = localStorage.getItem('register_active_step')
+    if (savedStep) {
+      setActiveStep(parseInt(savedStep))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeStep) {
+      localStorage.setItem('register_active_step', activeStep)
+    }
+  }, [activeStep])
+
   // COUNT DOWN
   const [minutes, setMinutes] = useState(0)
   const [seconds, setSeconds] = useState(0)
@@ -109,6 +122,7 @@ function RegisterForm({ activeStep, setActiveStep }) {
         await verifyOtp(otpCode)
         setActiveStep(4)
       } else if (activeStep === 4) {
+        localStorage.removeItem('register_active_step')
         const token = cookie['token-backoffice-temp']
 
         setCookie('token-backoffice', token, { path: '/' })

@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { XCircle } from '@untitled-ui/icons-react'
 import { MyButton, MyFeaturedIconV2 } from '@interstellar-component'
+import RejectResendForm from './RejectResendForm'
 
 export default function VerificationOCRModal({ open, data }) {
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
   if (!open) return null
 
   // Use provided data or defaults for illustration
@@ -114,6 +116,7 @@ export default function VerificationOCRModal({ open, data }) {
             variant="outlined"
             size="lg"
             customClassname="px-6"
+            onClick={() => setIsRejectModalOpen(true)}
           >
             Reject & resend form
           </MyButton>
@@ -127,6 +130,16 @@ export default function VerificationOCRModal({ open, data }) {
           </MyButton>
         </div>
       </footer>
+
+      <RejectResendForm 
+        open={isRejectModalOpen} 
+        onClose={() => setIsRejectModalOpen(false)} 
+        zIndex={3000}
+        onConfirm={(formData) => {
+          console.log('Rejecting with data:', formData)
+          setIsRejectModalOpen(false)
+        }}
+      />
     </div>,
     document.body
   )

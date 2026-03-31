@@ -6,6 +6,8 @@ const statusConfig = {
   'Sent to CLIK': 'primary',
   'Awaiting Form': 'warning',
   'Form Revision': 'warning',
+  'Awaiting Admin Approval': 'primary',
+  'Awaiting Consent': 'warning',
   Canceled: 'error',
   Failed: 'error',
   Completed: 'success',

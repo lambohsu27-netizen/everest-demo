@@ -4,6 +4,8 @@ const ReportEnquiryContext = createContext()
 
 const INITIAL_METRICS = [
   { label: 'All status', value: '382', active: true },
+  { label: 'Awaiting Admin', value: '12', active: false },
+  { label: 'Awaiting Consent', value: '8', active: false },
   { label: 'Awaiting Form', value: '1.201', active: false },
   { label: 'Verification', value: '382', active: false },
   { label: 'Form Revision', value: '2.201', active: false },
@@ -14,6 +16,26 @@ const INITIAL_METRICS = [
 ]
 
 const INITIAL_ENQUIRIES = [
+  {
+    id: 1,
+    order: 'REQ-000038',
+    orderDate: '26 Jun 2026 17:00 PM',
+    name: 'Phoenix Baker',
+    employeeId: 'ID-00192',
+    category: 'Employee',
+    entity: 'PT Everest Maju Bersama',
+    slaStatus: 'Awaiting Admin Approval'
+  },
+  {
+    id: 11,
+    order: 'REQ-000039',
+    orderDate: '27 Jun 2026 10:00 AM',
+    name: 'Drew Cano',
+    employeeId: 'ID-00199',
+    category: 'Candidate',
+    entity: 'PT Annapurna Tinggi Sejahtera',
+    slaStatus: 'Awaiting Consent'
+  },
   {
     id: 1,
     order: 'REQ-000038',

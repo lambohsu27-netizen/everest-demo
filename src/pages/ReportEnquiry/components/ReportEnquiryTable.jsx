@@ -139,6 +139,13 @@ function ReportEnquiryTable() {
           paginator
           currentSortFieldFromParams={sortField}
           currentSortOrderFromParams={sortOrder}
+          onClick={(row) => {
+            if (row.slaStatus === 'Awaiting Admin Approval') {
+              handleCurrentSlider({ current: 'awaiting-admin-approval', props: { data: row } })
+            } else if (row.slaStatus === 'Awaiting Consent') {
+              handleCurrentSlider({ current: 'awaiting-consent', props: { data: row } })
+            }
+          }}
         >
           <MyColumn
             header="Order"

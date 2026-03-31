@@ -8,11 +8,15 @@ import ReportEnquiryTable from './components/ReportEnquiryTable'
 import ImportEnquirySlider from './components/ImportEnquirySlider'
 import NewEnquirySlider from './components/NewEnquirySlider'
 import EmployeeListSlider from './components/EmployeeListSlider'
+import AwaitingAdminApprovalSlider from './components/AwaitingAdminApprovalSlider'
+import AwaitingConsentSlider from './components/AwaitingConsentSlider'
 
 const SLIDER_COMPONENTS = {
   'import-enquiry': ImportEnquirySlider,
   'new-enquiry': NewEnquirySlider,
   'employee-list': EmployeeListSlider,
+  'awaiting-admin-approval': AwaitingAdminApprovalSlider,
+  'awaiting-consent': AwaitingConsentSlider,
 }
 
 function ReportEnquiry() {

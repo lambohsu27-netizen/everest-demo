@@ -2,40 +2,8 @@ import React from 'react'
 import { SearchMd, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
 import { MyColumn, MyDataTable, MyButton } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
+import MySLAStatusChip from './MySLAStatusChip'
 
-function getBadgeColor(status) {
-  switch (status) {
-    case 'Sent to CLIK':
-      return 'bg-brand/50 text-brand/700 border border-brand/200'
-    case 'Awaiting Form':
-    case 'Form Revision':
-      return 'bg-warning/50 text-warning/700 border border-warning/200'
-    case 'Canceled':
-    case 'Failed':
-      return 'bg-error/50 text-error/700 border border-error/200'
-    case 'Completed':
-      return 'bg-success/50 text-success/700 border border-success/200'
-    default:
-      return 'bg-gray-100 text-gray-700 border border-gray-200'
-  }
-}
-
-function getDotColor(status) {
-  switch (status) {
-    case 'Sent to CLIK':
-      return 'bg-brand/500'
-    case 'Awaiting Form':
-    case 'Form Revision':
-      return 'bg-warning/500'
-    case 'Canceled':
-    case 'Failed':
-      return 'bg-error/500'
-    case 'Completed':
-      return 'bg-success/500'
-    default:
-      return 'bg-gray-500'
-  }
-}
 
 function ReportEnquiryTable() {
   const {
@@ -210,16 +178,7 @@ function ReportEnquiryTable() {
             header="SLA Status"
             field="slaStatus"
             onSort={handleSort}
-            body={(row) => (
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${getBadgeColor(
-                  row.slaStatus
-                )}`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${getDotColor(row.slaStatus)}`} />
-                {row.slaStatus}
-              </span>
-            )}
+            body={(row) => <MySLAStatusChip status={row.slaStatus} />}
           />
         </MyDataTable>
       </div>

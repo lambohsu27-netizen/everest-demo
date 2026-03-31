@@ -23,7 +23,9 @@ import {
   MyDoubleCard,
   MyHorizontalTabV2,
   WhatsApp,
+  MyCalendar,
 } from '@interstellar-component'
+import { format } from 'date-fns'
 // Context
 import { useReportEnquiry } from '../Context'
 
@@ -53,10 +55,7 @@ const schema = yup.object({
     otherwise: (yupSchema) => yupSchema.optional(),
   }),
   email: yup.string().email('Invalid email').required('Email is required'),
-  consentExpiry: yup
-    .object({ label: yup.string(), value: yup.string() })
-    .nullable()
-    .required('Consent expiry is required'),
+  consentExpiry: yup.date().nullable().required('Consent expiry is required'),
   repeatEvery: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
@@ -84,12 +83,6 @@ const POSITION_OPTIONS = [
   { label: 'HR Manager', value: 'hr-manager' },
 ]
 
-const CONSENT_EXPIRY_OPTIONS = [
-  { label: 'One time request', value: 'one-time' },
-  { label: '3 months', value: '3m' },
-  { label: '6 months', value: '6m' },
-  { label: '1 year', value: '1y' },
-]
 
 const REPEAT_EVERY_OPTIONS = [
   { label: 'None', value: 'none' },
@@ -417,14 +410,51 @@ function NewEnquirySlider() {
               <MyDoubleCard heading="Request option" innerClassName="p-4">
                 <div className="flex flex-col gap-5">
                   {/* Consent Expiry */}
-                  <SelectField
-                    label="Consent Expiry"
+                  <Controller
                     name="consentExpiry"
                     control={control}
-                    options={CONSENT_EXPIRY_OPTIONS}
-                    placeholder="Select date"
-                    errors={errors?.consentExpiry?.message ?? errors?.consentExpiry?.value?.message}
-                    startAdornment={<Calendar className="size-4 text-gray-400" />}
+                    render={({ field }) => (
+                      <MyCalendar
+                        value={field.value}
+                        onChange={field.onChange}
+                        target={(open, show) => (
+                          <div className="flex flex-col gap-1.5">
+                            <FieldLabel required>Consent Expiry</FieldLabel>
+                            <button
+                              type="button"
+                              onClick={show}
+                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${
+                                errors.consentExpiry
+                                  ? 'border-red-300 ring-1 ring-red-300 shadow-[0_0_0_4px_rgba(240,68,56,0.24)]'
+                                  : 'border-gray-300 hover:border-brand/400 hover:ring-4 hover:ring-brand/100'
+                              }`}
+                            >
+                              <Calendar className="size-4 text-gray-400" />
+                              <div className="flex flex-1 flex-col overflow-hidden">
+                                {field.value ? (
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {format(field.value, 'MMM d, yyyy')}
+                                  </span>
+                                ) : (
+                                  <span className="text-sm text-gray-400">
+                                    Select date
+                                  </span>
+                                )}
+                              </div>
+                              <XClose
+                                className="size-5 text-gray-400 rotate-[-90deg]"
+                                strokeWidth={2}
+                              />
+                            </button>
+                            {errors.consentExpiry && (
+                              <p className="text-xs text-red-500">
+                                {errors.consentExpiry.message}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      />
+                    )}
                   />
 
                   {/* Repeat Every */}

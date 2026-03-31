@@ -4,14 +4,75 @@ import { SettingsService } from './service'
 
 const SettingsContext = createContext()
 
+/**
+ * List endpoints return `meta` (current_page, total_page, total) or legacy `paginator` (page, limit, total).
+ * Table state expects { page, limit, total, total_pages }.
+ */
+function normalizeListPagination(res, requestedLimit = 10) {
+  const raw = res?.meta ?? res?.paginator
+  if (!raw) {
+    const len = Array.isArray(res?.data) ? res.data.length : 0
+    return { page: 1, limit: requestedLimit, total: len, total_pages: 1 }
+  }
+  if (raw.current_page != null) {
+    return {
+      page: Number(raw.current_page),
+      limit: Number(raw.per_page ?? raw.limit ?? requestedLimit),
+      total: Number(raw.total ?? 0),
+      total_pages: Number(raw.total_page ?? raw.total_pages ?? 1),
+    }
+  }
+  return {
+    page: Number(raw.page ?? 1),
+    limit: Number(raw.limit ?? requestedLimit),
+    total: Number(raw.total ?? 0),
+    total_pages: Number(raw.total_pages ?? 1),
+  }
+}
 
 const INITIAL_EMPLOYMENT_LEVELS = [
-  { id: 1, level: 'Staff', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '5 years', repeatEvery: 'Every month' },
-  { id: 2, level: 'Supervisor', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '2 years', repeatEvery: 'Every 3 months' },
-  { id: 3, level: 'Assistant Manager', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '2 years', repeatEvery: 'Every 3 months' },
-  { id: 4, level: 'Junior Manager', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '2 years', repeatEvery: 'Every 3 months' },
-  { id: 5, level: 'Senior Manager', salaryRange: 'Rp5,000,000 - Rp10,000,000', consentExpiry: '2 years', repeatEvery: 'Every 6 months' },
-  { id: 6, level: 'Director', salaryRange: 'Rp150,000,000 - Rp300,000,000', consentExpiry: '1 year', repeatEvery: 'None' },
+  {
+    id: 1,
+    level: 'Staff',
+    salaryRange: 'Rp5,000,000 - Rp10,000,000',
+    consentExpiry: '5 years',
+    repeatEvery: 'Every month',
+  },
+  {
+    id: 2,
+    level: 'Supervisor',
+    salaryRange: 'Rp5,000,000 - Rp10,000,000',
+    consentExpiry: '2 years',
+    repeatEvery: 'Every 3 months',
+  },
+  {
+    id: 3,
+    level: 'Assistant Manager',
+    salaryRange: 'Rp5,000,000 - Rp10,000,000',
+    consentExpiry: '2 years',
+    repeatEvery: 'Every 3 months',
+  },
+  {
+    id: 4,
+    level: 'Junior Manager',
+    salaryRange: 'Rp5,000,000 - Rp10,000,000',
+    consentExpiry: '2 years',
+    repeatEvery: 'Every 3 months',
+  },
+  {
+    id: 5,
+    level: 'Senior Manager',
+    salaryRange: 'Rp5,000,000 - Rp10,000,000',
+    consentExpiry: '2 years',
+    repeatEvery: 'Every 6 months',
+  },
+  {
+    id: 6,
+    level: 'Director',
+    salaryRange: 'Rp150,000,000 - Rp300,000,000',
+    consentExpiry: '1 year',
+    repeatEvery: 'None',
+  },
 ]
 
 const INITIAL_POSITIONS = [
@@ -55,7 +116,10 @@ function SettingsProvider({ children }) {
         verification_threshold: Number(verificationThreshold),
       })
       myToaster(res)
-      savedGeneral.current = { session_timeout: sessionTimeout, verification_threshold: verificationThreshold }
+      savedGeneral.current = {
+        session_timeout: sessionTimeout,
+        verification_threshold: verificationThreshold,
+      }
     } catch (err) {
       myToaster(err)
     }
@@ -72,7 +136,12 @@ function SettingsProvider({ children }) {
 
   // ── Role Access (API-backed) ─────────────────────────────────────────────────
   const [roles, setRoles] = useState([])
-  const [rolePagination, setRolePagination] = useState({ total: 0, page: 1, limit: 10, total_pages: 1 })
+  const [rolePagination, setRolePagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    total_pages: 1,
+  })
   const [rolePage, setRolePage] = useState(1)
   const [roleSearchTerm, setRoleSearchTerm] = useState('')
   const [isLoadingRoles, setIsLoadingRoles] = useState(false)
@@ -88,11 +157,12 @@ function SettingsProvider({ children }) {
   const [allPermissions, setAllPermissions] = useState([])
 
   const fetchRoles = useCallback(async (page = 1, search = '') => {
+    const limit = 10
     setIsLoadingRoles(true)
     try {
-      const res = await SettingsService.getRoles({ page, limit: 10, ...(search ? { search } : {}) })
-      setRoles(res.data.roles)
-      setRolePagination(res.data.pagination)
+      const res = await SettingsService.getRoles({ page, limit, ...(search ? { search } : {}) })
+      setRoles(res.data)
+      setRolePagination(normalizeListPagination(res, limit))
     } catch (err) {
       myToaster(err)
     } finally {
@@ -123,11 +193,14 @@ function SettingsProvider({ children }) {
   }, [allPermissions.length])
 
   // Panel navigation
-  const openRoleDetail = useCallback((id) => {
-    setActivePanelRoleId(id)
-    setRolePanel('detail')
-    fetchRoleDetail(id)
-  }, [fetchRoleDetail])
+  const openRoleDetail = useCallback(
+    (id) => {
+      setActivePanelRoleId(id)
+      setRolePanel('detail')
+      fetchRoleDetail(id)
+    },
+    [fetchRoleDetail]
+  )
 
   const openCreateRole = useCallback(() => {
     setActivePanelRoleId(null)
@@ -148,27 +221,36 @@ function SettingsProvider({ children }) {
   }, [])
 
   // CRUD
-  const createRole = useCallback(async (data) => {
-    const res = await SettingsService.createRole(data)
-    myToaster(res)
-    fetchRoles(rolePage, roleSearchTerm)
-    closeRolePanel()
-  }, [rolePage, roleSearchTerm, fetchRoles, closeRolePanel])
+  const createRole = useCallback(
+    async (data) => {
+      const res = await SettingsService.createRole(data)
+      myToaster(res)
+      fetchRoles(rolePage, roleSearchTerm)
+      closeRolePanel()
+    },
+    [rolePage, roleSearchTerm, fetchRoles, closeRolePanel]
+  )
 
-  const updateRole = useCallback(async (id, data) => {
-    const res = await SettingsService.updateRole(id, data)
-    myToaster(res)
-    fetchRoles(rolePage, roleSearchTerm)
-    fetchRoleDetail(id)
-    setRolePanel('detail')
-  }, [rolePage, roleSearchTerm, fetchRoles, fetchRoleDetail])
+  const updateRole = useCallback(
+    async (id, data) => {
+      const res = await SettingsService.updateRole(id, data)
+      myToaster(res)
+      fetchRoles(rolePage, roleSearchTerm)
+      fetchRoleDetail(id)
+      setRolePanel('detail')
+    },
+    [rolePage, roleSearchTerm, fetchRoles, fetchRoleDetail]
+  )
 
-  const deleteRoles = useCallback(async (ids) => {
-    const res = await SettingsService.deleteRoles(ids)
-    myToaster(res)
-    setSelectedRoleIds([])
-    fetchRoles(rolePage, roleSearchTerm)
-  }, [rolePage, roleSearchTerm, fetchRoles])
+  const deleteRoles = useCallback(
+    async (ids) => {
+      const res = await SettingsService.deleteRoles(ids)
+      myToaster(res)
+      setSelectedRoleIds([])
+      fetchRoles(rolePage, roleSearchTerm)
+    },
+    [rolePage, roleSearchTerm, fetchRoles]
+  )
 
   const handleRoleSort = useCallback(({ sort, order }) => {
     setRoleSortField(sort)
@@ -180,10 +262,14 @@ function SettingsProvider({ children }) {
     setSelectedRoleIds(updated.data.filter((r) => r.checked).map((r) => r.id))
   }, [])
 
-
   // ── User Management (API-backed) ────────────────────────────────────────────
   const [users, setUsers] = useState([])
-  const [userPagination, setUserPagination] = useState({ total: 0, page: 1, limit: 10, total_pages: 1 })
+  const [userPagination, setUserPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    total_pages: 1,
+  })
   const [userPage, setUserPage] = useState(1)
   const [userSearchTerm, setUserSearchTerm] = useState('')
   const [isLoadingUsers, setIsLoadingUsers] = useState(false)
@@ -198,11 +284,12 @@ function SettingsProvider({ children }) {
   const [isLoadingUserDetail, setIsLoadingUserDetail] = useState(false)
 
   const fetchUsers = useCallback(async (page = 1, search = '') => {
+    const limit = 10
     setIsLoadingUsers(true)
     try {
-      const res = await SettingsService.getUsers({ page, limit: 10, ...(search ? { search } : {}) })
-      setUsers(res.data.users)
-      setUserPagination(res.data.pagination)
+      const res = await SettingsService.getUsers({ page, limit, ...(search ? { search } : {}) })
+      setUsers(res.data)
+      setUserPagination(normalizeListPagination(res, limit))
     } catch (err) {
       myToaster(err)
     } finally {
@@ -222,11 +309,14 @@ function SettingsProvider({ children }) {
     }
   }, [])
 
-  const openUserDetail = useCallback((id) => {
-    setActivePanelUserId(id)
-    setUserPanel('detail')
-    fetchUserDetail(id)
-  }, [fetchUserDetail])
+  const openUserDetail = useCallback(
+    (id) => {
+      setActivePanelUserId(id)
+      setUserPanel('detail')
+      fetchUserDetail(id)
+    },
+    [fetchUserDetail]
+  )
 
   const openCreateUser = useCallback(() => {
     setActivePanelUserId(null)
@@ -244,27 +334,36 @@ function SettingsProvider({ children }) {
     setUserDetail(null)
   }, [])
 
-  const createUser = useCallback(async (formData) => {
-    const res = await SettingsService.createUser(formData)
-    myToaster(res)
-    fetchUsers(userPage, userSearchTerm)
-    closeUserPanel()
-  }, [userPage, userSearchTerm, fetchUsers, closeUserPanel])
+  const createUser = useCallback(
+    async (formData) => {
+      const res = await SettingsService.createUser(formData)
+      myToaster(res)
+      fetchUsers(userPage, userSearchTerm)
+      closeUserPanel()
+    },
+    [userPage, userSearchTerm, fetchUsers, closeUserPanel]
+  )
 
-  const updateUser = useCallback(async (id, formData) => {
-    const res = await SettingsService.updateUser(id, formData)
-    myToaster(res)
-    fetchUsers(userPage, userSearchTerm)
-    fetchUserDetail(id)
-    setUserPanel('detail')
-  }, [userPage, userSearchTerm, fetchUsers, fetchUserDetail])
+  const updateUser = useCallback(
+    async (id, formData) => {
+      const res = await SettingsService.updateUser(id, formData)
+      myToaster(res)
+      fetchUsers(userPage, userSearchTerm)
+      fetchUserDetail(id)
+      setUserPanel('detail')
+    },
+    [userPage, userSearchTerm, fetchUsers, fetchUserDetail]
+  )
 
-  const deleteUsers = useCallback(async (ids) => {
-    const res = await SettingsService.deleteUsers(ids)
-    myToaster(res)
-    setSelectedUserIds([])
-    fetchUsers(userPage, userSearchTerm)
-  }, [userPage, userSearchTerm, fetchUsers])
+  const deleteUsers = useCallback(
+    async (ids) => {
+      const res = await SettingsService.deleteUsers(ids)
+      myToaster(res)
+      setSelectedUserIds([])
+      fetchUsers(userPage, userSearchTerm)
+    },
+    [userPage, userSearchTerm, fetchUsers]
+  )
 
   const handleUserSort = useCallback(({ sort, order }) => {
     setUserSortField(sort)
@@ -287,34 +386,52 @@ function SettingsProvider({ children }) {
   const [posSortOrder, setPosSortOrder] = useState(null)
   const [activeEmpSubTab, setActiveEmpSubTab] = useState('level')
 
-  const handleEmpSort = useCallback(({ sort, order }) => {
-    setEmpSortField(sort)
-    setEmpSortOrder(order)
-    if (!sort || !order) { setEmploymentLevels(INITIAL_EMPLOYMENT_LEVELS); return }
-    const sortedData = [...employmentLevels].sort((a, b) => {
-      const valA = a[sort] || ''; const valB = b[sort] || ''
-      if (valA < valB) return order === 'asc' ? -1 : 1
-      if (valA > valB) return order === 'asc' ? 1 : -1
-      return 0
-    })
-    setEmploymentLevels(sortedData)
-  }, [employmentLevels])
+  const handleEmpSort = useCallback(
+    ({ sort, order }) => {
+      setEmpSortField(sort)
+      setEmpSortOrder(order)
+      if (!sort || !order) {
+        setEmploymentLevels(INITIAL_EMPLOYMENT_LEVELS)
+        return
+      }
+      const sortedData = [...employmentLevels].sort((a, b) => {
+        const valA = a[sort] || ''
+        const valB = b[sort] || ''
+        if (valA < valB) return order === 'asc' ? -1 : 1
+        if (valA > valB) return order === 'asc' ? 1 : -1
+        return 0
+      })
+      setEmploymentLevels(sortedData)
+    },
+    [employmentLevels]
+  )
 
-  const handlePosSort = useCallback(({ sort, order }) => {
-    setPosSortField(sort)
-    setPosSortOrder(order)
-    if (!sort || !order) { setPositions(INITIAL_POSITIONS); return }
-    const sortedData = [...positions].sort((a, b) => {
-      const valA = a[sort] || ''; const valB = b[sort] || ''
-      if (valA < valB) return order === 'asc' ? -1 : 1
-      if (valA > valB) return order === 'asc' ? 1 : -1
-      return 0
-    })
-    setPositions(sortedData)
-  }, [positions])
+  const handlePosSort = useCallback(
+    ({ sort, order }) => {
+      setPosSortField(sort)
+      setPosSortOrder(order)
+      if (!sort || !order) {
+        setPositions(INITIAL_POSITIONS)
+        return
+      }
+      const sortedData = [...positions].sort((a, b) => {
+        const valA = a[sort] || ''
+        const valB = b[sort] || ''
+        if (valA < valB) return order === 'asc' ? -1 : 1
+        if (valA > valB) return order === 'asc' ? 1 : -1
+        return 0
+      })
+      setPositions(sortedData)
+    },
+    [positions]
+  )
 
-  const handleEmpSelectionChange = useCallback((updated) => { setEmploymentLevels(updated.data) }, [])
-  const handlePosSelectionChange = useCallback((updated) => { setPositions(updated.data) }, [])
+  const handleEmpSelectionChange = useCallback((updated) => {
+    setEmploymentLevels(updated.data)
+  }, [])
+  const handlePosSelectionChange = useCallback((updated) => {
+    setPositions(updated.data)
+  }, [])
 
   const filteredEmpLevels = useMemo(() => {
     if (!empSearchTerm) return employmentLevels
@@ -332,76 +449,148 @@ function SettingsProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       // General Settings
-      sessionTimeout, setSessionTimeout,
-      verificationThreshold, setVerificationThreshold,
+      sessionTimeout,
+      setSessionTimeout,
+      verificationThreshold,
+      setVerificationThreshold,
       isLoadingGeneral,
-      updateGeneralSettings, cancelGeneralSettings,
+      updateGeneralSettings,
+      cancelGeneralSettings,
 
       // Role Access
       roles,
       rolePagination,
-      rolePage, setRolePage,
-      roleSearchTerm, setRoleSearchTerm,
+      rolePage,
+      setRolePage,
+      roleSearchTerm,
+      setRoleSearchTerm,
       isLoadingRoles,
       selectedRoleIds,
-      roleSortField, roleSortOrder,
-      handleRoleSort, handleRoleSelectionChange,
+      roleSortField,
+      roleSortOrder,
+      handleRoleSort,
+      handleRoleSelectionChange,
       rolePanel,
       activePanelRoleId,
-      roleDetail, isLoadingRoleDetail,
+      roleDetail,
+      isLoadingRoleDetail,
       allPermissions,
       fetchRoles,
-      openRoleDetail, openCreateRole, openEditRole, closeRolePanel,
-      createRole, updateRole, deleteRoles,
+      openRoleDetail,
+      openCreateRole,
+      openEditRole,
+      closeRolePanel,
+      createRole,
+      updateRole,
+      deleteRoles,
 
       // User Management
       users,
       userPagination,
-      userPage, setUserPage,
-      userSearchTerm, setUserSearchTerm,
+      userPage,
+      setUserPage,
+      userSearchTerm,
+      setUserSearchTerm,
       isLoadingUsers,
       selectedUserIds,
-      userSortField, userSortOrder,
-      handleUserSort, handleUserSelectionChange,
+      userSortField,
+      userSortOrder,
+      handleUserSort,
+      handleUserSelectionChange,
       userPanel,
       activePanelUserId,
-      userDetail, isLoadingUserDetail,
+      userDetail,
+      isLoadingUserDetail,
       fetchUsers,
-      openUserDetail, openCreateUser, openEditUser, closeUserPanel,
-      createUser, updateUser, deleteUsers,
+      openUserDetail,
+      openCreateUser,
+      openEditUser,
+      closeUserPanel,
+      createUser,
+      updateUser,
+      deleteUsers,
 
       // Employment Level
       employmentLevels: filteredEmpLevels,
       positions: filteredPositions,
-      empSearchTerm, setEmpSearchTerm,
-      posSearchTerm, setPosSearchTerm,
-      empSortField, empSortOrder, handleEmpSort,
-      posSortField, posSortOrder, handlePosSort,
-      handleEmpSelectionChange, handlePosSelectionChange,
-      activeEmpSubTab, setActiveEmpSubTab,
+      empSearchTerm,
+      setEmpSearchTerm,
+      posSearchTerm,
+      setPosSearchTerm,
+      empSortField,
+      empSortOrder,
+      handleEmpSort,
+      posSortField,
+      posSortOrder,
+      handlePosSort,
+      handleEmpSelectionChange,
+      handlePosSelectionChange,
+      activeEmpSubTab,
+      setActiveEmpSubTab,
     }),
     [
-      sessionTimeout, verificationThreshold, isLoadingGeneral,
-      updateGeneralSettings, cancelGeneralSettings,
-      roles, rolePagination, rolePage, roleSearchTerm, isLoadingRoles,
-      selectedRoleIds, roleSortField, roleSortOrder,
-      handleRoleSort, handleRoleSelectionChange,
-      rolePanel, activePanelRoleId, roleDetail, isLoadingRoleDetail,
-      allPermissions, fetchRoles,
-      openRoleDetail, openCreateRole, openEditRole, closeRolePanel,
-      createRole, updateRole, deleteRoles,
-      users, userPagination, userPage, userSearchTerm, isLoadingUsers,
-      selectedUserIds, userSortField, userSortOrder,
-      handleUserSort, handleUserSelectionChange,
-      userPanel, activePanelUserId, userDetail, isLoadingUserDetail,
+      sessionTimeout,
+      verificationThreshold,
+      isLoadingGeneral,
+      updateGeneralSettings,
+      cancelGeneralSettings,
+      roles,
+      rolePagination,
+      rolePage,
+      roleSearchTerm,
+      isLoadingRoles,
+      selectedRoleIds,
+      roleSortField,
+      roleSortOrder,
+      handleRoleSort,
+      handleRoleSelectionChange,
+      rolePanel,
+      activePanelRoleId,
+      roleDetail,
+      isLoadingRoleDetail,
+      allPermissions,
+      fetchRoles,
+      openRoleDetail,
+      openCreateRole,
+      openEditRole,
+      closeRolePanel,
+      createRole,
+      updateRole,
+      deleteRoles,
+      users,
+      userPagination,
+      userPage,
+      userSearchTerm,
+      isLoadingUsers,
+      selectedUserIds,
+      userSortField,
+      userSortOrder,
+      handleUserSort,
+      handleUserSelectionChange,
+      userPanel,
+      activePanelUserId,
+      userDetail,
+      isLoadingUserDetail,
       fetchUsers,
-      openUserDetail, openCreateUser, openEditUser, closeUserPanel,
-      createUser, updateUser, deleteUsers,
-      filteredEmpLevels, filteredPositions,
-      empSearchTerm, posSearchTerm,
-      empSortField, empSortOrder, handleEmpSort,
-      posSortField, posSortOrder, handlePosSort,
-      handleEmpSelectionChange, handlePosSelectionChange,
+      openUserDetail,
+      openCreateUser,
+      openEditUser,
+      closeUserPanel,
+      createUser,
+      updateUser,
+      deleteUsers,
+      filteredEmpLevels,
+      filteredPositions,
+      empSearchTerm,
+      posSearchTerm,
+      empSortField,
+      empSortOrder,
+      handleEmpSort,
+      posSortField,
+      posSortOrder,
+      handlePosSort,
+      handleEmpSelectionChange,
+      handlePosSelectionChange,
       activeEmpSubTab,
     ]
   )

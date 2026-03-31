@@ -38,6 +38,7 @@ export default function JobApplicationLetterModal({ open, onClose, content, zInd
       open={open}
       onClose={onClose}
       zIndex={zIndex}
+      forceBlur
       title="SURAT LAMARAN KERJA"
       icon={<File02 className="text-brand/600" />}
       bgColor="bg-white"

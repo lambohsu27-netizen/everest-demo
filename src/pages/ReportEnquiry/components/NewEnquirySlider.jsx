@@ -85,10 +85,11 @@ const POSITION_OPTIONS = [
 
 
 const REPEAT_EVERY_OPTIONS = [
-  { label: 'None', value: 'none' },
-  { label: 'Weekly', value: 'weekly' },
-  { label: 'Monthly', value: 'monthly' },
-  { label: 'Yearly', value: 'yearly' },
+  { label: 'Monthly', value: 'monthly', subLabel: 'every 1 month' },
+  { label: 'Bi-monthly', value: 'bi-monthly', subLabel: 'every 2 months' },
+  { label: 'Quarterly', value: 'quarterly', subLabel: 'every 3 months' },
+  { label: 'Semiannual', value: 'semiannual', subLabel: 'every 6 months' },
+  { label: 'Annual', value: 'annual', subLabel: 'yearly' },
 ]
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -110,8 +111,7 @@ function SelectField({
   placeholder,
   errors,
   startAdornment,
-  renderOption,
-  getOptionLabel,
+  ...props
 }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -123,8 +123,7 @@ function SelectField({
         placeholder={placeholder}
         errors={errors}
         startAdornment={startAdornment}
-        renderOption={renderOption}
-        getOptionLabel={getOptionLabel}
+        {...props}
       />
     </div>
   )
@@ -466,6 +465,20 @@ function NewEnquirySlider() {
                     placeholder="Select interval"
                     errors={errors?.repeatEvery?.message ?? errors?.repeatEvery?.value?.message}
                     startAdornment={<RefreshCcw05 className="size-4 text-gray-400" />}
+                    renderOption={(option) => (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {option.label}
+                        </span>
+                        {option.subLabel && (
+                          <span className="text-xs text-gray-500">
+                            {option.subLabel}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    focusColor="#7f56d9"
+                    focusShadow="#7f56d93d"
                   />
                 </div>
               </MyDoubleCard>

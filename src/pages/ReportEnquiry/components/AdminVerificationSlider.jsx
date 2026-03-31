@@ -1,11 +1,12 @@
 import React from 'react'
 import SimpleBar from 'simplebar-react'
-import { XClose, Trash01, Send01, File02 } from '@untitled-ui/icons-react'
+import { XClose, File02, Trash01, Send01 } from '@untitled-ui/icons-react'
 import { MyButton, MyDoubleCard, WhatsApp, MyAvatar } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
 import MySLAStatusChip from './MySLAStatusChip'
 import MyTextField from '../../../../interstellar-component/components/TextField/MyTextField'
 import MyTextArea from '../../../../interstellar-component/components/TextField/MyTextArea'
+import VerificationOCRModal from './VerificationOCRModal'
 
 export default function AdminVerificationSlider({ data }) {
   const { popSlider } = useReportEnquiry()
@@ -38,7 +39,16 @@ export default function AdminVerificationSlider({ data }) {
   const handleClose = () => popSlider()
 
   return (
-    <div className="flex h-screen w-[420px] flex-col bg-white shadow-xl">
+    <div className="relative flex h-screen w-[420px] flex-col bg-white shadow-xl">
+      <VerificationOCRModal 
+        open 
+        onClose={handleClose} 
+        data={{
+          portrait: displayData.avatar,
+          ktp: 'https://images.unsplash.com/photo-1594819047050-99defca82545?q=80&w=800&h=500&auto=format&fit=crop',
+          score: 63
+        }} 
+      />
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="relative flex items-start gap-x-4 px-6 py-6 border-b border-gray-100 pb-4">
         <button

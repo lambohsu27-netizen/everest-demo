@@ -4,6 +4,8 @@ const ReportEnquiryContext = createContext()
 
 const INITIAL_METRICS = [
   { label: 'All status', value: '382', active: true },
+  { label: 'Awaiting Admin', value: '12', active: false },
+  { label: 'Awaiting Consent', value: '8', active: false },
   { label: 'Awaiting Form', value: '1.201', active: false },
   { label: 'Verification', value: '382', active: false },
   { label: 'Form Revision', value: '2.201', active: false },
@@ -14,6 +16,26 @@ const INITIAL_METRICS = [
 ]
 
 const INITIAL_ENQUIRIES = [
+  {
+    id: 1,
+    order: 'REQ-000038',
+    orderDate: '26 Jun 2026 17:00 PM',
+    name: 'Phoenix Baker',
+    employeeId: 'ID-00192',
+    category: 'Employee',
+    entity: 'PT Everest Maju Bersama',
+    slaStatus: 'Awaiting Admin Approval'
+  },
+  {
+    id: 11,
+    order: 'REQ-000039',
+    orderDate: '27 Jun 2026 10:00 AM',
+    name: 'Drew Cano',
+    employeeId: 'ID-00199',
+    category: 'Candidate',
+    entity: 'PT Annapurna Tinggi Sejahtera',
+    slaStatus: 'Awaiting Consent'
+  },
   {
     id: 1,
     order: 'REQ-000038',
@@ -92,6 +114,32 @@ function ReportEnquiryProvider({ children }) {
   const [enquiries, setEnquiries] = useState(INITIAL_ENQUIRIES)
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
+  const [sliderStack, setSliderStack] = useState([])
+
+  const pushSlider = useCallback((slider) => {
+    setSliderStack((prev) => {
+      // Prevent duplicate sliders of the same type
+      if (prev.some((s) => s.current === slider.current)) return prev
+      return [...prev, slider]
+    })
+  }, [])
+
+  const popSlider = useCallback(() => {
+    setSliderStack((prev) => prev.slice(0, -1))
+  }, [])
+
+  const handleCurrentSlider = useCallback((value) => {
+    if (value === null) {
+      setSliderStack([])
+    } else {
+      setSliderStack([value])
+    }
+  }, [])
+
+  const currentSlider = useMemo(
+    () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
+    [sliderStack]
+  )
 
   const handleMetricClick = useCallback((label) => {
     setMetrics((prev) =>
@@ -141,6 +189,11 @@ function ReportEnquiryProvider({ children }) {
       handleSelectionChange,
       sortField,
       sortOrder,
+      sliderStack,
+      currentSlider,
+      pushSlider,
+      popSlider,
+      handleCurrentSlider,
     }),
     [
       searchTerm,
@@ -151,6 +204,11 @@ function ReportEnquiryProvider({ children }) {
       handleSelectionChange,
       sortField,
       sortOrder,
+      sliderStack,
+      currentSlider,
+      pushSlider,
+      popSlider,
+      handleCurrentSlider,
     ]
   )
 

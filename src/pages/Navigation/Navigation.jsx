@@ -154,12 +154,7 @@ function Navigation({ childs }) {
           <div className="flex w-full flex-col items-center gap-y-4">
             <div className="flex flex-col gap-0.5 px-3">
               {hasSettingsAccess && (
-                <NavItem
-                  icon={<Settings01 />}
-                  path="/settings"
-                  label="Settings"
-                  isAccess={null}
-                />
+                <NavItem icon={<Settings01 />} path="/settings" label="Settings" isAccess={null} />
               )}
               <NavItem
                 icon={<MessageSmileSquare />}

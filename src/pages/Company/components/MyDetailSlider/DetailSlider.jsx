@@ -10,6 +10,7 @@ import {
 import { Edit01, LogOut01, RefreshCcw01, Trash01, User01, XClose } from '@untitled-ui/icons-react'
 import Result from './Result'
 import { useCompany } from '../../Context'
+import Information from './Information'
 
 const MyDetailSlider = () => {
   const {
@@ -93,10 +94,10 @@ const MyDetailSlider = () => {
           </MyTabPanel>
           {/* <MyTabPanel value={'activity'}>
             <Activity data={jobOrderDetail?.data?.action_histories} />
-          </MyTabPanel>
-          <MyTabPanel value={'attachment'}>
-            <Attachment data={jobOrderDetail} />
           </MyTabPanel> */}
+          <MyTabPanel value={'information'}>
+            <Information data={jobOrderDetail} />
+          </MyTabPanel>
         </MyTabView>
       </div>
     </div>

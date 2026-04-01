@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useLocation, useNavigate, Outlet } from 'react-router-dom'
+import { MyHorizontalTabV2 } from '@interstellar-component'
 
 const tabs = [
   { label: 'User', to: '/settings/user-role-access/user' },
@@ -6,6 +7,12 @@ const tabs = [
 ]
 
 export default function UserRoleAccess() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // Determine active tab based on current path
+  const activeTab = tabs.find((tab) => location.pathname.includes(tab.to))?.to || tabs[0].to
+
   return (
     <div className="flex flex-col pt-8">
       {/* Header */}
@@ -17,22 +24,13 @@ export default function UserRoleAccess() {
       </div>
 
       {/* Sub-tabs */}
-      <div className="mb-6 flex items-center gap-1 border-b border-gray-200">
-        {tabs.map((tab) => (
-          <NavLink
-            key={tab.to}
-            to={tab.to}
-            className={({ isActive }) =>
-              `px-3 pb-3 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'border-b-2 border-[#6941C6] text-[#6941C6]'
-                  : 'text-[#475467] hover:text-gray-900'
-              }`
-            }
-          >
-            {tab.label}
-          </NavLink>
-        ))}
+      <div className="mb-6">
+        <MyHorizontalTabV2
+          value={activeTab}
+          onChange={(val) => navigate(val)}
+          tabs={tabs.map((tab) => ({ ...tab, value: tab.to }))}
+          fitContent
+        />
       </div>
 
       <Outlet />

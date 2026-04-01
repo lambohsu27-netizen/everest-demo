@@ -5,11 +5,13 @@ import {
   Trash01,
   Plus,
   EyeOff,
+  DownloadCloud01,
+  UploadCloud01,
 } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../Context'
+import { useSettings } from '../../../Context'
 import RoleDetail from './RoleDetail'
 import RoleForm from './RoleForm'
 
@@ -18,15 +20,19 @@ export default function RoleTab() {
   const {
     roles,
     rolePagination,
-    rolePage, setRolePage,
-    roleSearchTerm, setRoleSearchTerm,
+    setRolePage,
+    roleSearchTerm,
+    setRoleSearchTerm,
     isLoadingRoles,
     selectedRoleIds,
-    roleSortField, roleSortOrder,
-    handleRoleSort, handleRoleSelectionChange,
+    roleSortField,
+    roleSortOrder,
+    handleRoleSort,
+    handleRoleSelectionChange,
     rolePanel,
     fetchRoles,
-    openRoleDetail, openCreateRole, closeRolePanel,
+    openRoleDetail,
+    openCreateRole,
     deleteRoles,
   } = useSettings()
 
@@ -42,14 +48,16 @@ export default function RoleTab() {
   useEffect(() => {
     if (!roleSearchInitialized.current) {
       roleSearchInitialized.current = true
-      return
+      return undefined
     }
     const timer = setTimeout(() => {
       setRolePage(1)
       fetchRoles(1, roleSearchTerm)
     }, 400)
-    return () => clearTimeout(timer)
-  }, [roleSearchTerm, fetchRoles])
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [roleSearchTerm, fetchRoles, setRolePage])
 
   const canAddRole = hasPermission(Access.ROLE_ACCESS, 'add_new')
   const canDeleteRole = hasPermission(Access.ROLE_ACCESS, 'delete')
@@ -104,13 +112,21 @@ export default function RoleTab() {
                 onClick={() => setDeleteConfirmOpen(true)}
               >
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
-                Delete
+                <p className="text-sm-semibold">Delete</p>
               </MyButton>
             )}
+            <MyButton color="primary" size="md" variant="outlined">
+              <DownloadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Download</p>
+            </MyButton>
+            <MyButton color="secondary" size="md" variant="outlined">
+              <UploadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Import</p>
+            </MyButton>
             {canAddRole && (
               <MyButton color="primary" size="md" variant="filled" onClick={openCreateRole}>
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />
-                New role
+                <p className="text-sm-semibold">New role</p>
               </MyButton>
             )}
           </div>
@@ -130,11 +146,11 @@ export default function RoleTab() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Filters
             </MyButton>
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields
             </MyButton>
@@ -145,7 +161,6 @@ export default function RoleTab() {
           values={roleTableValues}
           selectionMode="multiple"
           onSelectionChange={handleRoleSelectionChange}
-          paginator
           loading={isLoadingRoles}
           onPageChange={handleRolePageChange}
           currentSortFieldFromParams={roleSortField}
@@ -167,6 +182,33 @@ export default function RoleTab() {
             )}
           />
         </MyDataTable>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            Page {rolePagination.page} of {rolePagination.total_pages}
+          </span>
+          <div className="flex gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={rolePagination.page <= 1}
+              onClick={() => handleRolePageChange(rolePagination.page - 1)}
+            >
+              Previous
+            </MyButton>
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={rolePagination.page >= rolePagination.total_pages}
+              onClick={() => handleRolePageChange(rolePagination.page + 1)}
+            >
+              Next
+            </MyButton>
+          </div>
+        </div>
       </div>
 
       {rolePanel === 'detail' && <RoleDetail />}

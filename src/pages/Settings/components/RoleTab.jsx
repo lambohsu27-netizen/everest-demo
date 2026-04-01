@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
+import {
+  SearchMd,
+  FilterLines,
+  Trash01,
+  Plus,
+  EyeOff,
+  DownloadCloud01,
+  UploadCloud01,
+} from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
@@ -12,7 +20,6 @@ export default function RoleTab() {
   const {
     roles,
     rolePagination,
-    rolePage,
     setRolePage,
     roleSearchTerm,
     setRoleSearchTerm,
@@ -26,7 +33,6 @@ export default function RoleTab() {
     fetchRoles,
     openRoleDetail,
     openCreateRole,
-    closeRolePanel,
     deleteRoles,
   } = useSettings()
 
@@ -42,14 +48,16 @@ export default function RoleTab() {
   useEffect(() => {
     if (!roleSearchInitialized.current) {
       roleSearchInitialized.current = true
-      return
+      return undefined
     }
     const timer = setTimeout(() => {
       setRolePage(1)
       fetchRoles(1, roleSearchTerm)
     }, 400)
-    return () => clearTimeout(timer)
-  }, [roleSearchTerm, fetchRoles])
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [roleSearchTerm, fetchRoles, setRolePage])
 
   const canAddRole = hasPermission(Access.ROLE_ACCESS, 'add_new')
   const canDeleteRole = hasPermission(Access.ROLE_ACCESS, 'delete')
@@ -104,13 +112,21 @@ export default function RoleTab() {
                 onClick={() => setDeleteConfirmOpen(true)}
               >
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
-                Delete
+                <p className="text-sm-semibold">Delete</p>
               </MyButton>
             )}
+            <MyButton color="primary" size="md" variant="outlined">
+              <DownloadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Download</p>
+            </MyButton>
+            <MyButton color="secondary" size="md" variant="outlined">
+              <UploadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Import</p>
+            </MyButton>
             {canAddRole && (
               <MyButton color="primary" size="md" variant="filled" onClick={openCreateRole}>
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />
-                New role
+                <p className="text-sm-semibold">New role</p>
               </MyButton>
             )}
           </div>

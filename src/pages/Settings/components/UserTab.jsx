@@ -5,6 +5,8 @@ import {
   Trash01,
   Plus,
   EyeOff,
+  DownloadCloud01,
+  UploadCloud01,
 } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
@@ -104,13 +106,21 @@ export default function UserTab() {
                 onClick={() => setDeleteConfirmOpen(true)}
               >
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
-                Delete
+                <p className="text-sm-semibold">Delete</p>
               </MyButton>
             )}
+            <MyButton color="primary" size="md" variant="outlined">
+              <DownloadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Download</p>
+            </MyButton>
+            <MyButton color="secondary" size="md" variant="outlined">
+              <UploadCloud01 className="h-5 w-5" />
+              <p className="text-sm-semibold">Import</p>
+            </MyButton>
             {canAddUser && (
               <MyButton color="primary" size="md" variant="filled" onClick={openCreateUser}>
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />
-                New user
+                <p className="text-sm-semibold">New user</p>
               </MyButton>
             )}
           </div>

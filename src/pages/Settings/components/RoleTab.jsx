@@ -146,21 +146,11 @@ export default function RoleTab() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton
-              color="secondary"
-              size="md"
-              variant="outlined"
-              customClassname="text-gray-700"
-            >
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Filters
             </MyButton>
-            <MyButton
-              color="secondary"
-              size="md"
-              variant="outlined"
-              customClassname="text-gray-700"
-            >
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields
             </MyButton>

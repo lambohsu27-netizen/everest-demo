@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  SearchMd,
-  FilterLines,
-  Trash01,
-  Plus,
-  EyeOff,
-} from '@untitled-ui/icons-react'
+import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
@@ -18,15 +12,21 @@ export default function RoleTab() {
   const {
     roles,
     rolePagination,
-    rolePage, setRolePage,
-    roleSearchTerm, setRoleSearchTerm,
+    rolePage,
+    setRolePage,
+    roleSearchTerm,
+    setRoleSearchTerm,
     isLoadingRoles,
     selectedRoleIds,
-    roleSortField, roleSortOrder,
-    handleRoleSort, handleRoleSelectionChange,
+    roleSortField,
+    roleSortOrder,
+    handleRoleSort,
+    handleRoleSelectionChange,
     rolePanel,
     fetchRoles,
-    openRoleDetail, openCreateRole, closeRolePanel,
+    openRoleDetail,
+    openCreateRole,
+    closeRolePanel,
     deleteRoles,
   } = useSettings()
 
@@ -130,11 +130,21 @@ export default function RoleTab() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton
+              color="secondary"
+              size="md"
+              variant="outlined"
+              customClassname="text-gray-700"
+            >
               <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Filters
             </MyButton>
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton
+              color="secondary"
+              size="md"
+              variant="outlined"
+              customClassname="text-gray-700"
+            >
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields
             </MyButton>
@@ -145,7 +155,6 @@ export default function RoleTab() {
           values={roleTableValues}
           selectionMode="multiple"
           onSelectionChange={handleRoleSelectionChange}
-          paginator
           loading={isLoadingRoles}
           onPageChange={handleRolePageChange}
           currentSortFieldFromParams={roleSortField}
@@ -167,6 +176,33 @@ export default function RoleTab() {
             )}
           />
         </MyDataTable>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            Page {rolePagination.page} of {rolePagination.total_pages}
+          </span>
+          <div className="flex gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={rolePagination.page <= 1}
+              onClick={() => handleRolePageChange(rolePagination.page - 1)}
+            >
+              Previous
+            </MyButton>
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={rolePagination.page >= rolePagination.total_pages}
+              onClick={() => handleRolePageChange(rolePagination.page + 1)}
+            >
+              Next
+            </MyButton>
+          </div>
+        </div>
       </div>
 
       {rolePanel === 'detail' && <RoleDetail />}

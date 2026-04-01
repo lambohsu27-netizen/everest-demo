@@ -53,7 +53,7 @@ export const setCookie = (key, value, expiry) => {
 const logout = () => {
   setCookie('token-backoffice', null, '-1')
   setCookie('refresh-token-backoffice', null, '-1')
-  window.location.href = '/login'
+  // window.location.href = '/login'
 }
 
 // ─── SILENT REFRESH ──────────────────────────────────────────────────────────
@@ -209,13 +209,7 @@ export const patch = async (
   }
 }
 
-export const put = async (
-  endpoint,
-  data,
-  type = 'json',
-  timeout = 60 * 60 * 6000,
-  config = {}
-) => {
+export const put = async (endpoint, data, type = 'json', timeout = 60 * 60 * 6000, config = {}) => {
   try {
     const headers = getHeader(type)
     const url = `${baseURL}${endpoint}`
@@ -278,15 +272,7 @@ export const remove = async (endpoint, data, timeout = 60000) => {
 export const download = (endpoint, params) => {
   let url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
   const where = {
-    ...pick(params, [
-      'page',
-      'search',
-      'type',
-      'start_date',
-      'end_date',
-      'status',
-      'archive',
-    ]),
+    ...pick(params, ['page', 'search', 'type', 'start_date', 'end_date', 'status', 'archive']),
   }
 
   if (params && where) {

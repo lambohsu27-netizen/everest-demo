@@ -41,32 +41,26 @@ function Login() {
 
   useEffect(() => {
     if (localRememberMe) {
-      const decrypted = CryptoJS.AES.decrypt(
-        localRememberMe,
-        import.meta.env.VITE_APP_SECRET_KEY
-      ).toString(CryptoJS.enc.Utf8)
+      try {
+        const bytes = CryptoJS.AES.decrypt(localRememberMe, import.meta.env.VITE_APP_SECRET_KEY)
+        const decryptedData = bytes.toString(CryptoJS.enc.Utf8)
 
-      // console.log('decrypted: ', decrypted)
+        if (decryptedData) {
+          const rememberMeData = JSON.parse(decryptedData)
 
-      if (decrypted) {
-        try {
-          const rememberMeData = JSON.parse(decrypted)
-          // console.log('pass: ', rememberMeData.password)
-          const decryptedpassword = CryptoJS.AES.decrypt(
-            rememberMeData.password,
-            import.meta.env.VITE_APP_SECRET_KEY
-          ).toString(CryptoJS.enc.Utf8)
-          // console.log('decryptedpassword; ', decryptedpassword)
+          // Ambil langsung karena sekarang sudah jadi plain text setelah objek di-decrypt
+          const savedEmail = rememberMeData?.email || ''
+          const savedPassword = rememberMeData?.password || ''
 
-          setValue('email', rememberMeData?.email || '')
-          setValue('password', decryptedpassword || '')
+          console.log('Data dari Local:', rememberMeData)
+
+          setValue('email', savedEmail)
+          setValue('password', savedPassword)
           setValue('remember_me', true)
-        } catch (error) {
-          console.error('Failed to parse JSON:', error)
         }
+      } catch (error) {
+        console.error('Remember Me Decrypt Error:', error)
       }
-    } else {
-      setValue('remember_me', false)
     }
   }, [localRememberMe, setValue])
 
@@ -111,7 +105,7 @@ function Login() {
                   control={control}
                   value={email}
                   errors={errors?.email?.message}
-                  focusColor="#01172D"
+                  focusColor="#203cf5"
                   focusShadow="#E6EBF0"
                 />
               </div>
@@ -144,7 +138,7 @@ function Login() {
                       {show ? <Eye width={17} height={17} /> : <EyeOff width={17} height={17} />}
                     </span>
                   }
-                  focusColor="#01172D"
+                  focusColor="#203cf5"
                   focusShadow="#E6EBF0"
                 />
               </div>

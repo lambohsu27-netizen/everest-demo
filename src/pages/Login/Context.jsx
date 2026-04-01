@@ -66,7 +66,7 @@ function LoginProvider({ children }) {
           if (body?.remember_me === true) {
             const rememberMeData = {
               email: body.email,
-              password: encryptedPassword,
+              password: body.password,
             }
             localStorage.setItem(
               'rv5zzc9noTdU5AD2', // remember_me
@@ -80,15 +80,7 @@ function LoginProvider({ children }) {
           }
         })
         .catch((e) => {
-          if (e.code) {
-            setCurrentModal({
-              status: true,
-              current: 'alert-modal',
-              error: e,
-            })
-          } else {
-            myToaster(e)
-          }
+          myToaster(e)
         })
     },
     [setCookie]

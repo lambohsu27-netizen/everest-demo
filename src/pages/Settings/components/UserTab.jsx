@@ -145,7 +145,6 @@ export default function UserTab() {
           values={userTableValues}
           selectionMode="multiple"
           onSelectionChange={handleUserSelectionChange}
-          paginator
           loading={isLoadingUsers}
           onPageChange={handleUserPageChange}
           currentSortFieldFromParams={userSortField}
@@ -205,6 +204,33 @@ export default function UserTab() {
             )}
           />
         </MyDataTable>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            Page {userPagination.page} of {userPagination.total_pages}
+          </span>
+          <div className="flex gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={userPagination.page <= 1}
+              onClick={() => handleUserPageChange(userPagination.page - 1)}
+            >
+              Previous
+            </MyButton>
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={userPagination.page >= userPagination.total_pages}
+              onClick={() => handleUserPageChange(userPagination.page + 1)}
+            >
+              Next
+            </MyButton>
+          </div>
+        </div>
       </div>
 
       {userPanel === 'detail' && <UserDetail />}

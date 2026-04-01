@@ -1,5 +1,5 @@
 import { MyHorizontalTabV2 } from '@interstellar-component'
-import { useSettings } from '../Context'
+import { useSettings } from '../../Context'
 import LevelTab from './LevelTab'
 import PositionTab from './PositionTab'
 

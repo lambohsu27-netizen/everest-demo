@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Copy01, Mail01, Phone, RefreshCw04, XClose } from '@untitled-ui/icons-react'
 import { MyButton, MyTextField, MyAutocomplete, MyAvatar, myToaster } from '@interstellar-component'
 import { encryptPassword } from '@src/services/Helper'
-import { useSettings } from '../Context'
+import { useSettings } from '../../../Context'
 
 function generateRandomPassword(length = 16) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*'

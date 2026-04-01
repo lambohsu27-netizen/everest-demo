@@ -8,7 +8,7 @@ import {
   UploadCloud01,
 } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton } from '@interstellar-component'
-import { useSettings } from '../Context'
+import { useSettings } from '../../Context'
 
 export default function LevelTab() {
   const {

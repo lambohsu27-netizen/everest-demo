@@ -17,7 +17,7 @@ import {
 } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../Context'
+import { useSettings } from '../../../Context'
 import UserDetail from './UserDetail'
 import UserForm from './UserForm'
 import MyUserStatusChip from './MyUserStatusChip'

@@ -276,6 +276,7 @@ function SettingsProvider({ children }) {
   const [selectedUserIds, setSelectedUserIds] = useState([])
   const [userSortField, setUserSortField] = useState(null)
   const [userSortOrder, setUserSortOrder] = useState(null)
+  const [userStatusFilter, setUserStatusFilter] = useState('all')
 
   // Panel state: null | 'detail' | 'create' | 'edit'
   const [userPanel, setUserPanel] = useState(null)
@@ -287,7 +288,13 @@ function SettingsProvider({ children }) {
     const limit = 10
     setIsLoadingUsers(true)
     try {
-      const res = await SettingsService.getUsers({ page, limit, ...(search ? { search } : {}) })
+      const params = {
+        page,
+        limit,
+        ...(search ? { search } : {}),
+        ...(userStatusFilter !== 'all' ? { status: userStatusFilter } : {}),
+      }
+      const res = await SettingsService.getUsers(params)
       setUsers(res.data)
       setUserPagination(normalizeListPagination(res, limit))
     } catch (err) {
@@ -295,7 +302,7 @@ function SettingsProvider({ children }) {
     } finally {
       setIsLoadingUsers(false)
     }
-  }, [])
+  }, [userStatusFilter])
 
   const fetchUserDetail = useCallback(async (id) => {
     setIsLoadingUserDetail(true)
@@ -495,6 +502,8 @@ function SettingsProvider({ children }) {
       selectedUserIds,
       userSortField,
       userSortOrder,
+      userStatusFilter,
+      setUserStatusFilter,
       handleUserSort,
       handleUserSelectionChange,
       userPanel,
@@ -565,6 +574,7 @@ function SettingsProvider({ children }) {
       selectedUserIds,
       userSortField,
       userSortOrder,
+      userStatusFilter,
       handleUserSort,
       handleUserSelectionChange,
       userPanel,

@@ -8,7 +8,13 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
+import {
+  MyDataTable,
+  MyColumn,
+  MyButton,
+  MyConfirmModal,
+  MyHorizontalTabV2,
+} from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import { useSettings } from '../Context'
@@ -21,15 +27,22 @@ export default function UserTab() {
   const {
     users,
     userPagination,
-    userPage, setUserPage,
-    userSearchTerm, setUserSearchTerm,
+    userPage,
+    setUserPage,
+    userSearchTerm,
+    setUserSearchTerm,
     isLoadingUsers,
     selectedUserIds,
-    userSortField, userSortOrder,
-    handleUserSort, handleUserSelectionChange,
+    userSortField,
+    userSortOrder,
+    userStatusFilter,
+    setUserStatusFilter,
+    handleUserSort,
+    handleUserSelectionChange,
     userPanel,
     fetchUsers,
-    openUserDetail, openCreateUser,
+    openUserDetail,
+    openCreateUser,
     deleteUsers,
   } = useSettings()
 
@@ -52,7 +65,13 @@ export default function UserTab() {
       fetchUsers(1, userSearchTerm)
     }, 400)
     return () => clearTimeout(timer)
-  }, [userSearchTerm, fetchUsers])
+  }, [userSearchTerm, fetchUsers, setUserPage])
+
+  // Handle status filter change
+  useEffect(() => {
+    setUserPage(1)
+    fetchUsers(1, userSearchTerm)
+  }, [userStatusFilter, fetchUsers, setUserPage, userSearchTerm])
 
   const canAddUser = hasPermission(Access.USER_MANAGEMENT, 'add_new')
   const canDeleteUser = hasPermission(Access.USER_MANAGEMENT, 'delete')
@@ -141,14 +160,24 @@ export default function UserTab() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Filters
             </MyButton>
-            <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields
             </MyButton>
+            <MyHorizontalTabV2
+              value={userStatusFilter}
+              onChange={setUserStatusFilter}
+              fitContent
+              tabs={[
+                { value: 'all', label: 'All' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
           </div>
         </div>
 
@@ -169,14 +198,22 @@ export default function UserTab() {
             body={(row) => (
               <div className="flex items-center gap-3 py-1 whitespace-nowrap">
                 {row.avatar_url ? (
-                  <img src={row.avatar_url} alt={row.name} className="w-10 h-10 rounded-full object-cover" />
+                  <img
+                    src={row.avatar_url}
+                    alt={row.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
                     {row.name?.charAt(0)?.toUpperCase()}
                   </div>
                 )}
                 <div className="flex flex-col gap-0.5">
-                  <span className={`text-sm font-medium ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}>{row.name}</span>
+                  <span
+                    className={`text-sm font-medium ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}
+                  >
+                    {row.name}
+                  </span>
                   <span className="text-sm text-gray-500">{row.role?.name}</span>
                 </div>
               </div>
@@ -205,7 +242,10 @@ export default function UserTab() {
             field="company"
             body={(row) => (
               <span className="text-sm text-gray-600">
-                {row.user_companies?.map((c) => c.name ?? c.company?.name).filter(Boolean).join(', ') || '-'}
+                {row.user_companies
+                  ?.map((c) => c.name ?? c.company?.name)
+                  .filter(Boolean)
+                  .join(', ') || '-'}
               </span>
             )}
           />

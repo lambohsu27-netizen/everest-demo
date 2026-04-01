@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   SearchMd,
   FilterLines,
@@ -9,8 +10,13 @@ import {
 } from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyButton } from '@interstellar-component'
 import { useSettings } from '../../Context'
+import NewPositionSlider from './NewPositionSlider'
+import PositionDetailsSlider from './PositionDetailsSlider'
 
 export default function PositionTab() {
+  const [positionSliderMode, setPositionSliderMode] = useState(null)
+  const [selectedPosition, setSelectedPosition] = useState(null)
+
   const {
     positions,
     posSearchTerm,
@@ -55,7 +61,7 @@ export default function PositionTab() {
             <UploadCloud01 className="h-5 w-5" />
             <p className="text-sm-semibold">Import</p>
           </MyButton>
-          <MyButton color="primary" size="md" variant="filled">
+          <MyButton color="primary" size="md" variant="filled" onClick={() => setPositionSliderMode('create')}>
             <Plus className="w-5 h-5 text-white" stroke="currentColor" />
             <p className="text-sm-semibold">New position</p>
           </MyButton>
@@ -101,14 +107,38 @@ export default function PositionTab() {
           field="name"
           onSort={handlePosSort}
           body={(row) => (
-            <span
-              className={`text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}
+            <div
+              role="button"
+              tabIndex={0}
+              className={`cursor-pointer text-sm font-medium py-1 ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'}`}
+              onClick={() => setSelectedPosition(row)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setSelectedPosition(row)
+                }
+              }}
             >
               {row.name}
-            </span>
+            </div>
           )}
         />
       </MyDataTable>
+
+      <NewPositionSlider
+        open={!!positionSliderMode}
+        mode={positionSliderMode}
+        initialData={positionSliderMode === 'edit' ? selectedPosition : null}
+        onClose={() => {
+          setPositionSliderMode(null)
+        }}
+      />
+      <PositionDetailsSlider
+        open={!!selectedPosition && !positionSliderMode}
+        data={selectedPosition}
+        onClose={() => setSelectedPosition(null)}
+        onEdit={() => setPositionSliderMode('edit')}
+      />
     </div>
   )
 }

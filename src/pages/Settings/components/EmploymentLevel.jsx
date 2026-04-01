@@ -1,4 +1,12 @@
-import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
+import {
+  SearchMd,
+  FilterLines,
+  Trash01,
+  Plus,
+  EyeOff,
+  DownloadCloud01,
+  UploadCloud01,
+} from '@untitled-ui/icons-react'
 import { MyDataTable, MyColumn, MyHorizontalTabV2, MyButton } from '@interstellar-component'
 import { useSettings } from '../Context'
 
@@ -80,11 +88,19 @@ export default function EmploymentLevel() {
             <div className="flex flex-wrap gap-3">
               <MyButton color="error" size="md" variant="outlined">
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
-                Delete
+                <p className="text-sm-semibold">Delete</p>
+              </MyButton>
+              <MyButton color="primary" size="md" variant="outlined">
+                <DownloadCloud01 className="h-5 w-5" />
+                <p className="text-sm-semibold">Download</p>
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined">
+                <UploadCloud01 className="h-5 w-5" />
+                <p className="text-sm-semibold">Import</p>
               </MyButton>
               <MyButton color="primary" size="md" variant="filled">
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />
-                New area
+                <p className="text-sm-semibold">New area</p>
               </MyButton>
             </div>
           </div>
@@ -104,11 +120,11 @@ export default function EmploymentLevel() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
                 <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Filters
               </MyButton>
-              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
                 <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Hide fields
               </MyButton>
@@ -170,11 +186,19 @@ export default function EmploymentLevel() {
             <div className="flex flex-wrap gap-3">
               <MyButton color="error" size="md" variant="outlined">
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
-                Delete
+                <p className="text-sm-semibold">Delete</p>
+              </MyButton>
+              <MyButton color="primary" size="md" variant="outlined">
+                <DownloadCloud01 className="h-5 w-5" />
+                <p className="text-sm-semibold">Download</p>
+              </MyButton>
+              <MyButton color="secondary" size="md" variant="outlined">
+                <UploadCloud01 className="h-5 w-5" />
+                <p className="text-sm-semibold">Import</p>
               </MyButton>
               <MyButton color="primary" size="md" variant="filled">
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />
-                New position
+                <p className="text-sm-semibold">New position</p>
               </MyButton>
             </div>
           </div>
@@ -194,11 +218,11 @@ export default function EmploymentLevel() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
                 <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Filters
               </MyButton>
-              <MyButton color="secondary" size="md" variant="outlined" customClassname="text-gray-700">
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
                 <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
                 Hide fields
               </MyButton>

@@ -11,6 +11,7 @@ import {
 import { MyDataTable, MyColumn, MyButton } from '@interstellar-component'
 import { useSettings } from '../../Context'
 import NewLevelSlider from './NewLevelSlider'
+import LevelDetailsSlider from './LevelDetailsSlider'
 
 export default function LevelTab() {
   const {
@@ -24,6 +25,7 @@ export default function LevelTab() {
   } = useSettings()
 
   const [isLevelSliderOpen, setIsLevelSliderOpen] = useState(false)
+  const [selectedLevel, setSelectedLevel] = useState(null)
 
   const levelTableValues = {
     data: employmentLevels,
@@ -105,6 +107,7 @@ export default function LevelTab() {
           paginator
           currentSortFieldFromParams={empSortField}
           currentSortOrderFromParams={empSortOrder}
+          onClick={(row) => setSelectedLevel(row)}
         >
           <MyColumn
             header="Level"
@@ -140,6 +143,7 @@ export default function LevelTab() {
       </div>
 
       <NewLevelSlider open={isLevelSliderOpen} onClose={() => setIsLevelSliderOpen(false)} />
+      <LevelDetailsSlider open={!!selectedLevel} data={selectedLevel} onClose={() => setSelectedLevel(null)} />
     </>
   )
 }

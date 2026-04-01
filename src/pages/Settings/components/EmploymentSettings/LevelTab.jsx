@@ -24,7 +24,7 @@ export default function LevelTab() {
     handleEmpSelectionChange,
   } = useSettings()
 
-  const [isLevelSliderOpen, setIsLevelSliderOpen] = useState(false)
+  const [levelSliderMode, setLevelSliderMode] = useState(null)
   const [selectedLevel, setSelectedLevel] = useState(null)
 
   const levelTableValues = {
@@ -66,7 +66,7 @@ export default function LevelTab() {
               color="primary"
               size="md"
               variant="filled"
-              onClick={() => setIsLevelSliderOpen(true)}
+              onClick={() => setLevelSliderMode('create')}
             >
               <Plus className="w-5 h-5 text-white" stroke="currentColor" />
               <p className="text-sm-semibold">New Employment Level</p>
@@ -142,8 +142,18 @@ export default function LevelTab() {
         </MyDataTable>
       </div>
 
-      <NewLevelSlider open={isLevelSliderOpen} onClose={() => setIsLevelSliderOpen(false)} />
-      <LevelDetailsSlider open={!!selectedLevel} data={selectedLevel} onClose={() => setSelectedLevel(null)} />
+      <NewLevelSlider 
+        open={!!levelSliderMode} 
+        mode={levelSliderMode} 
+        initialData={selectedLevel} 
+        onClose={() => setLevelSliderMode(null)} 
+      />
+      <LevelDetailsSlider 
+        open={!!selectedLevel && levelSliderMode === null} 
+        data={selectedLevel} 
+        onClose={() => setSelectedLevel(null)} 
+        onEdit={() => setLevelSliderMode('edit')}
+      />
     </>
   )
 }

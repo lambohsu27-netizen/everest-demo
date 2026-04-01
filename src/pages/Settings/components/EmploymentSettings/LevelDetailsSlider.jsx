@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Edit05, Trash01, XClose } from '@untitled-ui/icons-react'
 import { MyButton, MyConfirmModal } from '@interstellar-component'
 
-export default function LevelDetailsSlider({ open, data, onClose }) {
+export default function LevelDetailsSlider({ open, data, onClose, onEdit }) {
   const [isVisible, setIsVisible] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
@@ -206,7 +206,7 @@ export default function LevelDetailsSlider({ open, data, onClose }) {
                 <Trash01 className="h-4 w-4 mr-1.5" stroke="currentColor" />
                 Delete
               </MyButton>
-              <MyButton color="secondary" size="md" variant="outlined">
+              <MyButton color="secondary" size="md" variant="outlined" onClick={onEdit}>
                 <Edit05 className="h-4 w-4 mr-1.5" stroke="currentColor" />
                 Edit
               </MyButton>

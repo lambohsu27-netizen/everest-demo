@@ -70,7 +70,7 @@ function SelectField({
   )
 }
 
-export default function NewLevelSlider({ open, onClose }) {
+export default function NewLevelSlider({ open, mode = 'create', initialData, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
 
   const {
@@ -91,12 +91,41 @@ export default function NewLevelSlider({ open, onClose }) {
 
   useEffect(() => {
     if (open) {
+      if (mode === 'edit' && initialData) {
+        const salaryParts = initialData.salaryRange ? initialData.salaryRange.split(' - ') : ['', '']
+        
+        let repeatVal = null
+        if (initialData.repeatEvery) {
+          const lower = initialData.repeatEvery.toLowerCase()
+          if (lower.includes('month') && !lower.includes('3') && !lower.includes('6')) repeatVal = REPEAT_EVERY_OPTIONS[0]
+          else if (lower.includes('2 month')) repeatVal = REPEAT_EVERY_OPTIONS[1]
+          else if (lower.includes('3 month')) repeatVal = REPEAT_EVERY_OPTIONS[2]
+          else if (lower.includes('6 month')) repeatVal = REPEAT_EVERY_OPTIONS[3]
+          else if (lower.includes('year') || lower.includes('annual')) repeatVal = REPEAT_EVERY_OPTIONS[4]
+        }
+
+        reset({
+          levelName: initialData.level || '',
+          salaryFrom: salaryParts[0] || '',
+          salaryTo: salaryParts[1] || '',
+          consentExpiry: new Date(), // Mock date since dummy data is '5 years'
+          repeatEvery: repeatVal,
+        })
+      } else {
+        reset({
+          levelName: '',
+          salaryFrom: '',
+          salaryTo: '',
+          consentExpiry: null,
+          repeatEvery: null,
+        })
+      }
       const frame = requestAnimationFrame(() => setIsVisible(true))
       return () => cancelAnimationFrame(frame)
     }
     setIsVisible(false)
     return undefined
-  }, [open])
+  }, [open, mode, initialData, reset])
 
   const animateClose = () => {
     setIsVisible(false)
@@ -139,9 +168,13 @@ export default function NewLevelSlider({ open, onClose }) {
             </button>
 
             <div className="flex flex-1 flex-col gap-1 pt-1">
-              <p className="text-lg font-semibold text-gray-900">New Employment Level</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {mode === 'edit' ? 'Edit Employment Level' : 'New Employment Level'}
+              </p>
               <p className="text-sm text-gray-500 font-medium leading-relaxed pr-6">
-                Define an employment level and its associated screening rules.
+                {mode === 'edit'
+                  ? 'Update the employment level and its associated screening rules.'
+                  : 'Define an employment level and its associated screening rules.'}
               </p>
             </div>
           </header>

@@ -38,6 +38,10 @@ export default function LevelDetailsSlider({ open, data, onClose, onEdit }) {
         bgColor="bg-error-100"
         onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
+        negativeActionWord="Cancel"
+        positiveActionWord="Delete"
+        positiveButtonColor="error"
+        forceBlur
       />
 
       {/* Backdrop */}

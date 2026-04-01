@@ -14,6 +14,7 @@ import { Access } from '@src/services/Helper'
 import { useSettings } from '../Context'
 import UserDetail from './UserDetail'
 import UserForm from './UserForm'
+import MyUserStatusChip from './MyUserStatusChip'
 
 export default function UserTab() {
   const { hasPermission } = useApp()
@@ -185,12 +186,7 @@ export default function UserTab() {
             header="Status"
             field="is_active"
             onSort={handleUserSort}
-            body={(row) => (
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${row.is_active ? 'bg-success/50 text-success/700 border border-success/200' : 'bg-gray-100 text-gray-700 border border-gray-200'}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${row.is_active ? 'bg-success/500' : 'bg-gray-500'}`} />
-                {row.is_active ? 'Active' : 'Inactive'}
-              </span>
-            )}
+            body={(row) => <MyUserStatusChip status={row.is_active} />}
           />
           <MyColumn
             header="Email"

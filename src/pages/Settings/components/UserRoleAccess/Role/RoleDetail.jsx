@@ -3,7 +3,7 @@ import { Edit01, Trash01, XClose } from '@untitled-ui/icons-react'
 import { MyButton, MyConfirmModal } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../Context'
+import { useSettings } from '../../../Context'
 
 function formatDate(dateString) {
   if (!dateString) return ''

@@ -13,7 +13,9 @@ export default function SettingsHeader() {
     <div className="flex flex-col mt-4">
       <div className="flex flex-col gap-1 pb-5">
         <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Settings</h1>
-        <p className="text-[16px] text-gray-500">Lorem ipsum</p>
+        <p className="text-[16px] text-gray-500">
+          Centralized control to manage system configurations
+        </p>
       </div>
 
       <div className="flex items-center gap-2">

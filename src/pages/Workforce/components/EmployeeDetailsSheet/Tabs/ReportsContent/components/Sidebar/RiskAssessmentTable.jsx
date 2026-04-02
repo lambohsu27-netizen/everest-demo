@@ -1,5 +1,5 @@
 import React from 'react'
-import { MyChip, MyDoubleCard } from '@interstellar-component'
+import { MyChip, MyDoubleCard, MyTooltip } from '@interstellar-component'
 import { HelpCircle } from '@untitled-ui/icons-react'
 import { useEmployeeDetailsSheet } from '../../../../Context'
 
@@ -19,7 +19,18 @@ export default function RiskAssessmentTable({ data }) {
           >
             <div className="flex items-center gap-1.5 text-md-regular text-gray-700">
               {item.label}
-              <HelpCircle className="h-4 w-4 text-gray-400" />
+              {item.tooltip && (
+                <MyTooltip
+                  target={
+                    <span>
+                      <HelpCircle className="h-4 w-4 text-gray-400 cursor-pointer" />
+                    </span>
+                  }
+                  placement="top"
+                >
+                  <div className="max-w-[180px] text-xs-medium text-white">{item.tooltip}</div>
+                </MyTooltip>
+              )}
             </div>
             <div className="flex items-center">
               {item.value && <span className="text-md-semibold text-gray-900">{item.value}</span>}

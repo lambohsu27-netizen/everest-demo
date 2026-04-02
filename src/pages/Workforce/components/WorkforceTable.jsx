@@ -8,7 +8,7 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
+import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
 function WorkforceTable() {
@@ -24,17 +24,18 @@ function WorkforceTable() {
     selectedCategory,
     setSelectedCategory,
     handleCurrentSlider,
+    pagination,
+    setPage,
   } = useWorkforce()
 
   const values = {
     data: workforce || [],
     meta: {
-      current_page: 1,
-      next_page: 2,
-      per_page: 10,
-      total: workforce?.length || 0,
+      current_page: pagination.page,
+      per_page: pagination.limit,
+      total: pagination.total,
     },
-    checkedAll: workforce?.every((d) => d.checked),
+    checkedAll: workforce?.length > 0 && workforce?.every((d) => d.checked),
   }
 
   return (
@@ -46,7 +47,7 @@ function WorkforceTable() {
             <div className="flex items-center gap-3">
               <h3 className="text-[18px] font-semibold text-gray-900">Employee List</h3>
               <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
-                1,480 item
+                {pagination.total} item
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -102,29 +103,20 @@ function WorkforceTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <MyButton
-                color="secondary"
-                variant="outlined"
-                size="md"
-              >
-                <FilterLines className="h-4 w-4" />
-                <p className="text-sm-semibold">Filters</p>
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
+                <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
+                Filters
               </MyButton>
-              <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-                {['All category', 'Employee', 'Candidate'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`rounded-md px-3 py-1.5 text-sm font-medium shadow-none transition-colors ${
-                      selectedCategory === cat
-                        ? 'bg-gray-50 text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <MyHorizontalTabV2
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                fitContent
+                tabs={[
+                  { label: 'All category', value: 'All category' },
+                  { label: 'Employee', value: 'Employee' },
+                  { label: 'Candidate', value: 'Candidate' },
+                ]}
+              />
             </div>
           </div>
         </div>
@@ -133,7 +125,6 @@ function WorkforceTable() {
           values={values}
           selectionMode="multiple"
           onSelectionChange={handleSelectionChange}
-          paginator
           currentSortFieldFromParams={sortField}
           currentSortOrderFromParams={sortOrder}
           onClick={(row) => navigate(`/workforce/employee/${row.id}`)}
@@ -195,6 +186,33 @@ function WorkforceTable() {
             body={(row) => <span className="text-sm text-gray-600">{row.consentExpiry}</span>}
           />
         </MyDataTable>
+
+        {/* Custom Pagination Footer */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            Page {pagination.page} of {pagination.total_pages}
+          </span>
+          <div className="flex gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={pagination.page <= 1}
+              onClick={() => setPage(pagination.page - 1)}
+            >
+              Previous
+            </MyButton>
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={pagination.page >= pagination.total_pages}
+              onClick={() => setPage(pagination.page + 1)}
+            >
+              Next
+            </MyButton>
+          </div>
+        </div>
       </div>
     </div>
   )

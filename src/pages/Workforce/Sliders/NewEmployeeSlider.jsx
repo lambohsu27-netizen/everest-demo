@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import SimpleBar from 'simplebar-react'
 // UI Icons
-import { XClose, UserPlus01, User01, Mail01 } from '@untitled-ui/icons-react'
+import { XClose, User01, Mail01 } from '@untitled-ui/icons-react'
 // Shared Components
 import { MyButton, MyTextField, MyAutocomplete, MyDoubleCard, MyHorizontalTabV2, WhatsApp } from '@interstellar-component'
 // Context
@@ -118,11 +118,6 @@ function NewEmployeeSlider() {
         >
           <XClose size={24} stroke="currentColor" />
         </button>
-
-        {/* Icon badge */}
-        <div className="z-0 rounded-lg border border-gray/300 bg-white p-2.5 shadow-shadows/shadow-xs-skeuomorphic shrink-0">
-          <UserPlus01 className="size-5 text-gray/700" />
-        </div>
 
         {/* Title + subtitle */}
         <div className="flex flex-1 flex-col gap-1 pt-1">

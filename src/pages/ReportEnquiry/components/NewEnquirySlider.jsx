@@ -13,7 +13,6 @@ import {
   Calendar,
   RefreshCcw05,
   Edit01,
-  Plus,
 } from '@untitled-ui/icons-react'
 // Shared Components
 import {
@@ -384,15 +383,6 @@ function NewEnquirySlider() {
                   {/* Edit action for employee */}
                   {category === 'Employee' && (
                     <div className="flex flex-col gap-2">
-                      <MyButton
-                        variant="text"
-                        color="primary"
-                        size="sm"
-                        customClassname="gap-2 w-max px-0 font-semibold"
-                      >
-                        <Plus className="size-4" />
-                        Add new employee
-                      </MyButton>
                       <button
                         type="button"
                         className="flex items-center gap-2 text-sm font-semibold text-brand/700 hover:text-brand/800 w-max"
@@ -401,7 +391,7 @@ function NewEnquirySlider() {
                         Edit employee details
                       </button>
                     </div>
-                   )}
+                  )}
                 </div>
               </MyDoubleCard>
 

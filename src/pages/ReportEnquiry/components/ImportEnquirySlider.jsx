@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import SimpleBar from 'simplebar-react'
 // UI Icons
-import { XClose, UploadCloud01, DownloadCloud01 } from '@untitled-ui/icons-react'
+import { XClose, DownloadCloud01 } from '@untitled-ui/icons-react'
 // Shared Components
 import { MyButton, MyDropzone } from '@interstellar-component'
 // Context
@@ -54,10 +54,7 @@ function ImportEnquirySlider() {
           <XClose size={24} stroke="currentColor" />
         </button>
 
-        {/* Icon badge */}
-        <div className="z-0 rounded-lg border border-gray-300 bg-white p-2.5 shadow-sm shrink-0">
-          <UploadCloud01 className="size-5 text-gray-700" />
-        </div>
+
 
         {/* Title + subtitle */}
         <div className="flex flex-1 flex-col gap-1 pt-1">

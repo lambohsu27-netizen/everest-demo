@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 const WorkforceContext = createContext()
 
@@ -216,6 +216,7 @@ function WorkforceProvider({ children }) {
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('All category')
+  const [page, setPage] = useState(1)
   const [sliderStack, setSliderStack] = useState([])
   const [activeAccountId, setActiveAccountId] = useState(null)
 
@@ -255,6 +256,15 @@ function WorkforceProvider({ children }) {
       setActiveAccountId(null)
     }
   }, [])
+
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage)
+  }, [])
+
+  // Reset page to 1 when search or category changes
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, selectedCategory])
 
   const currentSlider = useMemo(
     () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
@@ -300,20 +310,39 @@ function WorkforceProvider({ children }) {
       result = result.filter((w) => w.category === selectedCategory)
     }
     if (searchTerm) {
+      const lowerSearch = searchTerm.toLowerCase()
       result = result.filter(
         (w) =>
-          w.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          w.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
+          w.name.toLowerCase().includes(lowerSearch) ||
+          w.employeeId.toLowerCase().includes(lowerSearch)
       )
     }
     return result
   }, [workforce, selectedCategory, searchTerm])
 
+  const limit = 10
+  const paginatedWorkforce = useMemo(() => {
+    const start = (page - 1) * limit
+    return filteredWorkforce.slice(start, start + limit)
+  }, [filteredWorkforce, page])
+
+  const pagination = useMemo(
+    () => ({
+      page,
+      limit,
+      total: filteredWorkforce.length,
+      total_pages: Math.ceil(filteredWorkforce.length / limit),
+    }),
+    [filteredWorkforce.length, page]
+  )
+
   const contextValue = useMemo(
     () => ({
       searchTerm,
       setSearchTerm,
-      workforce: filteredWorkforce,
+      workforce: paginatedWorkforce,
+      pagination,
+      setPage: handlePageChange,
       handleSort,
       handleSelectionChange,
       sortField,
@@ -333,7 +362,9 @@ function WorkforceProvider({ children }) {
     }),
     [
       searchTerm,
-      filteredWorkforce,
+      paginatedWorkforce,
+      pagination,
+      handlePageChange,
       handleSort,
       handleSelectionChange,
       sortField,

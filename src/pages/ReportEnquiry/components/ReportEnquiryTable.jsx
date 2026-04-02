@@ -1,9 +1,8 @@
 import React from 'react'
 import { SearchMd, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyButton } from '@interstellar-component'
+import { MyColumn, MyDataTable, MyButton, MyHorizontalTabV2 } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
 import MySLAStatusChip from './MySLAStatusChip'
-
 
 function ReportEnquiryTable() {
   const {
@@ -15,17 +14,20 @@ function ReportEnquiryTable() {
     handleSort,
     handleSelectionChange,
     handleCurrentSlider,
+    pagination,
+    setPage,
+    enquiryCategory,
+    setEnquiryCategory,
   } = useReportEnquiry()
 
   const values = {
     data: enquiries || [],
     meta: {
-      current_page: 1,
-      next_page: 2,
-      per_page: 10,
-      total: enquiries?.length || 0,
+      current_page: pagination.page,
+      per_page: pagination.limit,
+      total: pagination.total,
     },
-    checkedAll: enquiries?.every((d) => d.checked),
+    checkedAll: enquiries?.length > 0 && enquiries?.every((d) => d.checked),
   }
 
   return (
@@ -37,7 +39,7 @@ function ReportEnquiryTable() {
             <div className="flex items-center gap-3">
               <h3 className="text-[18px] font-semibold text-gray-900">List of Enquiry</h3>
               <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
-                1,480 item
+                {pagination.total} item
               </span>
             </div>
             <div className="flex gap-3">
@@ -49,7 +51,7 @@ function ReportEnquiryTable() {
                 onClick={() => handleCurrentSlider({ current: 'import-enquiry' })}
               >
                 <PackagePlus />
-                Bulk enquiry
+                <p className="text-sm-semibold">Bulk enquiry</p>
               </MyButton>
               <MyButton
                 color="primary"
@@ -73,7 +75,7 @@ function ReportEnquiryTable() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                New enquiry
+                <p className="text-sm-semibold">New enquiry</p>
               </MyButton>
             </div>
           </div>
@@ -93,41 +95,21 @@ function ReportEnquiryTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <MyButton
-                color="secondary"
-                variant="outlined"
-                size="md"
-                customClassname="gap-2"
-              >
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
                 <FilterLines className="h-4 w-4 text-gray-500" />
                 Filters
               </MyButton>
-              <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-                <MyButton
-                  variant="filledTonal"
-                  color="secondary"
-                  size="sm"
-                  rounded="md"
-                >
-                  All type
-                </MyButton>
-                <MyButton
-                  variant="text"
-                  color="secondary"
-                  size="sm"
-                  rounded="md"
-                >
-                  Employee
-                </MyButton>
-                <MyButton
-                  variant="text"
-                  color="secondary"
-                  size="sm"
-                  rounded="md"
-                >
-                  Candidate
-                </MyButton>
-              </div>
+
+              <MyHorizontalTabV2
+                value={enquiryCategory}
+                onChange={setEnquiryCategory}
+                fitContent
+                tabs={[
+                  { label: 'All type', value: 'all' },
+                  { label: 'Employee', value: 'employee' },
+                  { label: 'Candidate', value: 'candidate' },
+                ]}
+              />
             </div>
           </div>
         </div>
@@ -136,7 +118,6 @@ function ReportEnquiryTable() {
           values={values}
           selectionMode="multiple"
           onSelectionChange={handleSelectionChange}
-          paginator
           currentSortFieldFromParams={sortField}
           currentSortOrderFromParams={sortOrder}
           onClick={(row) => {
@@ -188,6 +169,33 @@ function ReportEnquiryTable() {
             body={(row) => <MySLAStatusChip status={row.slaStatus} />}
           />
         </MyDataTable>
+
+        {/* Custom Pagination Footer */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            Page {pagination.page} of {pagination.total_pages}
+          </span>
+          <div className="flex gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={pagination.page <= 1}
+              onClick={() => setPage(pagination.page - 1)}
+            >
+              Previous
+            </MyButton>
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="sm"
+              disabled={pagination.page >= pagination.total_pages}
+              onClick={() => setPage(pagination.page + 1)}
+            >
+              Next
+            </MyButton>
+          </div>
+        </div>
       </div>
     </div>
   )

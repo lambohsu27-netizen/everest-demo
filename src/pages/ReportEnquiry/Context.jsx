@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 const ReportEnquiryContext = createContext()
 
@@ -114,6 +114,8 @@ function ReportEnquiryProvider({ children }) {
   const [enquiries, setEnquiries] = useState(INITIAL_ENQUIRIES)
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
+  const [enquiryCategory, setEnquiryCategory] = useState('all')
+  const [page, setPage] = useState(1)
   const [sliderStack, setSliderStack] = useState([])
 
   const pushSlider = useCallback((slider) => {
@@ -135,6 +137,15 @@ function ReportEnquiryProvider({ children }) {
       setSliderStack([value])
     }
   }, [])
+
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage)
+  }, [])
+
+  // Reset page to 1 when search or filtered category changes
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, enquiryCategory])
 
   const currentSlider = useMemo(
     () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
@@ -178,13 +189,51 @@ function ReportEnquiryProvider({ children }) {
     setEnquiries(updated.data)
   }, [])
 
+  const filteredEnquiries = useMemo(() => {
+    let result = enquiries
+    if (enquiryCategory !== 'all') {
+      result = result.filter((e) => e.category.toLowerCase() === enquiryCategory)
+    }
+    if (searchTerm) {
+      const lowerSearch = searchTerm.toLowerCase()
+      result = result.filter(
+        (e) =>
+          e.name.toLowerCase().includes(lowerSearch) ||
+          e.order.toLowerCase().includes(lowerSearch) ||
+          e.employeeId.toLowerCase().includes(lowerSearch)
+      )
+    }
+    // Note: If you want to filter by active metric, add that logic here
+    return result
+  }, [enquiries, searchTerm, enquiryCategory])
+
+  const limit = 10
+  const paginatedEnquiries = useMemo(() => {
+    const start = (page - 1) * limit
+    return filteredEnquiries.slice(start, start + limit)
+  }, [filteredEnquiries, page])
+
+  const pagination = useMemo(
+    () => ({
+      page,
+      limit,
+      total: filteredEnquiries.length,
+      total_pages: Math.ceil(filteredEnquiries.length / limit),
+    }),
+    [filteredEnquiries.length, page]
+  )
+
   const contextValue = useMemo(
     () => ({
       searchTerm,
       setSearchTerm,
       metrics,
       handleMetricClick,
-      enquiries,
+      enquiryCategory,
+      setEnquiryCategory,
+      enquiries: paginatedEnquiries,
+      pagination,
+      setPage: handlePageChange,
       handleSort,
       handleSelectionChange,
       sortField,
@@ -199,7 +248,11 @@ function ReportEnquiryProvider({ children }) {
       searchTerm,
       metrics,
       handleMetricClick,
-      enquiries,
+      enquiryCategory,
+      setEnquiryCategory,
+      paginatedEnquiries,
+      pagination,
+      handlePageChange,
       handleSort,
       handleSelectionChange,
       sortField,

@@ -8,7 +8,7 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip } from '@interstellar-component'
+import { MyButton, MyColumn, MyDataTable, MyConsentStatusChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
 function WorkforceTable() {
@@ -103,29 +103,20 @@ function WorkforceTable() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <MyButton
-                color="secondary"
-                variant="outlined"
-                size="md"
-              >
-                <FilterLines className="h-4 w-4" />
-                <p className="text-sm-semibold">Filters</p>
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
+                <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
+                Filters
               </MyButton>
-              <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-                {['All category', 'Employee', 'Candidate'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`rounded-md px-3 py-1.5 text-sm font-medium shadow-none transition-colors ${
-                      selectedCategory === cat
-                        ? 'bg-gray-50 text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <MyHorizontalTabV2
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                fitContent
+                tabs={[
+                  { label: 'All category', value: 'All category' },
+                  { label: 'Employee', value: 'Employee' },
+                  { label: 'Candidate', value: 'Candidate' },
+                ]}
+              />
             </div>
           </div>
         </div>

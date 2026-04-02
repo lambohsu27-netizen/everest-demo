@@ -1,4 +1,4 @@
-import { MyButton, MyButtonGroup, MyChip, MyContextMenu, MyPopper } from '@interstellar-component'
+import { MyButton, MyChip, MyContextMenu, MyPopper, MyHorizontalTabV2 } from '@interstellar-component'
 import { useState } from 'react'
 import {
   Calendar,
@@ -17,7 +17,10 @@ export default function ProfileHeader({ employee }) {
   const { currentTabs, setCurrentTabs } = useEmployeeDetailsSheet()
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false)
 
-  const tabs = ['Report', 'Personal information']
+  const tabs = [
+    { label: 'Report', value: 'report' },
+    { label: 'Personal information', value: 'personal_information' },
+  ]
 
   return (
     <div className="flex flex-col gap-6 pb-8 border-b border-gray-200 bg-white">
@@ -111,14 +114,15 @@ export default function ProfileHeader({ employee }) {
 
       {/* Tabs & Filters Section */}
       <div className="flex items-center justify-between gap-4 mt-2">
-        <MyButtonGroup
-          buttons={tabs}
-          value={currentTabs.type === 'report' ? 'Report' : 'Personal information'}
+        <MyHorizontalTabV2
+          tabs={tabs}
+          value={currentTabs.type}
           onChange={(val) =>
             setCurrentTabs({
-              type: val === 'Report' ? 'report' : 'personal_information',
+              type: val,
             })
           }
+          fitContent
         />
 
         <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 const CompanyContext = createContext()
 
@@ -43,12 +43,13 @@ function CompanyProvider({ children }) {
   const [sortField, setSortField] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
   const [selectedStatus, setSelectedStatus] = useState('All status')
+  const [page, setPage] = useState(1)
   const [currentSlider, setCurrentSlider] = useState({
     status: false,
     current: null,
   })
 
-  const handleCurrentSlider = (slider, id) => {
+  const handleCurrentSlider = useCallback((slider, id) => {
     if (slider && slider.current) {
       setCurrentSlider({ status: true, current: slider.current, id })
     } else {
@@ -57,7 +58,7 @@ function CompanyProvider({ children }) {
         setCurrentSlider({ current: null })
       }, 200)
     }
-  }
+  }, [])
 
   const handleSort = useCallback(
     ({ sort, order }) => {
@@ -102,11 +103,34 @@ function CompanyProvider({ children }) {
     return result
   }, [companies, selectedStatus, searchTerm])
 
+  // Reset page to 1 on filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [searchTerm, selectedStatus])
+
+  const limit = 10
+  const paginatedCompanies = useMemo(() => {
+    const start = (page - 1) * limit
+    return filteredCompanies.slice(start, start + limit)
+  }, [filteredCompanies, page])
+
+  const pagination = useMemo(
+    () => ({
+      page,
+      limit,
+      total: filteredCompanies.length,
+      total_pages: Math.ceil(filteredCompanies.length / limit),
+    }),
+    [filteredCompanies.length, page]
+  )
+
   const contextValue = useMemo(
     () => ({
       searchTerm,
       setSearchTerm,
-      companies: filteredCompanies,
+      companies: paginatedCompanies,
+      pagination,
+      setPage,
       handleSort,
       handleSelectionChange,
       sortField,
@@ -120,7 +144,8 @@ function CompanyProvider({ children }) {
       currentSlider,
       handleCurrentSlider,
       searchTerm,
-      filteredCompanies,
+      paginatedCompanies,
+      pagination,
       handleSort,
       handleSelectionChange,
       sortField,

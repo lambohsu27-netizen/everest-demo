@@ -1,6 +1,6 @@
 import React from 'react'
 import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyModalSlider } from '@interstellar-component'
+import { MyColumn, MyDataTable, MyModalSlider, MyButton } from '@interstellar-component'
 import { useCompany } from '../Context'
 import MyDetailSlider from './MyDetailSlider/DetailSlider'
 import MyMemberStatusChip from './MyMemberStatusChip'
@@ -13,21 +13,22 @@ function CompanyTable() {
     searchTerm,
     setSearchTerm,
     companies,
-    sortField,
-    sortOrder,
     handleSort,
     handleSelectionChange,
     selectedStatus,
     setSelectedStatus,
+    pagination,
+    setPage,
+    sortField,
+    sortOrder,
   } = useCompany()
 
   const values = {
     data: companies || [],
     meta: {
-      current_page: 1,
-      next_page: 2,
-      per_page: 10,
-      total: companies?.length || 0,
+      current_page: pagination.page,
+      per_page: pagination.limit,
+      total: pagination.total,
     },
     checkedAll: companies?.every((d) => d.checked),
   }
@@ -47,7 +48,7 @@ function CompanyTable() {
               <div className="flex items-center gap-3">
                 <h3 className="text-[18px] font-semibold text-gray-900">Company List</h3>
                 <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
-                  1,480 item
+                  {pagination.total} item
                 </span>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -108,7 +109,6 @@ function CompanyTable() {
             values={values}
             selectionMode="multiple"
             onSelectionChange={handleSelectionChange}
-            paginator
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
             onClick={() => {
@@ -145,6 +145,33 @@ function CompanyTable() {
               body={(row) => <span className="text-sm text-gray-600">{row.quotaLeft}</span>}
             />
           </MyDataTable>
+
+          {/* Custom Pagination Footer */}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
+            <span className="text-sm text-gray-600 font-medium">
+              Page {pagination.page} of {pagination.total_pages}
+            </span>
+            <div className="flex gap-3">
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="sm"
+                disabled={pagination.page <= 1}
+                onClick={() => setPage(pagination.page - 1)}
+              >
+                Previous
+              </MyButton>
+              <MyButton
+                color="secondary"
+                variant="outlined"
+                size="sm"
+                disabled={pagination.page >= pagination.total_pages}
+                onClick={() => setPage(pagination.page + 1)}
+              >
+                Next
+              </MyButton>
+            </div>
+          </div>
         </div>
       </div>
     </>

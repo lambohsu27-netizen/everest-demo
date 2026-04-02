@@ -3,34 +3,8 @@ import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons
 import { MyColumn, MyDataTable, MyModalSlider } from '@interstellar-component'
 import { useCompany } from '../Context'
 import MyDetailSlider from './MyDetailSlider/DetailSlider'
+import MyMemberStatusChip from './MyMemberStatusChip'
 
-function getBadgeColor(status) {
-  switch (status) {
-    case 'Waiting CLIK approval':
-      return 'bg-warning/50 text-warning/700 border border-warning/200'
-    case 'Rejected':
-      return 'bg-error/50 text-error/700 border border-error/200'
-    case 'Active':
-      return 'bg-success/50 text-success/700 border border-success/200'
-    case 'Document submission':
-    default:
-      return 'bg-gray-100 text-gray-700 border border-gray-200'
-  }
-}
-
-function getDotColor(status) {
-  switch (status) {
-    case 'Waiting CLIK approval':
-      return 'bg-warning/500'
-    case 'Rejected':
-      return 'bg-error/500'
-    case 'Active':
-      return 'bg-success/500'
-    case 'Document submission':
-    default:
-      return 'bg-gray-500'
-  }
-}
 
 function CompanyTable() {
   const {
@@ -137,7 +111,7 @@ function CompanyTable() {
             paginator
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
-            onClick={(value) => {
+            onClick={() => {
               handleCurrentSlider(
                 {
                   status: true,
@@ -162,16 +136,7 @@ function CompanyTable() {
               header="Member status"
               field="memberStatus"
               onSort={handleSort}
-              body={(row) => (
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${getBadgeColor(
-                    row.memberStatus
-                  )}`}
-                >
-                  <span className={`h-1.5 w-1.5 rounded-full ${getDotColor(row.memberStatus)}`} />
-                  {row.memberStatus}
-                </span>
-              )}
+              body={(row) => <MyMemberStatusChip status={row.memberStatus} />}
             />
             <MyColumn
               header="Quota left"

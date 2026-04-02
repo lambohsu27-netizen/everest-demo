@@ -1,32 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
-  MyAvatar,
-  MyButton,
   MyButtonGroupV2,
-  MyChip,
   MyTabPanel,
   MyTabView,
 } from '@interstellar-component'
-import { Edit01, LogOut01, RefreshCcw01, Trash01, User01, XClose } from '@untitled-ui/icons-react'
+import { XClose } from '@untitled-ui/icons-react'
 import Result from './Result'
 import { useCompany } from '../../Context'
 import Information from './Information'
+import MyMemberStatusChip from '../MyMemberStatusChip'
 
-const MyDetailSlider = () => {
+function MyDetailSlider() {
   const {
-    currentSlider,
     handleCurrentSlider,
-    getCustomerDetail,
-    deleteCustomer,
-    restorePartNumber,
-    customerDetail,
-    restoreUser,
     jobOrderDetail,
   } = useCompany()
-
-  //   useEffect(() => {
-  //     if (currentSlider.id) getCustomerDetail(currentSlider.id)
-  //   }, [currentSlider.id])
 
   const [tab, setTab] = useState('result')
   return (
@@ -50,28 +38,7 @@ const MyDetailSlider = () => {
                 <p className="text-xl-semibold text-gray-light/900">PT Everest Maju sejahtera</p>
                 <p className="text-md-regular text-gray-light/600">ID-00192</p>
               </div>
-              <MyChip
-                label="Rejected"
-                rounded={'lg'}
-                startAdornment={
-                  <div
-                    className={`w-1.5 h-1.5 min-h-[6px] min-w-[6px] rounded-full ${
-                      jobOrderDetail?.data?.status === 'Active'
-                        ? 'bg-success/500'
-                        : jobOrderDetail?.data?.status === 'Waiting CLIK approval'
-                          ? 'bg-warning/500'
-                          : jobOrderDetail?.data?.status === 'Rejected'
-                            ? 'bg-error/500'
-                            : jobOrderDetail?.data?.status === 'Document submission'
-                              ? 'bg-brand/500'
-                              : 'bg-error/500'
-                    }`}
-                  ></div>
-                }
-                color={'modern'}
-                variant={'outlined'}
-                size={'sm'}
-              />
+              <MyMemberStatusChip status={jobOrderDetail?.data?.status || 'Rejected'} />
             </div>
             <MyButtonGroupV2
               buttons={[
@@ -89,13 +56,13 @@ const MyDetailSlider = () => {
 
       <div className="flex-1 overflow-hidden">
         <MyTabView value={tab}>
-          <MyTabPanel value={'result'}>
+          <MyTabPanel value="result">
             <Result data={jobOrderDetail} />
           </MyTabPanel>
           {/* <MyTabPanel value={'activity'}>
             <Activity data={jobOrderDetail?.data?.action_histories} />
           </MyTabPanel> */}
-          <MyTabPanel value={'information'}>
+          <MyTabPanel value="information">
             <Information data={jobOrderDetail} />
           </MyTabPanel>
         </MyTabView>

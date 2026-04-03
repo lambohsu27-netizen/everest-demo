@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  SearchMd,
+  SearchLg,
   FilterLines,
   Trash01,
   Plus,
@@ -8,7 +8,15 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
-import { MyDataTable, MyColumn, MyButton, MyConfirmModal } from '@interstellar-component'
+import { debounce } from 'lodash'
+import {
+  MyDataTable,
+  MyColumn,
+  MyButton,
+  MyConfirmModal,
+  MyFilterModal,
+  MyTextField,
+} from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import { useSettings } from '../../../Context'
@@ -21,12 +29,12 @@ export default function RoleTab() {
     roles,
     rolePagination,
     setRolePage,
-    roleSearchTerm,
-    setRoleSearchTerm,
     isLoadingRoles,
     selectedRoleIds,
     roleSortField,
     roleSortOrder,
+    roleFilters,
+    handleRoleFilterChange,
     handleRoleSort,
     handleRoleSelectionChange,
     rolePanel,
@@ -38,26 +46,10 @@ export default function RoleTab() {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
-  // Initial fetch
+  // Initial fetch + refetch on filter change
   useEffect(() => {
     fetchRoles(1, '')
   }, [fetchRoles])
-
-  // Debounced search
-  const roleSearchInitialized = useRef(false)
-  useEffect(() => {
-    if (!roleSearchInitialized.current) {
-      roleSearchInitialized.current = true
-      return undefined
-    }
-    const timer = setTimeout(() => {
-      setRolePage(1)
-      fetchRoles(1, roleSearchTerm)
-    }, 400)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [roleSearchTerm, fetchRoles, setRolePage])
 
   const canAddRole = hasPermission(Access.ROLE_ACCESS, 'add_new')
   const canDeleteRole = hasPermission(Access.ROLE_ACCESS, 'delete')
@@ -74,7 +66,7 @@ export default function RoleTab() {
 
   const handleRolePageChange = (page) => {
     setRolePage(page)
-    fetchRoles(page, roleSearchTerm)
+    fetchRoles(page)
   }
 
   const handleConfirmDelete = async () => {
@@ -133,23 +125,47 @@ export default function RoleTab() {
         </div>
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between p-5 border-b border-gray-200">
-          <div className="relative w-full max-w-sm">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchMd className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+          <div className="w-full max-w-sm">
+            <MyTextField
+              focusColor="#7F56D9"
+              focusShadow="#7F56D93D"
               placeholder="Search roles"
-              value={roleSearchTerm}
-              onChange={(e) => setRoleSearchTerm(e.target.value)}
+              startAdornment={
+                <SearchLg
+                  className="size-5 text-gray-light/600"
+                  stroke="currentColor"
+                />
+              }
+              onChangeForm={debounce((e) => {
+                setRolePage(1)
+                fetchRoles(1, e.target.value)
+              }, 500)}
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
-              <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
-              Filters
-            </MyButton>
+            <MyFilterModal
+              id="filter-role"
+              currentFilters={roleFilters}
+              onChange={(filter) => {
+                handleRoleFilterChange(filter)
+              }}
+              target={(open, handleClick) => (
+                <MyButton
+                  removeWhite
+                  onClick={handleClick}
+                  color="gray"
+                  variant="tertiary"
+                  size="sm"
+                  customClassname="text-gray-700"
+                >
+                  <FilterLines
+                    className="h-4 w-4 text-gray-500"
+                    stroke="currentColor"
+                  />
+                  Filters
+                </MyButton>
+              )}
+            />
             <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields

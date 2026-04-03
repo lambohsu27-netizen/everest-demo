@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
-  SearchMd,
+  SearchLg,
   FilterLines,
   Trash01,
   Plus,
@@ -8,12 +8,15 @@ import {
   DownloadCloud01,
   UploadCloud01,
 } from '@untitled-ui/icons-react'
+import { debounce } from 'lodash'
 import {
   MyDataTable,
   MyColumn,
   MyButton,
   MyConfirmModal,
+  MyFilterModal,
   MyHorizontalTabV2,
+  MyTextField,
 } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
@@ -29,14 +32,14 @@ export default function UserTab() {
     userPagination,
     userPage,
     setUserPage,
-    userSearchTerm,
-    setUserSearchTerm,
     isLoadingUsers,
     selectedUserIds,
     userSortField,
     userSortOrder,
     userStatusFilter,
     setUserStatusFilter,
+    userFilters,
+    handleUserFilterChange,
     handleUserSort,
     handleUserSelectionChange,
     userPanel,
@@ -48,30 +51,10 @@ export default function UserTab() {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
-  // Initial fetch
+  // Initial fetch + refetch on status/filter change
   useEffect(() => {
     fetchUsers(1, '')
   }, [fetchUsers])
-
-  // Debounced search
-  const userSearchInitialized = useRef(false)
-  useEffect(() => {
-    if (!userSearchInitialized.current) {
-      userSearchInitialized.current = true
-      return
-    }
-    const timer = setTimeout(() => {
-      setUserPage(1)
-      fetchUsers(1, userSearchTerm)
-    }, 400)
-    return () => clearTimeout(timer)
-  }, [userSearchTerm, fetchUsers, setUserPage])
-
-  // Handle status filter change
-  useEffect(() => {
-    setUserPage(1)
-    fetchUsers(1, userSearchTerm)
-  }, [userStatusFilter, fetchUsers, setUserPage, userSearchTerm])
 
   const canAddUser = hasPermission(Access.USER_MANAGEMENT, 'add_new')
   const canDeleteUser = hasPermission(Access.USER_MANAGEMENT, 'delete')
@@ -88,7 +71,7 @@ export default function UserTab() {
 
   const handleUserPageChange = (page) => {
     setUserPage(page)
-    fetchUsers(page, userSearchTerm)
+    fetchUsers(page)
   }
 
   const handleConfirmDelete = async () => {
@@ -147,23 +130,48 @@ export default function UserTab() {
         </div>
 
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between p-5 border-b border-gray-200">
-          <div className="relative w-full max-w-sm">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <SearchMd className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+          <div className="w-full max-w-sm">
+            <MyTextField
+              focusColor="#7F56D9"
+              focusShadow="#7F56D93D"
               placeholder="Search for users"
-              value={userSearchTerm}
-              onChange={(e) => setUserSearchTerm(e.target.value)}
+              startAdornment={
+                <SearchLg
+                  className="size-5 text-gray-light/600"
+                  stroke="currentColor"
+                />
+              }
+              onChangeForm={debounce((e) => {
+                setUserPage(1)
+                fetchUsers(1, e.target.value)
+              }, 500)}
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
-              <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
-              Filters
-            </MyButton>
+            <MyFilterModal
+              id="filter-user"
+              currentFilters={userFilters}
+              onChange={(filter) => {
+                console.log(filter)
+                handleUserFilterChange(filter)
+              }}
+              target={(open, handleClick) => (
+                <MyButton
+                  removeWhite
+                  onClick={handleClick}
+                  color="gray"
+                  variant="tertiary"
+                  size="sm"
+                  customClassname="text-gray-700"
+                >
+                  <FilterLines
+                    className="h-4 w-4 text-gray-500"
+                    stroke="currentColor"
+                  />
+                  Filters
+                </MyButton>
+              )}
+            />
             <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields

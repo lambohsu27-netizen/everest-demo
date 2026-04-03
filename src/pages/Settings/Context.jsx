@@ -148,6 +148,8 @@ function SettingsProvider({ children }) {
   const [selectedRoleIds, setSelectedRoleIds] = useState([])
   const [roleSortField, setRoleSortField] = useState(null)
   const [roleSortOrder, setRoleSortOrder] = useState(null)
+  const [roleFilters, setRoleFilters] = useState([])
+  const [roleFilterParams, setRoleFilterParams] = useState([])
 
   // Panel state: null | 'detail' | 'create' | 'edit'
   const [rolePanel, setRolePanel] = useState(null)
@@ -160,15 +162,24 @@ function SettingsProvider({ children }) {
     const limit = 10
     setIsLoadingRoles(true)
     try {
-      const res = await SettingsService.getRoles({ page, limit, ...(search ? { search } : {}) })
+      const params = {
+        page,
+        limit,
+        ...(search ? { search } : {}),
+        ...(roleFilterParams.length > 0 ? { filter: roleFilterParams } : {}),
+        ...(roleSortField ? { sort: roleSortField } : {}),
+        ...(roleSortOrder ? { order: roleSortOrder } : {}),
+      }
+      const res = await SettingsService.getRoles(params)
       setRoles(res.data)
       setRolePagination(normalizeListPagination(res, limit))
+      if (res.filter) setRoleFilters(res.filter)
     } catch (err) {
       myToaster(err)
     } finally {
       setIsLoadingRoles(false)
     }
-  }, [])
+  }, [roleFilterParams, roleSortField, roleSortOrder])
 
   const fetchRoleDetail = useCallback(async (id) => {
     setIsLoadingRoleDetail(true)
@@ -252,6 +263,19 @@ function SettingsProvider({ children }) {
     [rolePage, roleSearchTerm, fetchRoles]
   )
 
+  const handleRoleFilterChange = useCallback(
+    (filter) => {
+      const filterArray = filter
+        ? Object.values(filter).filter(
+            (f) => f.field && f.condition && f.value != null
+          )
+        : []
+      setRoleFilterParams(filterArray)
+      setRolePage(1)
+    },
+    []
+  )
+
   const handleRoleSort = useCallback(({ sort, order }) => {
     setRoleSortField(sort)
     setRoleSortOrder(order)
@@ -277,6 +301,8 @@ function SettingsProvider({ children }) {
   const [userSortField, setUserSortField] = useState(null)
   const [userSortOrder, setUserSortOrder] = useState(null)
   const [userStatusFilter, setUserStatusFilter] = useState('all')
+  const [userFilters, setUserFilters] = useState([])
+  const [userFilterParams, setUserFilterParams] = useState([])
 
   // Panel state: null | 'detail' | 'create' | 'edit'
   const [userPanel, setUserPanel] = useState(null)
@@ -293,16 +319,20 @@ function SettingsProvider({ children }) {
         limit,
         ...(search ? { search } : {}),
         ...(userStatusFilter !== 'all' ? { status: userStatusFilter } : {}),
+        ...(userFilterParams.length > 0 ? { filter: userFilterParams } : {}),
+        ...(userSortField ? { sort: userSortField } : {}),
+        ...(userSortOrder ? { order: userSortOrder } : {}),
       }
       const res = await SettingsService.getUsers(params)
       setUsers(res.data)
       setUserPagination(normalizeListPagination(res, limit))
+      if (res.filter) setUserFilters(res.filter)
     } catch (err) {
       myToaster(err)
     } finally {
       setIsLoadingUsers(false)
     }
-  }, [userStatusFilter])
+  }, [userStatusFilter, userFilterParams, userSortField, userSortOrder])
 
   const fetchUserDetail = useCallback(async (id) => {
     setIsLoadingUserDetail(true)
@@ -372,6 +402,19 @@ function SettingsProvider({ children }) {
     [userPage, userSearchTerm, fetchUsers]
   )
 
+  const handleUserFilterChange = useCallback(
+    (filter) => {
+      const filterArray = filter
+        ? Object.values(filter).filter(
+            (f) => f.field && f.condition && f.value != null
+          )
+        : []
+      setUserFilterParams(filterArray)
+      setUserPage(1)
+    },
+    []
+  )
+
   const handleUserSort = useCallback(({ sort, order }) => {
     setUserSortField(sort)
     setUserSortOrder(order)
@@ -381,6 +424,39 @@ function SettingsProvider({ children }) {
     setUsers(updated.data)
     setSelectedUserIds(updated.data.filter((u) => u.checked).map((u) => u.id))
   }, [])
+
+  // ── Option Endpoints (for dropdowns) ─────────────────────────────────────────
+  const searchOptionRoles = useCallback(
+    async (search = '') => {
+      const res = await SettingsService.getOptionRoles({ search })
+      return res.data
+    },
+    []
+  )
+
+  const searchOptionCompanies = useCallback(
+    async (search = '') => {
+      const res = await SettingsService.getOptionCompanies({ search })
+      return res.data
+    },
+    []
+  )
+
+  const searchOptionStatuses = useCallback(
+    async (search = '') => {
+      const res = await SettingsService.getOptionStatuses({ search })
+      return res.data
+    },
+    []
+  )
+
+  const searchOptionUsers = useCallback(
+    async (search = '') => {
+      const res = await SettingsService.getOptionUsers({ search })
+      return res.data
+    },
+    []
+  )
 
   // ── Employment Level State (dummy, unchanged) ────────────────────────────────
   const [employmentLevels, setEmploymentLevels] = useState(INITIAL_EMPLOYMENT_LEVELS)
@@ -475,6 +551,8 @@ function SettingsProvider({ children }) {
       selectedRoleIds,
       roleSortField,
       roleSortOrder,
+      roleFilters,
+      handleRoleFilterChange,
       handleRoleSort,
       handleRoleSelectionChange,
       rolePanel,
@@ -504,6 +582,9 @@ function SettingsProvider({ children }) {
       userSortOrder,
       userStatusFilter,
       setUserStatusFilter,
+      userFilters,
+      userFilterParams,
+      handleUserFilterChange,
       handleUserSort,
       handleUserSelectionChange,
       userPanel,
@@ -518,6 +599,12 @@ function SettingsProvider({ children }) {
       createUser,
       updateUser,
       deleteUsers,
+
+      // Options (dropdowns)
+      searchOptionRoles,
+      searchOptionCompanies,
+      searchOptionStatuses,
+      searchOptionUsers,
 
       // Employment Level
       employmentLevels: filteredEmpLevels,
@@ -551,6 +638,8 @@ function SettingsProvider({ children }) {
       selectedRoleIds,
       roleSortField,
       roleSortOrder,
+      roleFilters,
+      handleRoleFilterChange,
       handleRoleSort,
       handleRoleSelectionChange,
       rolePanel,
@@ -575,6 +664,9 @@ function SettingsProvider({ children }) {
       userSortField,
       userSortOrder,
       userStatusFilter,
+      userFilters,
+      userFilterParams,
+      handleUserFilterChange,
       handleUserSort,
       handleUserSelectionChange,
       userPanel,
@@ -589,6 +681,10 @@ function SettingsProvider({ children }) {
       createUser,
       updateUser,
       deleteUsers,
+      searchOptionRoles,
+      searchOptionCompanies,
+      searchOptionStatuses,
+      searchOptionUsers,
       filteredEmpLevels,
       filteredPositions,
       empSearchTerm,

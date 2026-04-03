@@ -17,4 +17,10 @@ export const SettingsService = {
   createUser: async (data) => await post('/v1/settings/users', data, 'form-data'),
   updateUser: async (id, data) => await put(`/v1/settings/users/${id}`, data, 'form-data'),
   deleteUsers: async (ids) => await remove('/v1/settings/users', { ids }),
+
+  // Options (for dropdowns)
+  getOptionRoles: async (params) => await get('/v1/option/role-list', params),
+  getOptionStatuses: async (params) => await get('/v1/option/active-status-list', params),
+  getOptionCompanies: async (params) => await get('/v1/option/company-list', params),
+  getOptionUsers: async (params) => await get('/v1/option/user-list', params),
 }

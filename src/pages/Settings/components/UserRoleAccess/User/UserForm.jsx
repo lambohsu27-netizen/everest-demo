@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Copy01, Mail01, Phone, RefreshCw04, XClose } from '@untitled-ui/icons-react'
-import { MyButton, MyTextField, MyAutocomplete, MyAvatar, myToaster } from '@interstellar-component'
+import { MyButton, MyTextField, MyAsyncDropdown, MyAvatar, myToaster } from '@interstellar-component'
 import { encryptPassword } from '@src/services/Helper'
 import { useSettings } from '../../../Context'
 
@@ -22,8 +22,8 @@ export default function UserForm({ mode }) {
     activePanelUserId,
     createUser,
     updateUser,
-    roles,
-    fetchRoles,
+    searchOptionRoles,
+    searchOptionCompanies,
   } = useSettings()
 
   const isEdit = mode === 'edit'
@@ -50,30 +50,26 @@ export default function UserForm({ mode }) {
     return () => cancelAnimationFrame(frame)
   }, [])
 
-  // Fetch roles for the dropdown
-  useEffect(() => {
-    if (roles.length === 0) fetchRoles(1, '')
-  }, [roles.length, fetchRoles])
-
   // Populate form for edit mode
   useEffect(() => {
     if (isEdit && userDetail) {
       setName(userDetail.name ?? '')
       setEmail(userDetail.email ?? '')
       setPhone(userDetail.phone ?? '')
-      const matchedRole = roles.find((r) => r.id === userDetail.role_id) ?? null
-      if (matchedRole) {
-        setSelectedRole({ label: matchedRole.name, value: matchedRole.id })
+      if (userDetail.role_id) {
+        setSelectedRole({
+          id: userDetail.role_id,
+          name: userDetail.role?.name ?? '',
+        })
       } else {
         setSelectedRole(null)
       }
       setIsActive(userDetail.is_active ?? true)
       setAvatarPreview(userDetail.avatar_url ?? null)
-      const companies = userDetail.user_companies?.map((c) => {
-        const name = c.name ?? c.company?.name
-        const id = c.id ?? c.company?.id
-        return name ? { label: name, value: id ?? name } : null
-      }).filter(Boolean) ?? []
+      const companies = userDetail.user_companies?.map((c) => ({
+        id: c.id ?? c.company?.id,
+        name: c.name ?? c.company?.name,
+      })).filter((c) => c.name) ?? []
       setSelectedCompanies(companies)
     }
   }, [isEdit, userDetail])
@@ -109,20 +105,23 @@ export default function UserForm({ mode }) {
     setPassword(generateRandomPassword())
   }
 
-  const roleOptions = roles.map((r) => ({ label: r.name, value: r.id }))
+  const asyncRoleOptions = async (params) => {
+    try {
+      const data = await searchOptionRoles(params?.search ?? '')
+      return { loading: false, data }
+    } catch {
+      return { loading: false, data: [] }
+    }
+  }
 
-  const companyOptions = [
-    { label: 'Everest', value: 'everest' },
-    { label: 'Kalachakra', value: 'kalachakra' },
-    { label: 'Merpati', value: 'merpati' },
-    { label: 'Garuda Indonesia', value: 'garuda-indonesia' },
-    { label: 'Telkom Indonesia', value: 'telkom-indonesia' },
-    { label: 'Bank Mandiri', value: 'bank-mandiri' },
-    { label: 'Pertamina', value: 'pertamina' },
-    { label: 'Astra International', value: 'astra-international' },
-    { label: 'Tokopedia', value: 'tokopedia' },
-    { label: 'GoTo Group', value: 'goto-group' },
-  ]
+  const asyncCompanyOptions = async (params) => {
+    try {
+      const data = await searchOptionCompanies(params?.search ?? '')
+      return { loading: false, data }
+    } catch {
+      return { loading: false, data: [] }
+    }
+  }
 
   const validate = () => {
     const errs = {}
@@ -146,9 +145,9 @@ export default function UserForm({ mode }) {
       formData.append('name', name.trim())
       formData.append('email', email.trim())
       formData.append('phone', phone.trim())
-      formData.append('role_id', selectedRole?.value ?? '')
+      formData.append('role_id', selectedRole?.id ?? '')
       formData.append('is_active', isActive ? 'true' : 'false')
-      formData.append('company_ids', JSON.stringify(selectedCompanies.map((c) => c.value)))
+      formData.append('company_ids', JSON.stringify(selectedCompanies.map((c) => c.id)))
 
       if (password) formData.append('password', encryptPassword(password))
       if (avatarFile) formData.append('avatar', avatarFile)
@@ -353,14 +352,14 @@ export default function UserForm({ mode }) {
                         <p className="text-sm font-medium leading-5 text-gray-700">
                           Role <span className="text-brand/600">*</span>
                         </p>
-                        <MyAutocomplete
+                        <MyAsyncDropdown
                           name="role"
-                          options={roleOptions}
+                          asyncFunction={asyncRoleOptions}
                           value={selectedRole}
                           placeholder="Select role"
                           error={errors.roleId}
-                          isOptionEqualToValue={(option, val) => option?.value === val?.id}
-                          getOptionLabel={(e) => e?.label || ''}
+                          isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                          getOptionLabel={(e) => e?.name || ''}
                           onChange={(_e, val) => { setSelectedRole(val); clearError('roleId') }}
                           focusColor="#7F56D9"
                           focusShadow="#7F56D93D"
@@ -372,21 +371,15 @@ export default function UserForm({ mode }) {
                         <p className="text-sm font-medium leading-5 text-gray-700">
                           Company <span className="text-brand/600">*</span>
                         </p>
-                        <MyAutocomplete
+                        <MyAsyncDropdown
                           name="company"
                           multiple
-                          freeSolo
-                          options={companyOptions}
+                          asyncFunction={asyncCompanyOptions}
                           value={selectedCompanies}
-                          placeholder="Type and press Enter"
-                          isOptionEqualToValue={(option, val) => option?.value === val?.value}
-                          getOptionLabel={(e) => e?.label || e || ''}
-                          onChange={(_e, val) => {
-                            const normalized = val.map((v) =>
-                              typeof v === 'string' ? { label: v, value: v } : v
-                            )
-                            setSelectedCompanies(normalized)
-                          }}
+                          placeholder="Search companies"
+                          isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                          getOptionLabel={(e) => e?.name || ''}
+                          onChange={(_e, val) => setSelectedCompanies(val)}
                           focusColor="#7F56D9"
                           focusShadow="#7F56D93D"
                         />

@@ -87,10 +87,10 @@ export default function PositionTab() {
             <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
             Filters
           </MyButton>
-          <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
+          {/* <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
             <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
             Hide fields
-          </MyButton>
+          </MyButton> */}
         </div>
       </div>
 

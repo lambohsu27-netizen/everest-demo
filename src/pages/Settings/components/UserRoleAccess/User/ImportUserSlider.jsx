@@ -34,20 +34,30 @@ export default function ImportUserSlider() {
     const formData = new FormData()
     formData.append('file', files[0])
     try {
-      await postSSE('/v1/settings/users/import', formData, (event) => {
-        if (event.event === 'progress') {
-          setProgressUpload({ progress: parseInt(event.progress ?? "0"), import: true })
-        }
+      await postSSE(
+        '/v1/settings/users/import',
+        formData,
+        (event) => {
+          if (event.event === 'progress') {
+            setProgressUpload({ progress: parseFloat(event.progress ?? "0"), import: true })
+          }
 
-        if (event.event === 'result') {
-          setResult(event)
-          fetchUsers(1, '')
-          setFailedFile({
-            failed: event.failed,
-            success: event.success,
-          })
+          if (event.event === 'result') {
+            setResult(event)
+            fetchUsers(1, '')
+            setFailedFile({
+              failed: event.failed,
+              success: event.success,
+            })
+          }
+        },
+        {
+          onUploadProgress: (e) => {
+            const progress = e.total ? e.loaded / e.total : 0
+            setProgressUpload({ progress, import: false })
+          },
         }
-      })
+      )
     } catch (err) {
       myToaster(err)
     } finally {

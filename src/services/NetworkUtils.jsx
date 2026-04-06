@@ -68,6 +68,49 @@ const processQueue = (error, token = null) => {
   failedQueue = []
 }
 
+/**
+ * Refresh the access token. Returns the new token string.
+ * Handles queue so concurrent 401s only trigger one refresh.
+ */
+const refreshAccessToken = () => {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      failedQueue.push({ resolve, reject })
+    })
+  }
+
+  isRefreshing = true
+  const refreshToken = getCookie('refresh-token-backoffice')
+
+  if (!refreshToken) {
+    isRefreshing = false
+    logout()
+    return Promise.reject(new Error('No refresh token'))
+  }
+
+  return refreshInstance
+    .post('/v1/auth/refresh', { refresh_token: refreshToken })
+    .then(({ data }) => {
+      const newToken = data?.data?.access_token
+      const newRefreshToken = data?.data?.refresh_token
+
+      setCookie('token-backoffice', newToken, 1)
+      setCookie('refresh-token-backoffice', newRefreshToken, 24 * 30)
+      instance.defaults.headers.common.authorization = `Bearer ${newToken}`
+
+      processQueue(null, newToken)
+      return newToken
+    })
+    .catch((refreshError) => {
+      processQueue(refreshError, null)
+      logout()
+      return Promise.reject(refreshError)
+    })
+    .finally(() => {
+      isRefreshing = false
+    })
+}
+
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -76,47 +119,14 @@ instance.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject })
-      })
-        .then((token) => {
-          originalRequest.headers.authorization = `Bearer ${token}`
-          return instance(originalRequest)
-        })
-        .catch((err) => Promise.reject(err))
-    }
-
     originalRequest._retry = true
-    isRefreshing = true
-
-    const refreshToken = getCookie('refresh-token-backoffice')
-    if (!refreshToken) {
-      isRefreshing = false
-      logout()
-      return Promise.reject(error)
-    }
 
     try {
-      const { data } = await refreshInstance.post('/v1/auth/refresh', {
-        refresh_token: refreshToken,
-      })
-      const newToken = data?.data?.access_token
-      const newRefreshToken = data?.data?.refresh_token
-
-      setCookie('token-backoffice', newToken, 1)
-      setCookie('refresh-token-backoffice', newRefreshToken, 24 * 30)
-
-      instance.defaults.headers.common.authorization = `Bearer ${newToken}`
+      const newToken = await refreshAccessToken()
       originalRequest.headers.authorization = `Bearer ${newToken}`
-      processQueue(null, newToken)
       return instance(originalRequest)
     } catch (refreshError) {
-      processQueue(refreshError, null)
-      logout()
       return Promise.reject(refreshError)
-    } finally {
-      isRefreshing = false
     }
   }
 )
@@ -270,43 +280,76 @@ export const remove = async (endpoint, data, timeout = 60000) => {
 // }
 
 /**
- * POST with SSE streaming (axios 1.8+ fetch adapter).
- * Inherits instance baseURL, headers, interceptors & token refresh.
+ * POST with real upload progress + SSE response streaming via XHR.
+ * XHR supports both upload.onprogress (real bytes sent) and
+ * onprogress (streaming response chunks) — no fetch/ALPN issues.
  *
- * Usage:
- *   await postSSE('/v1/endpoint', formData, (event) => { ... })
+ * @param {string}   endpoint  - API path
+ * @param {*}        data      - Request body (e.g. FormData)
+ * @param {Function} onEvent   - Called for each parsed SSE event
+ * @param {Object}   [options]
+ * @param {Function} [options.onUploadProgress] - ({ loaded, total }) real upload bytes
  */
-export const postSSE = async (endpoint, data, onEvent, type = 'form-data') => {
-  const headers = getHeader(type)
+export const postSSE = (endpoint, data, onEvent, options = {}, _isRetry = false) => {
+  const { onUploadProgress } = options
   const url = `${baseURL}${endpoint}`
+  const token = getCookie('token-backoffice')
 
-  const response = await instance.post(url, data, {
-    headers,
-    responseType: 'stream',
-    adapter: 'fetch',
-  })
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
 
-  const reader = response.data.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ''
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    buffer = lines.pop()
-
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue
-      try {
-        onEvent(JSON.parse(line.slice(6)))
-      } catch {
-        // skip malformed SSE lines
+    // Real upload progress
+    if (onUploadProgress) {
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          onUploadProgress({ loaded: e.loaded, total: e.total })
+        }
       }
     }
-  }
+
+    // Parse SSE chunks as they arrive
+    let parsed = 0
+    const parseChunk = (text) => {
+      for (const line of text.split('\n')) {
+        if (!line.startsWith('data: ')) continue
+        try {
+          onEvent(JSON.parse(line.slice(6)))
+        } catch {
+          // skip malformed SSE lines
+        }
+      }
+    }
+
+    xhr.onprogress = () => {
+      const text = xhr.responseText.slice(parsed)
+      parsed = xhr.responseText.length
+      parseChunk(text)
+    }
+
+    xhr.onload = () => {
+      parseChunk(xhr.responseText.slice(parsed))
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve()
+      } else if (xhr.status === 401 && !_isRetry) {
+        // Token expired — refresh and retry once
+        refreshAccessToken()
+          .then(() => resolve(postSSE(endpoint, data, onEvent, options, true)))
+          .catch(reject)
+      } else {
+        try {
+          reject(JSON.parse(xhr.responseText))
+        } catch {
+          reject({ message: `HTTP ${xhr.status}` })
+        }
+      }
+    }
+
+    xhr.onerror = () => reject({ message: 'Network error' })
+    xhr.send(data)
+  })
 }
 
 export const download = (endpoint, params) => {

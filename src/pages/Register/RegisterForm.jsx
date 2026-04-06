@@ -124,8 +124,14 @@ function RegisterForm({ activeStep, setActiveStep }) {
       } else if (activeStep === 4) {
         localStorage.removeItem('register_active_step')
         const token = cookie['token-backoffice-temp']
+        console.log(token, "<<<< token-backoffice-temp ");
 
-        setCookie('token-backoffice', token, { path: '/' })
+        if (token) {
+          setCookie('token-backoffice', token, { path: '/' })
+          
+         
+          window.location.href = '/register-company-info';
+        }
       }
     } catch (err) {
       console.error(err)

@@ -12,7 +12,7 @@ const RegisterContext = createContext()
 
 function RegisterProvider({ children }) {
   const { getSession } = useApp()
-  const [cookie, setCookie] = useCookies(['token-backoffice'])
+  const [cookie, setCookie] = useCookies(['token-backoffice', 'token-backoffice-temp'])
   const [User, setUser] = useState()
   const [isProfileSliderOpen, setIsProfileSliderOpen] = useState(false)
   const [currentModal, setCurrentModal] = useState({
@@ -85,7 +85,7 @@ function RegisterProvider({ children }) {
 
       const result = await RegisterService.verifyOtp(payload)
 
-      setCookie('token-backoffice-temp', result?.data?.access_token)
+      setCookie('token-backoffice-temp', result?.data?.access_token, { path: '/' })
       return result
     },
     [setCookie]

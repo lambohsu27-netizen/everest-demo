@@ -361,6 +361,10 @@ function SettingsProvider({ children }) {
     setUserPanel('create')
   }, [])
 
+  const openImportUser = useCallback(() => {
+    setUserPanel('import')
+  }, [])
+
   const openEditUser = useCallback(() => {
     setUserPanel('edit')
   }, [])
@@ -423,6 +427,21 @@ function SettingsProvider({ children }) {
   const handleUserSelectionChange = useCallback((updated) => {
     setUsers(updated.data)
     setSelectedUserIds(updated.data.filter((u) => u.checked).map((u) => u.id))
+  }, [])
+
+  const exportUsers = useCallback(() => {
+    const params = {
+      ...(userSearchTerm ? { search: userSearchTerm } : {}),
+      ...(userStatusFilter !== 'all' ? { status: userStatusFilter } : {}),
+      ...(userFilterParams.length > 0 ? { filter: userFilterParams } : {}),
+    }
+    const url = SettingsService.exportUsers(params)
+    window.open(url, '_blank').focus()
+  }, [userSearchTerm, userStatusFilter, userFilterParams])
+
+  const downloadUserTemplate = useCallback(() => {
+    const url = SettingsService.downloadUserTemplate()
+    window.open(url, '_blank').focus()
   }, [])
 
   // ── Option Endpoints (for dropdowns) ─────────────────────────────────────────
@@ -594,11 +613,14 @@ function SettingsProvider({ children }) {
       fetchUsers,
       openUserDetail,
       openCreateUser,
+      openImportUser,
       openEditUser,
       closeUserPanel,
       createUser,
       updateUser,
       deleteUsers,
+      exportUsers,
+      downloadUserTemplate,
 
       // Options (dropdowns)
       searchOptionRoles,
@@ -676,11 +698,14 @@ function SettingsProvider({ children }) {
       fetchUsers,
       openUserDetail,
       openCreateUser,
+      openImportUser,
       openEditUser,
       closeUserPanel,
       createUser,
       updateUser,
       deleteUsers,
+      exportUsers,
+      downloadUserTemplate,
       searchOptionRoles,
       searchOptionCompanies,
       searchOptionStatuses,

@@ -45,7 +45,7 @@ function StepVerification({
           </div>
         </div>
 
-        {otpMode && (
+        {/* {otpMode && ( */}
           <div className="z-40 flex flex-col gap-y-1.5 w-full items-center justify-center">
             <div className="flex w-auto items-center justify-center gap-3">
               {otp.map((digit, index) => (
@@ -68,14 +68,14 @@ function StepVerification({
               ))}
             </div>
           </div>
-        )}
+        {/* )} */}
 
         <div className="z-40 relative w-full space-y-8">
-          {otpMode ? (
+          {/* {otpMode ? ( */}
             <MyButton
               type="submit"
               color="primary"
-              variant="filled"
+              variant="filled"x
               size="lg"
               expanded
               disabled={isSubmitting}
@@ -83,7 +83,7 @@ function StepVerification({
             >
               <p className="text-md-semibold">Verify email</p>
             </MyButton>
-          ) : (
+          {/* ) : (
             <MyButton
               type="button"
               color="primary"
@@ -95,7 +95,7 @@ function StepVerification({
             >
               <p className="text-md-semibold">Enter code manually</p>
             </MyButton>
-          )}
+          )} */}
 
           {otpMode && (
             <div className="w-full items-center justify-center flex">

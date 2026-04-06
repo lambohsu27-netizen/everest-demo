@@ -166,10 +166,10 @@ export default function RoleTab() {
                 </MyButton>
               )}
             />
-            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
+            {/* <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
               <EyeOff className="h-4 w-4 text-gray-500" stroke="currentColor" />
               Hide fields
-            </MyButton>
+            </MyButton> */}
           </div>
         </div>
 
@@ -189,9 +189,8 @@ export default function RoleTab() {
             onSort={handleRoleSort}
             body={(row) => (
               <span
-                className={`text-sm-medium py-1 whitespace-nowrap ${
-                  row.checked ? 'text-[#6941C6]' : 'text-gray-900'
-                }`}
+                className={`text-sm-medium py-1 whitespace-nowrap ${row.checked ? 'text-[#6941C6]' : 'text-gray-900'
+                  }`}
               >
                 {row.name}
               </span>

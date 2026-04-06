@@ -1,4 +1,4 @@
-import { get, post, put, remove } from '@src/services/NetworkUtils'
+import { get, post, put, remove, download } from '@src/services/NetworkUtils'
 
 export const SettingsService = {
   getGeneral: async () => await get('/v1/settings/general'),
@@ -17,6 +17,9 @@ export const SettingsService = {
   createUser: async (data) => await post('/v1/settings/users', data, 'form-data'),
   updateUser: async (id, data) => await put(`/v1/settings/users/${id}`, data, 'form-data'),
   deleteUsers: async (ids) => await remove('/v1/settings/users', { ids }),
+
+  downloadUserTemplate: () => download('/v1/settings/users/import-template'),
+  exportUsers: (params) => download('/v1/settings/users/export', params),
 
   // Options (for dropdowns)
   getOptionRoles: async (params) => await get('/v1/option/role-list', params),

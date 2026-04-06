@@ -127,10 +127,10 @@ function RegisterForm({ activeStep, setActiveStep }) {
         console.log(token, "<<<< token-backoffice-temp ");
 
         if (token) {
-          setCookie('token-backoffice', token)
+          setCookie('token-backoffice', token, { path: '/' })
           
          
-          nav('/register-company-info')
+          window.location.href = '/register-company-info';
         }
       }
     } catch (err) {

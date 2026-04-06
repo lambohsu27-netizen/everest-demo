@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.224",
+  "version": "0.0.225",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,6 +25,7 @@
     "react-router-dom": "^7.4.0",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "react-toastify": "^10.0.4",
+    "axios": "^1.8.4",
     "simplebar-react": "^3.3.0",
     "yup": "^1.6.1"
   },

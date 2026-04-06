@@ -269,6 +269,46 @@ export const remove = async (endpoint, data, timeout = 60000) => {
 //   return url
 // }
 
+/**
+ * POST with SSE streaming (axios 1.8+ fetch adapter).
+ * Inherits instance baseURL, headers, interceptors & token refresh.
+ *
+ * Usage:
+ *   await postSSE('/v1/endpoint', formData, (event) => { ... })
+ */
+export const postSSE = async (endpoint, data, onEvent, type = 'form-data') => {
+  const headers = getHeader(type)
+  const url = `${baseURL}${endpoint}`
+
+  const response = await instance.post(url, data, {
+    headers,
+    responseType: 'stream',
+    adapter: 'fetch',
+  })
+
+  const reader = response.data.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop()
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue
+      try {
+        onEvent(JSON.parse(line.slice(6)))
+      } catch {
+        // skip malformed SSE lines
+      }
+    }
+  }
+}
+
 export const download = (endpoint, params) => {
   let url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
   const where = {

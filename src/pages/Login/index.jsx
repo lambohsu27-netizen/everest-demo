@@ -37,6 +37,11 @@ function Login() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(LoginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      remember_me: false // Pastikan ada default value false
+    }
   })
 
   useEffect(() => {
@@ -149,9 +154,9 @@ function Login() {
                   name="remember_me"
                   control={control}
                   onChangeForm={(e) => {
-                    setValue('remember_me', e.target.checked)
+                    setValue('remember_me', e.target.checked,{ shouldValidate: true, shouldDirty: true })
                   }}
-                  checked={remember_me}
+                  checked={watch('remember_me')}
                 />
                 <p className="text-sm-medium text-gray-700">Remember for 30 days</p>
               </div>

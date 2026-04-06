@@ -63,6 +63,9 @@ function LoginProvider({ children }) {
             maxAge: body?.remember_me ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
           })
 
+          console.log(body.remember_me, '<<<< remember');
+          
+
           if (body?.remember_me === true) {
             const rememberMeData = {
               email: body.email,

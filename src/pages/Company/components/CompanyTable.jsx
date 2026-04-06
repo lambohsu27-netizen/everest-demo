@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
 import { MyColumn, MyDataTable, MyModalSlider, MyButton } from '@interstellar-component'
 import { useCompany } from '../Context'
@@ -7,6 +8,7 @@ import MyMemberStatusChip from './MyMemberStatusChip'
 
 
 function CompanyTable() {
+  const navigate = useNavigate()
   const {
     handleCurrentSlider,
     currentSlider,
@@ -56,7 +58,7 @@ function CompanyTable() {
                   <Trash01 className="h-5 w-5" />
                   Delete
                 </button>
-                <button className="flex items-center gap-2 rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                <button onClick={() => navigate('/register-company-info')} className="flex items-center gap-2 rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
                   <Plus className="h-5 w-5" />
                   New company
                 </button>

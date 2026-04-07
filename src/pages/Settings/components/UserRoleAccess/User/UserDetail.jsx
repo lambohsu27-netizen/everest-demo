@@ -79,7 +79,7 @@ export default function UserDetail() {
               <div className="px-4 pb-0">
                 <div className="flex items-center gap-3">
                   {userDetail.avatar_url ? (
-                    <img src={userDetail.avatar_url} alt={userDetail.name} className="h-14 w-14 rounded-full object-cover" />
+                    <img src={userDetail.avatar_full_url} alt={userDetail.name} className="h-14 w-14 rounded-full object-cover" />
                   ) : (
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 text-lg font-semibold text-gray-600">
                       {userDetail.name?.charAt(0)?.toUpperCase()}
@@ -184,7 +184,7 @@ export default function UserDetail() {
                             <span className="text-xs-regular text-gray-600">{formatDate(userDetail.updated_at)}</span>
                           </div>
                           {userDetail.updater?.avatar_url ? (
-                            <img src={userDetail.updater.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" />
+                            <img src={userDetail.updater.avatar_full_url} alt="" className="h-6 w-6 rounded-full object-cover" />
                           ) : (
                             <div className="h-6 w-6 rounded-full bg-gray-200" />
                           )}
@@ -203,7 +203,7 @@ export default function UserDetail() {
                             <span className="text-xs-regular text-gray-600">{formatDate(userDetail.created_at)}</span>
                           </div>
                           {userDetail.creator?.avatar_url ? (
-                            <img src={userDetail.creator.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" />
+                            <img src={userDetail.creator.avatar_full_url} alt="" className="h-6 w-6 rounded-full object-cover" />
                           ) : (
                             <div className="h-6 w-6 rounded-full bg-gray-200" />
                           )}

@@ -59,7 +59,7 @@ export default function UserForm({ mode }) {
         setSelectedRole(null)
       }
       setIsActive(userDetail.is_active ?? true)
-      setAvatarPreview(userDetail.avatar_url ?? null)
+      setAvatarPreview(userDetail.avatar_url ? userDetail.avatar_full_url : null)
       const companies = userDetail.user_companies?.map((c) => ({
         id: c.id ?? c.company?.id,
         name: c.name ?? c.company?.name,

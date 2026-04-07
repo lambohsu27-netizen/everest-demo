@@ -223,7 +223,7 @@ export default function UserTab() {
                 </MyButton>
               )}
             />
-            <MyButton
+            {/* <MyButton
               color="gray"
               size="sm"
               variant="tertiary"
@@ -234,7 +234,7 @@ export default function UserTab() {
                 stroke="currentColor"
               />
               Hide fields
-            </MyButton>
+            </MyButton> */}
             <MyHorizontalTabV2
               value={userStatusFilter}
               onChange={setUserStatusFilter}
@@ -267,7 +267,7 @@ export default function UserTab() {
               <div className="flex items-center gap-3 whitespace-nowrap py-1">
                 {row.avatar_url ? (
                   <img
-                    src={row.avatar_url}
+                    src={row.avatar_full_url}
                     alt={row.name}
                     className="h-10 w-10 rounded-full object-cover"
                   />

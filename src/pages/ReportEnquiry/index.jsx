@@ -43,7 +43,7 @@ function ReportEnquiry() {
         )
       })}
 
-      <div className="mx-auto w-full max-w-[1372px]">
+      <div className="w-full">
         <ReportEnquiryHeader />
         <ReportEnquiryMetrics />
         <ReportEnquiryTable />

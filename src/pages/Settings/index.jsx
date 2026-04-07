@@ -7,14 +7,14 @@ import { SettingsProvider } from './Context'
 export default function Settings() {
   return (
     <SettingsProvider>
-      <StackedPageSheet backUrl="/dashboard" closeUrl="/dashboard">
-        <div className="flex w-full flex-col font-inter">
+      {/* <StackedPageSheet backUrl="/dashboard" closeUrl="/dashboard"> */}
+        <div className="flex w-full flex-col font-inter p-8">
           <div className="w-full">
             <SettingsHeader />
             <Outlet />
           </div>
         </div>
-      </StackedPageSheet>
+      {/* </StackedPageSheet> */}
     </SettingsProvider>
   )
 }

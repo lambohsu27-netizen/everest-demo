@@ -9,6 +9,7 @@ export const SettingsService = {
   createRole: async (data) => await post('/v1/settings/roles', data),
   updateRole: async (id, data) => await put(`/v1/settings/roles/${id}`, data),
   deleteRoles: async (ids) => await remove('/v1/settings/roles', { ids }),
+  exportRoles: (params) => download('/v1/settings/roles/export', params),
 
   getPermissions: async () => await get('/v1/permissions'),
 

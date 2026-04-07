@@ -225,6 +225,15 @@ function SettingsProvider({ children }) {
     fetchAllPermissions()
   }, [fetchAllPermissions])
 
+  const exportRoles = useCallback(() => {
+    const params = {
+      ...(roleSearchTerm ? { search: roleSearchTerm } : {}),
+      ...(roleFilterParams.length > 0 ? { filter: roleFilterParams } : {}),
+    }
+    const url = SettingsService.exportRoles(params)
+    window.open(url, '_blank').focus()
+  }, [roleSearchTerm, roleFilterParams])
+
   const closeRolePanel = useCallback(() => {
     setRolePanel(null)
     setActivePanelRoleId(null)
@@ -587,6 +596,7 @@ function SettingsProvider({ children }) {
       createRole,
       updateRole,
       deleteRoles,
+      exportRoles,
 
       // User Management
       users,
@@ -677,6 +687,7 @@ function SettingsProvider({ children }) {
       createRole,
       updateRole,
       deleteRoles,
+      exportRoles,
       users,
       userPagination,
       userPage,

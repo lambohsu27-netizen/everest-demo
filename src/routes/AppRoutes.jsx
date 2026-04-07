@@ -50,8 +50,7 @@ export function AuthenticatedRoutes() {
   const previousLocationRaw = useRef(location)
   const [backgroundLocation, setBackgroundLocation] = useState(null)
 
-  const isStackedRoute = (path) =>
-    path.startsWith('/settings') || path.startsWith('/workforce/employee')
+  const isStackedRoute = (path) => path.startsWith('/workforce/employee')
 
   useEffect(() => {
     if (isStackedRoute(location.pathname)) {
@@ -114,6 +113,7 @@ export function AuthenticatedRoutes() {
         />
         <Route path="/legal" element={<Legal />} />
         <Route path="/contact-us" element={<ContactUs />} />
+
         <Route path="/settings" element={<Settings />}>
           <Route index element={<Navigate to="general" replace />} />
           <Route path="general" element={<GeneralSettings />} />
@@ -125,6 +125,7 @@ export function AuthenticatedRoutes() {
           <Route path="employment-level" element={<EmploymentLevel />} />
           <Route path="consent-editor" element={<ConsentEditor />} />
         </Route>
+
         <Route path="/login" element={<Navigate to="/" replace />} />
         <Route
           path="/profile"

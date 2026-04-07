@@ -40,15 +40,17 @@ function WorkforceTable() {
 
   return (
     <div className="px-8 pb-8">
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="w-full rounded-xl border border-gray-light/200 shadow-shadows/shadow-xs">
         {/* Table Control Header */}
-        <div className="flex flex-col gap-5 p-5 border-b border-gray-200">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h3 className="text-[18px] font-semibold text-gray-900">Employee List</h3>
+        <div className="flex flex-col">
+          <div className="flex justify-between items-center rounded-t-xl bg-gray-light/50 py-4 pl-6">
+            <div className="flex flex-col gap-13">
+            <div className="flex gap-x-2">
+            <h3 className="text-[18px] font-semibold text-gray-900">Employee List</h3>
               <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
                 {pagination.total} item
               </span>
+            </div>
             </div>
             <div className="flex flex-wrap gap-3">
               <MyButton
@@ -87,8 +89,9 @@ function WorkforceTable() {
               </MyButton>
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex items-center justify-between gap-3 rounded-t-lg border border-gray-light/200 px-4 py-5">
             <div className="relative w-full max-w-sm">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 <SearchMd className="h-4 w-4 text-gray-400" />
@@ -119,7 +122,6 @@ function WorkforceTable() {
               />
             </div>
           </div>
-        </div>
 
         <MyDataTable
           values={values}

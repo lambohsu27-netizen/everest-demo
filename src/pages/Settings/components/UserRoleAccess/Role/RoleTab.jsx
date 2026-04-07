@@ -15,6 +15,7 @@ import {
   MyButton,
   MyConfirmModal,
   MyFilterModal,
+  MyModalSlider,
   MyTextField,
 } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
@@ -38,9 +39,11 @@ export default function RoleTab() {
     handleRoleSort,
     handleRoleSelectionChange,
     rolePanel,
+    closeRolePanel,
     fetchRoles,
     openRoleDetail,
     openCreateRole,
+    exportRoles,
     deleteRoles,
   } = useSettings()
 
@@ -76,6 +79,22 @@ export default function RoleTab() {
 
   return (
     <>
+      {/* Sliders */}
+      <MyModalSlider
+        open={rolePanel === 'detail'}
+        element={<RoleDetail />}
+        onClose={closeRolePanel}
+      />
+      <MyModalSlider
+        open={rolePanel === 'create' || rolePanel === 'edit'}
+        element={
+          rolePanel === 'create' || rolePanel === 'edit' ? (
+            <RoleForm mode={rolePanel} />
+          ) : null
+        }
+        onClose={closeRolePanel}
+      />
+
       <MyConfirmModal
         open={deleteConfirmOpen}
         title="Delete roles"
@@ -107,13 +126,14 @@ export default function RoleTab() {
                 <p className="text-sm-semibold">Delete</p>
               </MyButton>
             )}
-            <MyButton color="primary" size="md" variant="outlined">
+            <MyButton
+              color="primary"
+              size="md"
+              variant="outlined"
+              onClick={exportRoles}
+            >
               <DownloadCloud01 className="h-5 w-5" />
               <p className="text-sm-semibold">Download</p>
-            </MyButton>
-            <MyButton color="secondary" size="md" variant="outlined">
-              <UploadCloud01 className="h-5 w-5" />
-              <p className="text-sm-semibold">Import</p>
             </MyButton>
             {canAddRole && (
               <MyButton color="primary" size="md" variant="filled" onClick={openCreateRole}>
@@ -226,8 +246,6 @@ export default function RoleTab() {
         </div>
       </div>
 
-      {rolePanel === 'detail' && <RoleDetail />}
-      {(rolePanel === 'create' || rolePanel === 'edit') && <RoleForm mode={rolePanel} />}
     </>
   )
 }

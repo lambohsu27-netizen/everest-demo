@@ -50,6 +50,14 @@ export default function ImportUserSlider() {
               success: event.success,
             })
           }
+
+          if (event.event === 'error') {
+            myToaster({
+              status: 400,
+              title: 'Error',
+              message: event.message,
+            })
+          }
         },
         {
           onUploadProgress: (e) => {

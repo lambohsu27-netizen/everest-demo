@@ -51,7 +51,7 @@ function StepLegalBusinessInfo({
               <div className="p-6 flex flex-col gap-5">
                 <section className="w-full flex flex-col md:flex-row justify-between gap-6">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                       Company NPWP
                     </label>
                     <MyTextField
@@ -65,7 +65,7 @@ function StepLegalBusinessInfo({
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                       NIB / Business Registration Number
                     </label>
                     <MyTextField
@@ -80,7 +80,7 @@ function StepLegalBusinessInfo({
                 </section>
 
                 <div className="flex flex-col gap-1.5 max-w-[312px]">
-                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                     Date of Establishment
                   </label>
                   <MyTextField
@@ -113,7 +113,7 @@ function StepLegalBusinessInfo({
             <div className="flex-1 max-w-[624px] rounded-xl border border-gray-200 shadow-[0_1px_2px_rgba(10,13,18,0.05)] bg-white flex flex-col">
               <div className="p-6 flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                     NPWP
                   </label>
                   <MyDropzone

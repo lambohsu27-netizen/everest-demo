@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { get, post, put, remove, download } from '@src/services/NetworkUtils'
 
 export const SettingsService = {
@@ -27,4 +28,23 @@ export const SettingsService = {
   getOptionStatuses: async (params) => await get('/v1/option/active-status-list', params),
   getOptionCompanies: async (params) => await get('/v1/option/company-list', params),
   getOptionUsers: async (params) => await get('/v1/option/user-list', params),
+
+  // Employment Level
+  // level
+  getEmploymentLevel: async (params) => await get('/v1/settings/employment-level/levels', params),
+  getEmploymentLevelDetail: async (id) => await get(`/v1/settings/employment-level/levels/${id}`),
+  createEmploymentLevel: async (data) => await post('/v1/settings/employment-level/levels', data),
+  updateEmploymentLevel: async (id, data) => await put(`/v1/settings/employment-level/levels/${id}`, data),
+  deleteEmploymentLevel: async (ids) => await remove('/v1/settings/employment-level/levels', { ids }),
+
+  // position
+  getEmploymentPosition: async (params) => await get('/v1/settings/employment-level/positions', params),
+  getEmploymentPositionDetail: async (id) => await get(`/v1/settings/employment-level/positions/${id}`),
+  createEmploymentPosition: async (data) => await post('/v1/settings/employment-level/positions', data),
+  updateEmploymentPosition: async (id, data) => await put(`/v1/settings/employment-level/positions/${id}`, data),
+  deleteEmploymentPosition: async (ids) => await remove('/v1/settings/employment-level/positions', { ids }),
+
+  // consent editor
+  getConsentEditor: async () => await get('/v1/settings/consent-editor'),
+  updateConsentEditor: async (data) => await put('/v1/settings/consent-editor', data),
 }

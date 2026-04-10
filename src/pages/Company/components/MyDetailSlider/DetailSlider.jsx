@@ -11,12 +11,15 @@ import Information from './Information'
 import MyMemberStatusChip from '../MyMemberStatusChip'
 
 function MyDetailSlider() {
-  const {
-    handleCurrentSlider,
-    jobOrderDetail,
-  } = useCompany()
+  const { handleCurrentSlider, companyDetail, isLoadingCompanyDetail } = useCompany()
 
   const [tab, setTab] = useState('result')
+
+  const title =
+    companyDetail?.name ?? companyDetail?.legal_name ?? '—'
+  const subtitle = companyDetail?.nib ?? companyDetail?.id ?? ''
+  const enrollmentStatus = companyDetail?.enrollment_status ?? ''
+
   return (
     <div className="flex h-screen w-[375px] flex-col">
       <header className="relative flex flex-col px-4">
@@ -32,13 +35,19 @@ function MyDetailSlider() {
               stroke="currentColor"
             />
           </button>
-          <div className="flex gap-4 flex-col">
-            <div className="flex gap-3 flex-col">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <p className="text-xl-semibold text-gray-light/900">PT Everest Maju sejahtera</p>
-                <p className="text-md-regular text-gray-light/600">ID-00192</p>
+                <p className="text-xl-semibold text-gray-light/900">
+                  {isLoadingCompanyDetail ? '…' : title}
+                </p>
+                {subtitle ? (
+                  <p className="text-md-regular text-gray-light/600">{subtitle}</p>
+                ) : null}
               </div>
-              <MyMemberStatusChip status={jobOrderDetail?.data?.status || 'Rejected'} />
+              {!isLoadingCompanyDetail && enrollmentStatus ? (
+                <MyMemberStatusChip status={String(enrollmentStatus)} />
+              ) : null}
             </div>
             <MyButtonGroupV2
               buttons={[
@@ -51,19 +60,18 @@ function MyDetailSlider() {
             />
           </div>
         </div>
-        {/* <hr className="border-gray-light/200" /> */}
       </header>
 
       <div className="flex-1 overflow-hidden">
         <MyTabView value={tab}>
           <MyTabPanel value="result">
-            <Result data={jobOrderDetail} />
+            <Result loading={isLoadingCompanyDetail} />
           </MyTabPanel>
-          {/* <MyTabPanel value={'activity'}>
-            <Activity data={jobOrderDetail?.data?.action_histories} />
-          </MyTabPanel> */}
+          <MyTabPanel value="billing">
+            <div className="px-4 py-6 text-sm text-gray-light/600">Billing coming soon.</div>
+          </MyTabPanel>
           <MyTabPanel value="information">
-            <Information data={jobOrderDetail} />
+            <Information data={companyDetail} loading={isLoadingCompanyDetail} />
           </MyTabPanel>
         </MyTabView>
       </div>

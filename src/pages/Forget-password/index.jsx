@@ -25,7 +25,7 @@ function ForgetPassword() {
           <div className="flex items-stretch gap-x-4">
             <div className="flex flex-col items-center">
               <div
-                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_1 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_1 ? 'border-brand/900 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
                 <Key01 size={20} strokeWidth={2.5} />
               </div>
@@ -48,7 +48,7 @@ function ForgetPassword() {
           <div className="flex items-stretch gap-x-4">
             <div className="flex flex-col items-center">
               <div
-                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_2 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_2 ? 'border-brand/900 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
                 <Passcode size={20} strokeWidth={2.5} />
               </div>
@@ -68,7 +68,7 @@ function ForgetPassword() {
           <div className="flex items-stretch gap-x-4">
             <div className="flex flex-col items-center">
               <div
-                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_3 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_3 ? 'border-brand/900 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
                 <UsersPlus size={20} strokeWidth={2.5} />
               </div>
@@ -90,7 +90,7 @@ function ForgetPassword() {
           <div className="flex items-start gap-x-4">
             <div className="flex flex-col items-center">
               <div
-                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_4 ? 'border-brand/600 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
+                className={`rounded-lg border-[1.5px] p-2 bg-white shadow-sm z-10 ${currentStep.step_4 ? 'border-brand/900 text-brand/700' : 'border-gray-200 text-gray-400 opacity-50'}`}
               >
                 <Stars02 size={20} strokeWidth={2.5} />
               </div>

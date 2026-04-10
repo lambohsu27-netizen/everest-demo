@@ -20,7 +20,7 @@ export default function CreditScoreTrend() {
         enabled: false,
       },
     },
-    colors: ['#7F56D9'],
+    colors: ['#42307D'],
     dataLabels: {
       enabled: false,
     },

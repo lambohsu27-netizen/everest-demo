@@ -432,9 +432,9 @@ export default {
          -8px 8px 12px -4px rgba(0, 0, 0, 0.1),   /* Left */
           0px 10px 15px -3px rgba(0, 0, 0, 0.12)  /* Bottom */
         `,
-        'focus-rings/ring-brand': '0px 0px 0px 4px #7F56D93D',
+        'focus-rings/ring-brand': '0px 0px 0px 4px #42307D3D',
         'focus-rings/ring-gray': '0px 0px 0px 4px #98a2b324',
-        'focus-rings/ring-brand-shadow-xs': '0px 0px 0px 4px #7F56D93D, 0px 1px 2px 0px #1018280D',
+        'focus-rings/ring-brand-shadow-xs': '0px 0px 0px 4px #42307D3D, 0px 1px 2px 0px #1018280D',
         'focus-rings/ring-error-shadow-xs': '0px 0px 0px 4px #F044383D,  0px 1px 2px 0px #1018280D',
       },
       backgroundImage: {

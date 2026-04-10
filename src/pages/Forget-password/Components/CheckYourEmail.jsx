@@ -113,7 +113,7 @@ function CheckYourEmail() {
                 ref={(reference) => (otpBoxReference.current[index] = reference)}
                 className={`border ${
                   digit ? 'border-brand/500 border-2' : ''
-                } display-lg-medium z-0 block h-auto w-20 appearance-none rounded-xl px-2 py-2.5 text-center text-brand/600 focus:border-brand/500 focus:border-2 focus:outline-none focus:shadow-focus-rings/ring-brand-mega`}
+                } display-lg-medium z-0 block h-auto w-20 appearance-none rounded-xl px-2 py-2.5 text-center text-brand/900 focus:border-brand/500 focus:border-2 focus:outline-none focus:shadow-focus-rings/ring-brand-mega`}
               />
             ))}
           </div>

@@ -4,24 +4,27 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import SimpleBar from 'simplebar-react'
 import { XClose, Calendar, RefreshCcw05 } from '@untitled-ui/icons-react'
-import { format } from 'date-fns'
+import { format, isValid, parseISO } from 'date-fns'
 import {
   MyButton,
   MyTextField,
-  MyAutocomplete,
-  MyDoubleCard,
+  MyAsyncDropdown,
   MyCalendar,
 } from '@interstellar-component'
+import { checkErrorYup, handleError } from '@src/services/Helper'
+import { useEmploymentSettings } from './Context'
 
 const schema = yup.object({
-  levelName: yup.string().required('Employment Level Name is required'),
-  salaryFrom: yup.string().required('Salary Range (from) is required'),
-  salaryTo: yup.string().required('Salary Range (to) is required'),
-  consentExpiry: yup.date().nullable().required('Consent Expiry is required'),
-  repeatEvery: yup
+  name: yup.string().required('Employment Level Name is required'),
+  salary_from: yup.string().required('Salary Range (from) is required'),
+  salary_to: yup.string().required('Salary Range (to) is required'),
+  currency: yup.string().default('IDR'),
+  consent_expiry: yup.date().nullable().required('Consent Expiry is required'),
+  repeat_every: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
     .required('Repeat Every is required'),
+  is_active: yup.boolean().default(true),
 })
 
 const REPEAT_EVERY_OPTIONS = [
@@ -32,92 +35,171 @@ const REPEAT_EVERY_OPTIONS = [
   { label: 'Annual', value: 'annual', subLabel: 'yearly' },
 ]
 
-function FieldLabel({ children, required }) {
-  return (
-    <p className="text-sm font-medium text-gray-700 mb-1">
-      {children}
-      {required && <span className="ml-0.5 text-red-500">*</span>}
-    </p>
-  )
+/** Kontrak async MyAsyncDropdown: resolve { loading, data } */
+function asyncRepeatEveryOptions(params) {
+  const q = (params?.search ?? '').toLowerCase().trim()
+  const data = REPEAT_EVERY_OPTIONS.filter((o) => {
+    if (!q) return true
+    return (
+      o.label.toLowerCase().includes(q) ||
+      (o.subLabel && o.subLabel.toLowerCase().includes(q)) ||
+      String(o.value).toLowerCase().includes(q)
+    )
+  })
+  return Promise.resolve({ loading: false, data })
 }
 
-function SelectField({
-  label,
-  required,
-  name,
-  control,
-  options,
-  placeholder,
-  errors,
-  startAdornment,
-  hintText,
-  ...props
+function formatSalaryFieldForForm(val) {
+  if (val == null || val === '') return ''
+  const n = Number(String(val).replace(/\D/g, ''))
+  if (Number.isNaN(n)) return ''
+  return `Rp${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+/** Saat mengetik / paste: hanya digit yang dipakai; tampilan Rp + pemisah ribuan. */
+function formatSalaryInputValue(raw) {
+  const digits = String(raw ?? '').replace(/\D/g, '')
+  if (digits === '') return ''
+  const n = Number(digits)
+  if (!Number.isFinite(n) || n < 0) return ''
+  return `Rp${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+function salaryRupiahFieldClassName(hasError) {
+  return [
+    'w-full rounded-lg border px-3.5 py-2.5 text-sm text-gray-900 shadow-sm transition-colors placeholder:text-gray-400 focus:outline-none',
+    hasError
+      ? 'border-red-300 ring-1 ring-red-300'
+      : 'border-gray-300 focus:border-brand/400 focus:ring-4 focus:ring-brand/100',
+  ].join(' ')
+}
+
+function matchRepeatOption(repeatRaw) {
+  if (repeatRaw == null || repeatRaw === '') return null
+  const s = String(repeatRaw).toLowerCase().trim()
+  const byValue = REPEAT_EVERY_OPTIONS.find((o) => o.value === s)
+  if (byValue) return byValue
+  const byLabel = REPEAT_EVERY_OPTIONS.find((o) => o.label.toLowerCase() === s)
+  if (byLabel) return byLabel
+
+  const lower = s
+  if (lower.includes('month') && !lower.includes('3') && !lower.includes('6') && !lower.includes('2'))
+    return REPEAT_EVERY_OPTIONS[0]
+  if (lower.includes('2 month') || lower.includes('bi')) return REPEAT_EVERY_OPTIONS[1]
+  if (lower.includes('3 month') || lower.includes('quarter')) return REPEAT_EVERY_OPTIONS[2]
+  if (lower.includes('6 month') || lower.includes('semi')) return REPEAT_EVERY_OPTIONS[3]
+  if (lower.includes('year') || lower.includes('annual')) return REPEAT_EVERY_OPTIONS[4]
+  return null
+}
+
+function parseConsentExpiryDate(raw) {
+  if (raw == null || raw === '') return null
+  if (raw instanceof Date) {
+    return Number.isNaN(raw.getTime()) ? null : raw
+  }
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim()
+    let d = trimmed.includes('T') ? parseISO(trimmed) : parseISO(trimmed.slice(0, 10))
+    if (isValid(d)) return d
+    d = new Date(trimmed)
+    return Number.isNaN(d.getTime()) ? null : d
+  }
+  const d = new Date(raw)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
+function mapApiRowToFormValues(initialData) {
+  if (!initialData) return null
+  const name =
+    initialData.name ??
+    initialData.level ??
+    initialData.level_name ??
+    initialData.employment_level_name ??
+    ''
+
+  let salary_from = ''
+  let salary_to = ''
+  if (initialData.salary_from != null || initialData.salary_to != null) {
+    salary_from = formatSalaryFieldForForm(initialData.salary_from)
+    salary_to = formatSalaryFieldForForm(initialData.salary_to)
+  } else if (initialData.salaryRange) {
+    const salaryParts = String(initialData.salaryRange).split(' - ')
+    salary_from = salaryParts[0]?.trim() || ''
+    salary_to = salaryParts[1]?.trim() || ''
+  } else if (initialData.salary_from_text || initialData.salary_to_text) {
+    salary_from = initialData.salary_from_text ?? ''
+    salary_to = initialData.salary_to_text ?? ''
+  }
+
+  const repeatRaw =
+    initialData.repeat_every ?? initialData.repeat_every_value ?? initialData.repeatEvery
+  const repeat_every = matchRepeatOption(repeatRaw)
+
+  const rawConsent =
+    initialData.consent_expiry ?? initialData.consent_expiry_at ?? initialData.consentExpiry
+  const consent_expiry = parseConsentExpiryDate(rawConsent)
+
+  return {
+    name,
+    salary_from,
+    salary_to,
+    currency: initialData.currency ?? 'IDR',
+    consent_expiry,
+    repeat_every,
+    is_active: initialData.is_active !== undefined ? Boolean(initialData.is_active) : true,
+  }
+}
+
+export default function NewLevelSlider({
+  open,
+  mode = 'create',
+  initialData,
+  onClose,
+  inModalSlider = false,
 }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <FieldLabel required={required}>{label}</FieldLabel>
-      <MyAutocomplete
-        name={name}
-        control={control}
-        options={options}
-        placeholder={placeholder}
-        errors={errors}
-        startAdornment={startAdornment}
-        {...props}
-      />
-      {hintText && <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{hintText}</p>}
-    </div>
-  )
-}
-
-export default function NewLevelSlider({ open, mode = 'create', initialData, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
+  const { createEmploymentLevel, updateEmploymentLevel, setErr } = useEmploymentSettings()
 
   const {
     control,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
     reset,
+    trigger,
   } = useForm({
+    mode: 'all',
     resolver: yupResolver(schema),
     defaultValues: {
-      levelName: '',
-      salaryFrom: '',
-      salaryTo: '',
-      consentExpiry: null,
-      repeatEvery: null,
+      name: '',
+      salary_from: '',
+      salary_to: '',
+      currency: 'IDR',
+      consent_expiry: null,
+      repeat_every: null,
+      is_active: true,
     },
   })
 
+  const repeatEveryValue = watch('repeat_every')
+
   useEffect(() => {
     if (open) {
-      if (mode === 'edit' && initialData) {
-        const salaryParts = initialData.salaryRange ? initialData.salaryRange.split(' - ') : ['', '']
-        
-        let repeatVal = null
-        if (initialData.repeatEvery) {
-          const lower = initialData.repeatEvery.toLowerCase()
-          if (lower.includes('month') && !lower.includes('3') && !lower.includes('6')) repeatVal = REPEAT_EVERY_OPTIONS[0]
-          else if (lower.includes('2 month')) repeatVal = REPEAT_EVERY_OPTIONS[1]
-          else if (lower.includes('3 month')) repeatVal = REPEAT_EVERY_OPTIONS[2]
-          else if (lower.includes('6 month')) repeatVal = REPEAT_EVERY_OPTIONS[3]
-          else if (lower.includes('year') || lower.includes('annual')) repeatVal = REPEAT_EVERY_OPTIONS[4]
+      if (mode === 'edit') {
+        if (initialData) {
+          const mapped = mapApiRowToFormValues(initialData)
+          if (mapped) reset(mapped)
         }
-
-        reset({
-          levelName: initialData.level || '',
-          salaryFrom: salaryParts[0] || '',
-          salaryTo: salaryParts[1] || '',
-          consentExpiry: new Date(), // Mock date since dummy data is '5 years'
-          repeatEvery: repeatVal,
-        })
       } else {
         reset({
-          levelName: '',
-          salaryFrom: '',
-          salaryTo: '',
-          consentExpiry: null,
-          repeatEvery: null,
+          name: '',
+          salary_from: '',
+          salary_to: '',
+          currency: 'IDR',
+          consent_expiry: null,
+          repeat_every: null,
+          is_active: true,
         })
       }
       const frame = requestAnimationFrame(() => setIsVisible(true))
@@ -127,7 +209,14 @@ export default function NewLevelSlider({ open, mode = 'create', initialData, onC
     return undefined
   }, [open, mode, initialData, reset])
 
+  useEffect(() => () => setErr(null), [setErr])
+
   const animateClose = () => {
+    if (inModalSlider) {
+      onClose()
+      reset()
+      return
+    }
     setIsVisible(false)
     setTimeout(() => {
       onClose()
@@ -135,11 +224,321 @@ export default function NewLevelSlider({ open, mode = 'create', initialData, onC
     }, 300)
   }
 
-  const onSubmit = handleSubmit(() => {
-    animateClose()
-  })
+  const onSubmit = handleSubmit(
+    handleError(
+      async (data) => {
+        if (mode === 'edit') {
+          await updateEmploymentLevel(data)
+        } else {
+          await createEmploymentLevel(data)
+        }
+        animateClose()
+      },
+      control
+    ),
+    checkErrorYup
+  )
 
-  if (!open && !isVisible) return null
+  if (inModalSlider) {
+    if (!open) return null
+  } else if (!open && !isVisible) {
+    return null
+  }
+
+  const title =
+    mode === 'edit' && initialData?.name
+      ? initialData.name
+      : mode === 'edit'
+        ? 'Edit Employment Level'
+        : 'New Employment Level'
+
+  const formClassName = inModalSlider
+    ? 'flex h-full min-h-0 w-[420px] flex-col overflow-hidden bg-white'
+    : 'flex h-screen w-[420px] flex-col bg-white shadow-xl'
+
+  const formEl = (
+    <form noValidate className={formClassName} onSubmit={onSubmit}>
+          <header className="relative flex items-start gap-x-4 px-4 pt-6">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={animateClose}
+              className="absolute right-[12px] top-[12px] flex h-11 w-11 items-center justify-center rounded-lg p-2 text-gray-light/400 hover:bg-gray-50"
+            >
+              <XClose className="size-6" stroke="currentColor" />
+            </button>
+
+            <div className="flex flex-1 flex-col gap-6 pr-10">
+              <section className="flex flex-col gap-1">
+                <p className="text-xl-semibold text-gray-light/900">{title}</p>
+                <p className="text-sm-regular text-gray-light/600">
+                  {mode === 'edit'
+                    ? 'Update the employment level and its associated screening rules.'
+                    : 'Define an employment level and its associated screening rules. Complete the information below.'}
+                </p>
+              </section>
+            </div>
+          </header>
+
+          <hr className="mx-0 my-6 border-gray-light/200" />
+
+          <section className="min-h-0 flex-1 overflow-hidden">
+            <SimpleBar forceVisible="y" style={{ height: '100%' }}>
+              <div className="flex flex-col gap-6 px-4 pb-6">
+                <div className="mt-0.5 rounded-xl bg-gray/25 shadow-sm outline outline-1 outline-gray-200">
+                  <span className="text-sm-semibold block px-4 pb-2 pt-3 text-gray-900">
+                    Level Information
+                  </span>
+                  <div className="flex flex-col gap-4 rounded-xl bg-white px-4 py-5 outline outline-1 outline-gray-200">
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-blue-500 after:content-['*']"
+                        htmlFor="employment-level-name"
+                      >
+                        Employment Level Name
+                      </label>
+                      <MyTextField
+                        name="name"
+                        control={control}
+                        placeholder="e.g. Senior Manager"
+                        errors={errors?.name?.message}
+                        onChangeForm={() => setErr(null)}
+                        cypress="employment-level-name"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-blue-500 after:content-['*']"
+                        htmlFor="salary-from"
+                      >
+                        Salary Range (from)
+                      </label>
+                      <Controller
+                        name="salary_from"
+                        control={control}
+                        render={({ field }) => (
+                          <>
+                            <input
+                              {...field}
+                              id="salary-from"
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="off"
+                              data-test="salary-from"
+                              placeholder="e.g. Rp5,999,999"
+                              value={field.value ?? ''}
+                              onChange={(e) => {
+                                setErr(null)
+                                field.onChange(formatSalaryInputValue(e.target.value))
+                              }}
+                              className={salaryRupiahFieldClassName(Boolean(errors?.salary_from))}
+                              aria-invalid={errors?.salary_from ? 'true' : 'false'}
+                            />
+                            {errors?.salary_from?.message && (
+                              <p className="mt-1 text-xs text-red-500">{errors.salary_from.message}</p>
+                            )}
+                          </>
+                        )}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-blue-500 after:content-['*']"
+                        htmlFor="salary-to"
+                      >
+                        Salary Range (to)
+                      </label>
+                      <Controller
+                        name="salary_to"
+                        control={control}
+                        render={({ field }) => (
+                          <>
+                            <input
+                              {...field}
+                              id="salary-to"
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="off"
+                              data-test="salary-to"
+                              placeholder="e.g. Rp9,999,999"
+                              value={field.value ?? ''}
+                              onChange={(e) => {
+                                setErr(null)
+                                field.onChange(formatSalaryInputValue(e.target.value))
+                              }}
+                              className={salaryRupiahFieldClassName(Boolean(errors?.salary_to))}
+                              aria-invalid={errors?.salary_to ? 'true' : 'false'}
+                            />
+                            {errors?.salary_to?.message && (
+                              <p className="mt-1 text-xs text-red-500">{errors.salary_to.message}</p>
+                            )}
+                          </>
+                        )}
+                      />
+                    </div>
+
+                    {/* <div className="flex flex-col gap-1.5">
+                      <label
+                        className="block text-sm font-medium text-gray-700"
+                        htmlFor="employment-level-currency"
+                      >
+                        Currency
+                      </label>
+                      <MyTextField
+                        name="currency"
+                        control={control}
+                        placeholder="IDR"
+                        disabled
+                        errors={errors?.currency?.message}
+                        cypress="employment-level-currency"
+                      />
+                    </div> */}
+
+                    {/* <div className="flex items-center justify-between gap-4 rounded-lg border border-gray-200 px-3 py-2.5">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-gray-900">Active</span>
+                        <span className="text-xs text-gray-500">
+                          When off, this employment level is inactive.
+                        </span>
+                      </div>
+                      <MySwitch name="is_active" control={control} />
+                    </div> */}
+                  </div>
+                </div>
+
+                <div className="mb-0.5 mt-0.5 rounded-xl bg-gray/25 shadow-sm outline outline-1 outline-gray-200">
+                  <span className="text-sm-semibold block px-4 pb-2 pt-3 text-gray-900">
+                    Screening Rules
+                  </span>
+                  <div className="flex flex-col gap-4 rounded-xl bg-white px-4 py-5 outline outline-1 outline-gray-200">
+                    <Controller
+                      name="consent_expiry"
+                      control={control}
+                      render={({ field }) => (
+                        <MyCalendar
+                          value={field.value}
+                          onChange={field.onChange}
+                          target={(isCalendarOpen, show) => (
+                            <div className="flex flex-col gap-1.5">
+                              <label
+                                className="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-blue-500 after:content-['*']"
+                                htmlFor="consent-expiry-trigger"
+                              >
+                                Consent Expiry
+                              </label>
+                              <button
+                                id="consent-expiry-trigger"
+                                type="button"
+                                onClick={show}
+                                className={`flex w-full items-center gap-3 rounded-lg border px-3.5 py-2.5 text-left transition-all ${
+                                  errors.consent_expiry
+                                    ? 'border-red-300 ring-1 ring-red-300 shadow-[0_0_0_4px_rgba(240,68,56,0.24)]'
+                                    : 'border-gray-300 hover:border-brand/400 hover:ring-4 hover:ring-brand/100'
+                                }`}
+                              >
+                                <Calendar className="size-4 text-gray-400" />
+                                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                                  {field.value ? (
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {format(field.value, 'MMM d, yyyy')}
+                                    </span>
+                                  ) : (
+                                    <span className="text-sm text-gray-400">Select date</span>
+                                  )}
+                                </div>
+                                <XClose
+                                  className="size-5 rotate-[-90deg] text-gray-400"
+                                  strokeWidth={2}
+                                />
+                              </button>
+                              {errors.consent_expiry && (
+                                <p className="text-xs text-red-500">{errors.consent_expiry.message}</p>
+                              )}
+                              <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
+                                Duration for which employee consent remains valid.
+                              </p>
+                            </div>
+                          )}
+                        />
+                      )}
+                    />
+
+                    <div className="flex flex-col gap-1.5">
+                      <label
+                        className="block text-sm font-medium text-gray-700 after:ml-0.5 after:text-blue-500 after:content-['*']"
+                        htmlFor="repeat-every"
+                      >
+                        Repeat Every
+                      </label>
+                      <MyAsyncDropdown
+                        name="repeat_every"
+                        control={control}
+                        value={repeatEveryValue}
+                        trigger={trigger}
+                        asyncFunction={asyncRepeatEveryOptions}
+                        placeholder="Select interval"
+                        startAdornment={<RefreshCcw05 className="size-4 text-gray-400" />}
+                        error={errors?.repeat_every?.message}
+                        getOptionLabel={(option) => option?.label ?? ''}
+                        isOptionEqualToValue={(a, b) => a?.value === b?.value}
+                        onChange={(_e, v) => {
+                          setErr(null)
+                          setValue('repeat_every', v, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          })
+                        }}
+                        renderOption={(option) => (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">{option.label}</span>
+                            {option.subLabel && (
+                              <span className="text-xs text-gray-500">{option.subLabel}</span>
+                            )}
+                          </div>
+                        )}
+                        focusColor="#42307D"
+                        focusShadow="#42307D3D"
+                      />
+                      <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
+                        How often screening should be repeated for this employment level.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SimpleBar>
+          </section>
+
+          <footer className="flex items-center justify-end gap-4 border-t border-gray-light/200 bg-white px-4 py-4">
+            <MyButton
+              disabled={isSubmitting}
+              type="button"
+              color="secondary"
+              variant="outlined"
+              size="md"
+              onClick={animateClose}
+            >
+              <span className="text-sm-semibold">Cancel</span>
+            </MyButton>
+            <MyButton
+              type="submit"
+              color="primary"
+              variant="filled"
+              size="md"
+              disabled={isSubmitting}
+              cypress="submit-employment-level"
+            >
+              <span className="text-sm-semibold">Submit</span>
+            </MyButton>
+          </footer>
+    </form>
+  )
+
+  if (inModalSlider) {
+    return formEl
+  }
 
   return (
     <>
@@ -156,161 +555,7 @@ export default function NewLevelSlider({ open, mode = 'create', initialData, onC
           isVisible ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex h-screen w-[420px] flex-col bg-white shadow-xl">
-          {/* Header */}
-          <header className="relative flex items-start gap-x-4 px-6 py-6 border-b border-gray-100">
-            <button
-              type="button"
-              onClick={animateClose}
-              className="absolute right-[12px] top-[12px] flex h-10 w-10 items-center justify-center rounded-lg p-2 text-gray-400 hover:bg-gray-50 active:bg-gray-100"
-            >
-              <XClose size={24} stroke="currentColor" />
-            </button>
-
-            <div className="flex flex-1 flex-col gap-1 pt-1">
-              <p className="text-lg font-semibold text-gray-900">
-                {mode === 'edit' ? 'Edit Employment Level' : 'New Employment Level'}
-              </p>
-              <p className="text-sm text-gray-500 font-medium leading-relaxed pr-6">
-                {mode === 'edit'
-                  ? 'Update the employment level and its associated screening rules.'
-                  : 'Define an employment level and its associated screening rules.'}
-              </p>
-            </div>
-          </header>
-
-          <form noValidate onSubmit={onSubmit} className="flex flex-1 flex-col overflow-hidden">
-            <section className="flex-1 overflow-hidden">
-              <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
-                <div className="flex flex-col gap-6 px-6 py-6 bg-gray-50/30">
-                  {/* Level Information card */}
-                  <MyDoubleCard heading="Level Information" innerClassName="p-4">
-                    <div className="flex flex-col gap-5">
-                      <div className="flex flex-col gap-0.5">
-                        <FieldLabel required>Employment Level Name</FieldLabel>
-                        <MyTextField
-                          name="levelName"
-                          control={control}
-                          placeholder="e.g. Kania Elfira"
-                          errors={errors?.levelName?.message}
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-0.5">
-                        <FieldLabel required>Salary Range (from)</FieldLabel>
-                        <MyTextField
-                          name="salaryFrom"
-                          control={control}
-                          placeholder="e.g. Rp5,999,999"
-                          errors={errors?.salaryFrom?.message}
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-0.5">
-                        <FieldLabel required>Salary Range (to)</FieldLabel>
-                        <MyTextField
-                          name="salaryTo"
-                          control={control}
-                          placeholder="e.g. Rp9,999,999"
-                          errors={errors?.salaryTo?.message}
-                        />
-                      </div>
-                    </div>
-                  </MyDoubleCard>
-
-                  {/* Screening Rules Card */}
-                  <MyDoubleCard heading="Screening Rules" innerClassName="p-4">
-                    <div className="flex flex-col gap-5">
-                      {/* Consent Expiry */}
-                      <Controller
-                        name="consentExpiry"
-                        control={control}
-                        render={({ field }) => (
-                          <MyCalendar
-                            value={field.value}
-                            onChange={field.onChange}
-                            target={(isCalendarOpen, show) => (
-                              <div className="flex flex-col gap-1.5">
-                                <FieldLabel required>Consent Expiry</FieldLabel>
-                                <button
-                                  type="button"
-                                  onClick={show}
-                                  className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${
-                                    errors.consentExpiry
-                                      ? 'border-red-300 ring-1 ring-red-300 shadow-[0_0_0_4px_rgba(240,68,56,0.24)]'
-                                      : 'border-gray-300 hover:border-brand/400 hover:ring-4 hover:ring-brand/100'
-                                  }`}
-                                >
-                                  <Calendar className="size-4 text-gray-400" />
-                                  <div className="flex flex-1 flex-col overflow-hidden">
-                                    {field.value ? (
-                                      <span className="text-sm font-medium text-gray-900">
-                                        {format(field.value, 'MMM d, yyyy')}
-                                      </span>
-                                    ) : (
-                                      <span className="text-sm text-gray-400">Select date</span>
-                                    )}
-                                  </div>
-                                  <XClose
-                                    className="size-5 text-gray-400 rotate-[-90deg]"
-                                    strokeWidth={2}
-                                  />
-                                </button>
-                                {errors.consentExpiry && (
-                                  <p className="text-xs text-red-500">
-                                    {errors.consentExpiry.message}
-                                  </p>
-                                )}
-                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                                  Duration for which employee consent remains valid.
-                                </p>
-                              </div>
-                            )}
-                          />
-                        )}
-                      />
-
-                      {/* Repeat Every */}
-                      <SelectField
-                        label="Repeat Every"
-                        name="repeatEvery"
-                        control={control}
-                        options={REPEAT_EVERY_OPTIONS}
-                        placeholder="Select interval"
-                        errors={errors?.repeatEvery?.message ?? errors?.repeatEvery?.value?.message}
-                        startAdornment={<RefreshCcw05 className="size-4 text-gray-400" />}
-                        hintText="How often screening should be repeated for this employment level."
-                        renderOption={(option) => (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900">
-                              {option.label}
-                            </span>
-                            {option.subLabel && (
-                              <span className="text-xs text-gray-500">{option.subLabel}</span>
-                            )}
-                          </div>
-                        )}
-                        focusColor="#7f56d9"
-                        focusShadow="#7f56d93d"
-                      />
-                    </div>
-                  </MyDoubleCard>
-                </div>
-              </SimpleBar>
-            </section>
-
-            {/* Footer */}
-            <footer className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4 bg-white">
-              <MyButton type="button" color="secondary" variant="outlined" size="md" onClick={animateClose}>
-                Cancel
-              </MyButton>
-
-              <MyButton type="submit" color="primary" variant="filled" size="md" disabled={isSubmitting}>
-                Submit
-              </MyButton>
-            </footer>
-          </form>
-        </div>
+        {formEl}
       </div>
     </>
   )

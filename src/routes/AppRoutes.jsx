@@ -10,7 +10,6 @@ import { ReportEnquiryProvider } from '@src/pages/ReportEnquiry/Context'
 import Workforce from '@src/pages/Workforce'
 import { WorkforceProvider } from '@src/pages/Workforce/Context'
 import Company from '@src/pages/Company'
-import { CompanyProvider } from '@src/pages/Company/Context'
 import AuditTrail from '@src/pages/AuditTrail'
 import { AuditTrailProvider } from '@src/pages/AuditTrail/Context'
 import Legal from '@src/pages/Legal'
@@ -95,14 +94,7 @@ export function AuthenticatedRoutes() {
             <Route path="risk-signals" element={<RiskSignalsDetailsSheet />} />
           </Route>
         </Route>
-        <Route
-          path="/company"
-          element={
-            <CompanyProvider>
-              <Company />
-            </CompanyProvider>
-          }
-        />
+        <Route path="/company" element={<Company />} />
         <Route
           path="/audit-trail"
           element={

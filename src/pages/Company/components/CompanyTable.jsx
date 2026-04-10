@@ -1,38 +1,81 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SearchMd, FilterLines, Trash01, Plus, EyeOff } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyModalSlider, MyButton } from '@interstellar-component'
+import { debounce } from 'lodash'
+import {
+  SearchMd,
+  FilterLines,
+  Trash01,
+  Plus,
+} from '@untitled-ui/icons-react'
+import {
+  MyColumn,
+  MyDataTable,
+  MyModalSlider,
+  MyButton,
+  MyHorizontalTabV2,
+} from '@interstellar-component'
 import { useCompany } from '../Context'
 import MyDetailSlider from './MyDetailSlider/DetailSlider'
 import MyMemberStatusChip from './MyMemberStatusChip'
 
+const STATUS_TABS = [
+  { label: 'All status', value: 'All status' },
+  { label: 'In progress', value: 'in_progress' },
+  { label: 'Active', value: 'active' },
+  { label: 'Expired', value: 'expired' },
+]
 
 function CompanyTable() {
   const navigate = useNavigate()
   const {
     handleCurrentSlider,
     currentSlider,
-    searchTerm,
     setSearchTerm,
-    companies,
-    handleSort,
-    handleSelectionChange,
+    companyRows,
+    companyMeta,
+    company,
+    handleCompanySort,
+    handleCompanySelectionChange,
     selectedStatus,
     setSelectedStatus,
-    pagination,
     setPage,
     sortField,
     sortOrder,
   } = useCompany()
 
-  const values = {
-    data: companies || [],
-    meta: {
-      current_page: pagination.page,
-      per_page: pagination.limit,
-      total: pagination.total,
+  const rows = companyRows || []
+  const selectedCount = rows.filter((d) => d.checked).length
+
+  const total = Number(companyMeta?.total ?? rows.length) || 0
+  const currentPage = Number(companyMeta?.current_page ?? 1) || 1
+  const perPage = Number(companyMeta?.per_page ?? companyMeta?.limit ?? 10) || 10
+  const totalPages = Math.max(1, Number(companyMeta?.total_page ?? 1) || 1)
+
+  const itemCountLabel = new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: 0,
+  }).format(total)
+
+  const debouncedSearch = useMemo(
+    () => debounce((value) => setSearchTerm(value), 800),
+    [setSearchTerm]
+  )
+
+  useEffect(
+    () => () => {
+      debouncedSearch.cancel()
     },
-    checkedAll: companies?.every((d) => d.checked),
+    [debouncedSearch]
+  )
+
+  const values = {
+    data: rows,
+    meta: {
+      current_page: currentPage,
+      per_page: perPage,
+      total,
+    },
+    loading: company.loading,
+    checkedAll: rows.length > 0 && rows.every((d) => d.checked),
   }
 
   return (
@@ -42,123 +85,135 @@ function CompanyTable() {
         element={<MyDetailSlider />}
         onClose={() => handleCurrentSlider(null)}
       />
-      <div className="px-8 pb-8">
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-          {/* Table Control Header */}
-          <div className="flex flex-col gap-5 p-5 border-b border-gray-200">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h3 className="text-[18px] font-semibold text-gray-900">Company List</h3>
-                <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
-                  {pagination.total} item
-                </span>
+
+      <div className="px-8 pb-8 pt-2">
+        <div className="w-full rounded-xl border border-gray-light/200 shadow-shadows/shadow-xs">
+          <div className="flex flex-col">
+            <div className="flex justify-between items-center rounded-t-xl bg-gray-light/50 py-4 pl-6">
+              <div className="flex flex-col gap-13">
+                <div className="flex gap-x-2">
+                  <h3 className="text-[18px] font-semibold text-gray-900">Company List</h3>
+                  <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
+                    {itemCountLabel} item
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <button className="flex items-center gap-2 rounded-lg border border-error/300 bg-white px-4 py-2 text-sm font-semibold text-error/700 shadow-sm hover:bg-error/50 focus:outline-none focus:ring-2 focus:ring-error/500 focus:ring-offset-2">
+              <div className="flex flex-wrap gap-3 px-3.5 py-2">
+                <MyButton
+                  color="error"
+                  variant="outlined"
+                  size="md"
+                  type="button"
+                  disabled={selectedCount === 0}
+                >
                   <Trash01 className="h-5 w-5" />
-                  Delete
-                </button>
-                <button onClick={() => navigate('/register-company-info')} className="flex items-center gap-2 rounded-lg border border-transparent bg-brand/600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand/700 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
+                  <p className="text-sm-semibold">Delete</p>
+                </MyButton>
+                <MyButton
+                  color="primary"
+                  variant="filled"
+                  size="md"
+                  type="button"
+                  onClick={() => navigate('/register-company-info')}
+                >
                   <Plus className="h-5 w-5" />
-                  New company
-                </button>
+                  <p className="text-sm-semibold">New company</p>
+                </MyButton>
               </div>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-              <div className="relative w-full max-w-sm">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <SearchMd className="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
-                  placeholder="Search for company"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+          <div className="flex items-center justify-between gap-3 rounded-t-lg border border-gray-light/200 px-4 py-5">
+            <div className="relative w-full max-w-sm">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <SearchMd className="h-4 w-4 text-gray-400" />
               </div>
+              <input
+                id="input-search-company"
+                type="text"
+                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+                placeholder="Search for company"
+                onChange={(e) => debouncedSearch(e.target.value)}
+              />
+            </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
-                  <FilterLines className="h-4 w-4 text-gray-500" />
-                  Filters
-                </button>
-                {/* <button className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand/500 focus:ring-offset-2">
-                  <EyeOff className="h-4 w-4 text-gray-500" />
-                  Hide fields
-                </button> */}
-                <div className="inline-flex rounded-lg border border-gray-200 bg-white p-0.5">
-                  {['All status', 'Active', 'Expired'].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedStatus(cat)}
-                      className={`rounded-md px-3 py-1.5 text-sm font-medium shadow-none transition-colors ${selectedStatus === cat
-                          ? 'bg-gray-50 text-gray-900'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                        }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
+                <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
+                Filters
+              </MyButton>
+              <MyHorizontalTabV2
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                fitContent
+                tabs={STATUS_TABS}
+              />
             </div>
           </div>
 
           <MyDataTable
             values={values}
             selectionMode="multiple"
-            onSelectionChange={handleSelectionChange}
+            onSelectionChange={handleCompanySelectionChange}
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
-            onClick={() => {
-              handleCurrentSlider(
-                {
-                  status: true,
-                  current: 'details-slider',
-                },
-                1
-              )
-            }}
+            onClick={(row) => handleCurrentSlider({ current: 'details-slider' }, row.id)}
           >
             <MyColumn
               header="Company name & ID"
               field="name"
-              onSort={handleSort}
+              onSort={handleCompanySort}
               body={(row) => (
-                <div className="flex flex-col gap-0.5 py-1 whitespace-nowrap">
-                  <span className="text-sm font-medium text-gray-900">{row.name}</span>
-                  <span className="text-sm text-gray-500">{row.companyId}</span>
+                <div className="flex items-center gap-3 py-1 whitespace-nowrap">
+                  {row.logo_url ? (
+                    <img
+                      src={row.logo_url}
+                      alt=""
+                      className="h-10 w-10 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500">
+                      <span className="text-sm font-medium">{row.name?.charAt(0) ?? '?'}</span>
+                    </div>
+                  )}
+                  <div className="flex min-w-0 flex-col gap-0.5">
+                    <span className="text-sm font-medium text-brand/700">{row.name}</span>
+                    <span className="truncate text-sm text-gray-500" title={row.company_id}>
+                      {row.company_id}
+                    </span>
+                  </div>
                 </div>
               )}
             />
             <MyColumn
               header="Member status"
-              field="memberStatus"
-              onSort={handleSort}
-              body={(row) => <MyMemberStatusChip status={row.memberStatus} />}
+              field="member_status"
+              onSort={handleCompanySort}
+              body={(row) => <MyMemberStatusChip status={row.enrollment_status} />}
             />
             <MyColumn
               header="Quota left"
-              field="quotaLeft"
-              onSort={handleSort}
-              body={(row) => <span className="text-sm text-gray-600">{row.quotaLeft}</span>}
+              field="quota_left"
+              onSort={handleCompanySort}
+              body={(row) => (
+                <span className="text-sm text-gray-600 tabular-nums">
+                  {row.enrollment_step != null ? String(row.enrollment_step) : '—'}
+                </span>
+              )}
             />
           </MyDataTable>
 
-          {/* Custom Pagination Footer */}
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
             <span className="text-sm text-gray-600 font-medium">
-              Page {pagination.page} of {pagination.total_pages}
+              Page {currentPage} of {totalPages}
             </span>
             <div className="flex gap-3">
               <MyButton
                 color="secondary"
                 variant="outlined"
                 size="sm"
-                disabled={pagination.page <= 1}
-                onClick={() => setPage(pagination.page - 1)}
+                disabled={currentPage <= 1}
+                onClick={() => setPage(currentPage - 1)}
               >
                 Previous
               </MyButton>
@@ -166,8 +221,8 @@ function CompanyTable() {
                 color="secondary"
                 variant="outlined"
                 size="sm"
-                disabled={pagination.page >= pagination.total_pages}
-                onClick={() => setPage(pagination.page + 1)}
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage(currentPage + 1)}
               >
                 Next
               </MyButton>

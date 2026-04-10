@@ -196,7 +196,7 @@ export default function UserForm({ mode }) {
                     <button
                       type="button"
                       onClick={() => setIsActive((v) => !v)}
-                      className={`relative mt-0.5 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${isActive ? 'bg-brand/600' : 'bg-gray-200'}`}
+                      className={`relative mt-0.5 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${isActive ? 'bg-brand/900' : 'bg-gray-200'}`}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform duration-200 ${isActive ? 'translate-x-[17px]' : 'translate-x-[2px]'} mt-[2px]`}
@@ -225,7 +225,7 @@ export default function UserForm({ mode }) {
                   {/* Profile Photo */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Profile photo <span className="text-brand/600">*</span>
+                      Profile photo <span className="text-brand/900">*</span>
                     </p>
                     <div className="flex items-center gap-4">
                       <MyAvatar size={64} photo={avatarFile ?? avatarPreview} />
@@ -258,7 +258,7 @@ export default function UserForm({ mode }) {
                   {/* Full Name */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Full name <span className="text-brand/600">*</span>
+                      Full name <span className="text-brand/900">*</span>
                     </p>
                     <MyTextField
                       name="name"
@@ -267,15 +267,15 @@ export default function UserForm({ mode }) {
                       isError={!!errors.name}
                       helperText={errors.name || ''}
                       onChangeForm={(e) => { setName(e.target.value); clearError('name') }}
-                      focusColor="#7F56D9"
-                      focusShadow="#7F56D93D"
+                      focusColor="#42307D"
+                      focusShadow="#42307D3D"
                     />
                   </div>
 
                   {/* Email */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Email <span className="text-brand/600">*</span>
+                      Email <span className="text-brand/900">*</span>
                     </p>
                     <MyTextField
                       name="email"
@@ -284,8 +284,8 @@ export default function UserForm({ mode }) {
                       isError={!!errors.email}
                       helperText={errors.email || ''}
                       onChangeForm={(e) => { setEmail(e.target.value); clearError('email') }}
-                      focusColor="#7F56D9"
-                      focusShadow="#7F56D93D"
+                      focusColor="#42307D"
+                      focusShadow="#42307D3D"
                       startAdornment={<Mail01 className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -293,7 +293,7 @@ export default function UserForm({ mode }) {
                   {/* Phone */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Phone <span className="text-brand/600">*</span>
+                      Phone <span className="text-brand/900">*</span>
                     </p>
                     <MyTextField
                       name="phone"
@@ -302,8 +302,8 @@ export default function UserForm({ mode }) {
                       isError={!!errors.phone}
                       helperText={errors.phone || ''}
                       onChangeForm={(e) => { setPhone(e.target.value); clearError('phone') }}
-                      focusColor="#7F56D9"
-                      focusShadow="#7F56D93D"
+                      focusColor="#42307D"
+                      focusShadow="#42307D3D"
                       startAdornment={<Phone className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -323,7 +323,7 @@ export default function UserForm({ mode }) {
                   {/* Role Dropdown */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Role <span className="text-brand/600">*</span>
+                      Role <span className="text-brand/900">*</span>
                     </p>
                     <MyAsyncDropdown
                       name="role"
@@ -334,15 +334,15 @@ export default function UserForm({ mode }) {
                       isOptionEqualToValue={(option, val) => option?.id === val?.id}
                       getOptionLabel={(e) => e?.name || ''}
                       onChange={(_e, val) => { setSelectedRole(val); clearError('roleId') }}
-                      focusColor="#7F56D9"
-                      focusShadow="#7F56D93D"
+                      focusColor="#42307D"
+                      focusShadow="#42307D3D"
                     />
                   </div>
 
                   {/* Company Multi-select */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Company <span className="text-brand/600">*</span>
+                      Company <span className="text-brand/900">*</span>
                     </p>
                     <MyAsyncDropdown
                       name="company"
@@ -353,8 +353,8 @@ export default function UserForm({ mode }) {
                       isOptionEqualToValue={(option, val) => option?.id === val?.id}
                       getOptionLabel={(e) => e?.name || ''}
                       onChange={(_e, val) => setSelectedCompanies(val)}
-                      focusColor="#7F56D9"
-                      focusShadow="#7F56D93D"
+                      focusColor="#42307D"
+                      focusShadow="#42307D3D"
                     />
                   </div>
                 </div>
@@ -379,8 +379,8 @@ export default function UserForm({ mode }) {
                         disabled
                         isError={!!errors.password}
                         helperText={errors.password || ''}
-                        focusColor="#7F56D9"
-                        focusShadow="#7F56D93D"
+                        focusColor="#42307D"
+                        focusShadow="#42307D3D"
                       />
                     </div>
                     <button

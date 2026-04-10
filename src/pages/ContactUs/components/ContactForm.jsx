@@ -50,7 +50,7 @@ function ContactForm() {
             <div className="flex w-full flex-col gap-6 md:flex-row">
               <div className="flex flex-1 flex-col gap-[6px]">
                 <label className="text-sm font-medium text-gray-700">
-                  First name <span className="text-brand/600">*</span>
+                  First name <span className="text-brand/900">*</span>
                 </label>
                 <MyTextField
                   name="firstName"
@@ -65,7 +65,7 @@ function ContactForm() {
               </div>
               <div className="flex flex-1 flex-col gap-[6px]">
                 <label className="text-sm font-medium text-gray-700">
-                  Last name <span className="text-brand/600">*</span>
+                  Last name <span className="text-brand/900">*</span>
                 </label>
                 <MyTextField
                   name="lastName"
@@ -82,7 +82,7 @@ function ContactForm() {
 
             <div className="flex flex-col gap-[6px]">
               <label className="text-sm font-medium text-gray-700">
-                Email <span className="text-brand/600">*</span>
+                Email <span className="text-brand/900">*</span>
               </label>
               <MyTextField
                 name="email"
@@ -112,7 +112,7 @@ function ContactForm() {
 
             <div className="flex flex-col gap-[6px]">
               <label className="text-sm font-medium text-gray-700">
-                Message <span className="text-brand/600">*</span>
+                Message <span className="text-brand/900">*</span>
               </label>
               <textarea
                 {...register('message')}
@@ -140,7 +140,7 @@ function ContactForm() {
                   register('agree').onChange(e)
                   trigger('agree')
                 }}
-                className={`mt-1 h-4 w-4 rounded border-gray-300 text-brand/600 focus:ring-brand/600 ${
+                className={`mt-1 h-4 w-4 rounded border-gray-300 text-brand/900 focus:ring-brand/900 ${
                   errors?.agree ? 'border-red-300' : ''
                 }`}
               />

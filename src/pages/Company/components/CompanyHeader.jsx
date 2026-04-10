@@ -2,7 +2,7 @@ import React from 'react'
 
 function CompanyHeader() {
   return (
-    <div className="flex flex-col gap-1 w-full p-8 pb-4">
+    <div className="flex flex-col gap-1 w-full p-8 pb-4 mb-5">
       <h1 className="text-3xl font-semibold text-[#181d27]">
         Company & billing
       </h1>

@@ -42,7 +42,7 @@ export default function CollectabilityTrend() {
       toolbar: { show: false },
       zoom: { enabled: false },
     },
-    colors: ['#7F56D9', '#C4B5FD', '#1E1B7B'],
+    colors: ['#42307D', '#C4B5FD', '#1E1B7B'],
     dataLabels: { enabled: false },
     stroke: {
       curve: 'smooth',

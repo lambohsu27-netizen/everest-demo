@@ -39,7 +39,7 @@ function WorkforceTable() {
   }
 
   return (
-    <div className="px-8 pb-8">
+    <div className="px-8 pb-8 pt-2">
       <div className="w-full rounded-xl border border-gray-light/200 shadow-shadows/shadow-xs">
         {/* Table Control Header */}
         <div className="flex flex-col">
@@ -52,7 +52,7 @@ function WorkforceTable() {
               </span>
             </div>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 px-3.5 py-2">
               <MyButton
                 color="error"
                 variant="outlined"

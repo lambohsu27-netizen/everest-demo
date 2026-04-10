@@ -79,7 +79,7 @@ function Profile() {
 
   return (
     <SimpleBar forceVisible="y" style={{ height: '100%' }}>
-      <div className="relative -top-28 mb-12 bg-brand/600">
+      <div className="relative -top-28 mb-12 bg-brand/900">
         <div className="relative top-28 mx-4 mt-16 flex gap-6 px-2 md:mx-10 md:mt-20 md:px-0 max-sm:flex-col max-sm:items-center">
           <div className="rounded-full p-1 ring-4 ring-inset ring-white max-sm:ring-transparent">
             <MyAvatar size={160} iconSize={48} photo={photo} />

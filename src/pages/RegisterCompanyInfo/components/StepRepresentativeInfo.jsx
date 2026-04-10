@@ -84,7 +84,7 @@ function StepRepresentativeInfo({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                     Email address
                   </label>
                   <MyTextField
@@ -99,7 +99,7 @@ function StepRepresentativeInfo({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                  <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                     Phone number
                   </label>
                   <MyTextField
@@ -115,7 +115,7 @@ function StepRepresentativeInfo({
 
                 <div className="flex flex-col gap-1.5 pt-4 border-t border-gray-200">
                   <div className="flex flex-col gap-1">
-                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                       Surat kuasa
                     </label>
                   </div>

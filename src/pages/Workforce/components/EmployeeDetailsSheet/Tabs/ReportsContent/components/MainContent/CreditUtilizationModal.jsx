@@ -169,7 +169,7 @@ export default function CreditUtilizationModal({ open, onClose }) {
                   <div className="flex items-center gap-3 py-4">
                     <div className="h-2 w-24 rounded-full bg-gray-100 overflow-hidden min-w-[96px]">
                       <div
-                        className="h-full bg-brand/600 rounded-full"
+                        className="h-full bg-brand/900 rounded-full"
                         style={{ width: `${row.penggunaan}%` }}
                       />
                     </div>

@@ -548,7 +548,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="name"
-                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                     >
                       Name
                     </label>
@@ -566,7 +566,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="email"
-                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                     >
                       Email
                     </label>
@@ -587,7 +587,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="nik"
-                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                     >
                       NIK
                     </label>
@@ -606,7 +606,7 @@ function Formslider() {
                   <div className="flex gap-x-3">
                     {/* Jenis Kelamin */}
                     <div className="flex flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Jenis Kelamin
                       </label>
                       <MyButtonGroupV2
@@ -629,7 +629,7 @@ function Formslider() {
                     <div className="flex flex-1 flex-col gap-y-1.5">
                       <label
                         htmlFor="telepon"
-                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                        className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                       >
                         Telepon/HP
                       </label>
@@ -651,7 +651,7 @@ function Formslider() {
                     <div className="flex flex-1 flex-col gap-y-1.5">
                       <label
                         htmlFor="tempat_lahir"
-                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                        className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                       >
                         Tempat Lahir
                       </label>
@@ -667,7 +667,7 @@ function Formslider() {
 
                     {/* Tanggal Lahir */}
                     <div className="flex flex-1 flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Tanggal Lahir
                       </label>
                       <MyCalendar
@@ -704,7 +704,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-4">
                     {/* Kota */}
                     <div className="flex flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Kota
                       </label>
                       <MyAsyncDropdown
@@ -730,7 +730,7 @@ function Formslider() {
 
                     {/* Kecamatan */}
                     <div className="flex flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Kecamatan
                       </label>
                       <MyAsyncDropdown
@@ -756,7 +756,7 @@ function Formslider() {
 
                     {/* Kelurahan */}
                     <div className="flex flex-col gap-y-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Kelurahan
                       </label>
                       <MyAsyncDropdown
@@ -784,7 +784,7 @@ function Formslider() {
                     <div className="flex flex-col gap-y-1.5">
                       <label
                         htmlFor="kode_pos"
-                        className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                        className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                       >
                         Kode Pos
                       </label>
@@ -803,7 +803,7 @@ function Formslider() {
                   {/* Alamat Sesuai Identitas */}
                   <div className="flex flex-col gap-y-1.5">
                     <div className="flex items-center gap-x-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Alamat Sesuai Identitas
                       </label>
                       <MyTooltip title="Masukkan alamat sesuai dengan KTP" placement="top">
@@ -823,7 +823,7 @@ function Formslider() {
                   <div className="flex flex-col gap-y-1.5">
                     <label
                       htmlFor="nama_ibu"
-                      className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']"
+                      className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']"
                     >
                       Nama Ibu Gadis Kandung
                     </label>
@@ -865,7 +865,7 @@ function Formslider() {
 
                   {/* Tujuan Permintaan */}
                   <div className="flex flex-col gap-y-1.5">
-                    <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                    <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                       Tujuan Permintaan
                     </label>
                     <MyAutocomplete
@@ -887,7 +887,7 @@ function Formslider() {
                   {/* Penjelasan */}
                   <div className="flex flex-col gap-y-1.5">
                     <div className="flex items-center gap-x-1.5">
-                      <label className="text-sm-medium text-gray-700 after:text-brand/600 after:content-['*']">
+                      <label className="text-sm-medium text-gray-700 after:text-brand/900 after:content-['*']">
                         Penjelasan
                       </label>
                       <MyTooltip
@@ -1064,7 +1064,7 @@ function Formslider() {
                           <div className="mt-2 flex items-center justify-center">
                             <button
                               type="button"
-                              className="text-sm-medium text-brand/600 underline hover:text-brand-700"
+                              className="text-sm-medium text-brand/900 underline hover:text-brand/700"
                               onClick={() => setIsMobileSigning(true)}
                             >
                               Gambar dari perangkat seluler Anda
@@ -1081,7 +1081,7 @@ function Formslider() {
                             level="H"
                             includeMargin
                           />
-                          <p className="mt-4 text-center text-sm-medium text-brand/600">
+                          <p className="mt-4 text-center text-sm-medium text-brand/900">
                             Scan QR ini di perangkat seluler anda untuk tanda tangan
                           </p>
                           <button
@@ -1110,7 +1110,7 @@ function Formslider() {
                         Dengan menandatangani ini, Anda menyatakan telah membaca dan menyetujui{' '}
                         <button
                           type="button"
-                          className="text-brand/600 font-medium cursor-pointer"
+                          className="text-brand/900 font-medium cursor-pointer"
                           onClick={() => setIsTermsModalOpen(true)}
                         >
                           <p className="text-sm-regular text-brand/700">Terms & Conditions</p>

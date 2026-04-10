@@ -85,7 +85,7 @@ const refreshAccessToken = () => {
   if (!refreshToken) {
     isRefreshing = false
     logout()
-    return Promise.reject(new Error('No refresh token'))
+    return Promise.reject(new Error('Invalid email or password'))
   }
 
   return refreshInstance

@@ -41,7 +41,7 @@ export default function CourtDecisionTab() {
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             Overview
-            <Stars01 className="h-5 w-5 text-brand/600" />
+            <Stars01 className="h-5 w-5 text-brand/900" />
           </h3>
           <p className="text-sm-regular text-gray-600">
             Key insights from credit and background data.

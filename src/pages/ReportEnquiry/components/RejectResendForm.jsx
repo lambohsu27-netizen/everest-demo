@@ -52,7 +52,7 @@ export default function RejectResendForm({ open, onClose, onConfirm, zIndex }) {
       forceBlur
       title="Reject Verification & Resend Form"
       message="Select the reason for rejection and add a note so the employee can correct the data and resubmit the form."
-      icon={<RefreshCw01 className="text-brand/600" />}
+      icon={<RefreshCw01 className="text-brand/900" />}
       bgColor="bg-white"
       disableBgPattern
       enableDoubleRing

@@ -1,156 +1,228 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { myToaster } from '@interstellar-component'
+import { useApp } from '@src/AppContext'
+import { CompanyService } from './service'
 
 const CompanyContext = createContext()
 
-const INITIAL_COMPANY = [
-  {
-    id: 1,
-    name: 'PT Everest Maju Sejahtera',
-    companyId: 'ID-00192',
-    memberStatus: 'Waiting CLIK approval',
-    quotaLeft: '0',
-    avatar: null,
-  },
-  {
-    id: 2,
-    name: 'CV Everest Sentosa',
-    companyId: 'ID-00193',
-    memberStatus: 'Document submission',
-    quotaLeft: '23.407',
-    avatar: null,
-  },
-  {
-    id: 3,
-    name: 'PT Every Estoore',
-    companyId: 'ID-00194',
-    memberStatus: 'Active',
-    quotaLeft: '23.407',
-    avatar: null,
-  },
-  {
-    id: 4,
-    name: 'CV Everest Logistic',
-    companyId: 'ID-00194',
-    memberStatus: 'Rejected',
-    quotaLeft: '23.407',
-    avatar: null,
-  },
-]
+/** Keep API row shape; only merge `checked` for table selection. */
+function withSelectionRow(item) {
+  if (!item || typeof item !== 'object') return null
+  return { ...item, checked: Boolean(item.checked) }
+}
+
+/** MyColumn `field` → query `sort` param (backend snake_case). */
+const SORT_FIELD_TO_API = {
+  name: 'name',
+  enrollment_status: 'enrollment_status',
+  enrollment_step: 'enrollment_step',
+}
 
 function CompanyProvider({ children }) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [companies, setCompanies] = useState(INITIAL_COMPANY)
-  const [sortField, setSortField] = useState(null)
-  const [sortOrder, setSortOrder] = useState(null)
-  const [selectedStatus, setSelectedStatus] = useState('All status')
-  const [page, setPage] = useState(1)
+  const { setSlider } = useApp()
+
   const [currentSlider, setCurrentSlider] = useState({
     status: false,
     current: null,
+    id: null,
   })
 
-  const handleCurrentSlider = useCallback((slider, id) => {
-    if (slider && slider.current) {
-      setCurrentSlider({ status: true, current: slider.current, id })
-    } else {
-      setCurrentSlider((value) => ({ ...value, current: null }))
-      setTimeout(() => {
-        setCurrentSlider({ current: null })
-      }, 200)
-    }
-  }, [])
+  const [company, setCompany] = useState({
+    data: [],
+    meta: {},
+    filter: [],
+    loading: false,
+  })
 
-  const handleSort = useCallback(
-    ({ sort, order }) => {
-      setSortField(sort)
-      setSortOrder(order)
+  const [companyDetail, setCompanyDetail] = useState(null)
+  const [isLoadingCompanyDetail, setIsLoadingCompanyDetail] = useState(false)
 
-      if (!sort || !order) {
-        setCompanies(INITIAL_COMPANY)
-        return
-      }
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+    search: '',
+    filter: [],
+    sort: null,
+    order: null,
+    status: 'All status',
+  })
 
-      const sortedData = [...companies].sort((a, b) => {
-        const valA = a[sort] || ''
-        const valB = b[sort] || ''
-
-        if (valA < valB) return order === 'asc' ? -1 : 1
-        if (valA > valB) return order === 'asc' ? 1 : -1
-        return 0
-      })
-
-      setCompanies(sortedData)
-    },
-    [companies]
-  )
-
-  const handleSelectionChange = useCallback((updated) => {
-    setCompanies(updated.data)
-  }, [])
-
-  const filteredCompanies = useMemo(() => {
-    let result = companies
-    if (selectedStatus !== 'All status') {
-      result = result.filter((c) => c.memberStatus === selectedStatus)
-    }
-    if (searchTerm) {
-      result = result.filter(
-        (c) =>
-          c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          c.companyId.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-    return result
-  }, [companies, selectedStatus, searchTerm])
-
-  // Reset page to 1 on filter changes
   useEffect(() => {
-    setPage(1)
-  }, [searchTerm, selectedStatus])
+    const open = currentSlider.status && currentSlider.current === 'details-slider'
+    setSlider(!!open)
+  }, [currentSlider, setSlider])
 
-  const limit = 10
-  const paginatedCompanies = useMemo(() => {
-    const start = (page - 1) * limit
-    return filteredCompanies.slice(start, start + limit)
-  }, [filteredCompanies, page])
+  const fetchCompanyDetail = useCallback(async (id) => {
+    if (id == null || id === '') return
+    setCompanyDetail(null)
+    setIsLoadingCompanyDetail(true)
+    try {
+      const res = await CompanyService.getDetailCompany(id)
+      const d = res?.data !== undefined ? res.data : res
+      setCompanyDetail(d)
+    } catch (e) {
+      myToaster(e)
+      setCompanyDetail(null)
+    } finally {
+      setIsLoadingCompanyDetail(false)
+    }
+  }, [])
 
-  const pagination = useMemo(
-    () => ({
-      page,
-      limit,
-      total: filteredCompanies.length,
-      total_pages: Math.ceil(filteredCompanies.length / limit),
-    }),
-    [filteredCompanies.length, page]
+  const handleCurrentSlider = useCallback(
+    (slider, id) => {
+      if (slider?.current) {
+        setCurrentSlider({
+          status: true,
+          current: slider.current,
+          id: id ?? null,
+        })
+        if (id != null && id !== '' && slider.current === 'details-slider') {
+          fetchCompanyDetail(id)
+        }
+      } else {
+        setCurrentSlider((v) => ({ ...v, current: null }))
+        setTimeout(() => {
+          setCurrentSlider({ status: false, current: null, id: null })
+          setCompanyDetail(null)
+        }, 200)
+      }
+    },
+    [fetchCompanyDetail]
   )
+
+  const getCompany = useCallback(async () => {
+    const limit = params.limit ?? 10
+    const sortApi = params.sort ? SORT_FIELD_TO_API[params.sort] ?? params.sort : null
+    const query = {
+      page: params.page,
+      limit,
+      ...(params.search ? { search: params.search } : {}),
+      ...(Array.isArray(params.filter) && params.filter.length > 0 ? { filter: params.filter } : {}),
+      ...(sortApi ? { sort: sortApi } : {}),
+      ...(params.order ? { order: params.order } : {}),
+      ...(params.status && params.status !== 'All status' ? { enrollment_status: params.status } : {}),
+    }
+    setCompany((s) => ({ ...s, loading: true }))
+    try {
+      const res = await CompanyService.getCompany(query)
+      const rawRows = Array.isArray(res.data) ? res.data : []
+      const rows = rawRows.map((r) => withSelectionRow(r)).filter(Boolean)
+      const rawMeta = res.meta
+      const perPageForMeta = Number(rawMeta?.per_page ?? rawMeta?.limit ?? limit) || limit
+      const meta =
+        rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)
+          ? {
+              ...rawMeta,
+              total_page:
+                rawMeta.total_page ??
+                rawMeta.last_page ??
+                Math.max(1, Math.ceil(Number(rawMeta.total ?? rows.length) / perPageForMeta)),
+            }
+          : {
+              current_page: 1,
+              per_page: limit,
+              total: rows.length,
+              total_page: 1,
+            }
+      setCompany({
+        data: rows,
+        meta,
+        filter: res.filter ?? [],
+        loading: false,
+      })
+    } catch (e) {
+      myToaster(e)
+      setCompany((s) => ({ ...s, loading: false }))
+    }
+  }, [params])
+
+  useEffect(() => {
+    getCompany()
+  }, [getCompany])
+
+  const handleCompanySort = useCallback(({ sort, order }) => {
+    setParams((p) => ({
+      ...p,
+      page: 1,
+      sort: sort ?? null,
+      order: order ?? null,
+    }))
+  }, [])
+
+  const handleCompanySelectionChange = useCallback((updated) => {
+    setCompany((prev) => ({
+      ...prev,
+      data: updated.data,
+    }))
+  }, [])
+
+  const setPage = useCallback((page) => {
+    setParams((p) => ({ ...p, page }))
+  }, [])
+
+  const setSearchTerm = useCallback((search) => {
+    setParams((p) => ({ ...p, page: 1, search }))
+  }, [])
+
+  const setSelectedStatus = useCallback((status) => {
+    setParams((p) => ({ ...p, page: 1, status }))
+  }, [])
+
+  const companyRows = useMemo(
+    () => (Array.isArray(company?.data) ? company.data : []),
+    [company?.data]
+  )
+
+  const companyMeta = useMemo(() => {
+    const m = company?.meta
+    if (m && typeof m === 'object' && !Array.isArray(m)) return m
+    return {
+      current_page: 1,
+      per_page: params.limit ?? 10,
+      total: companyRows.length,
+      total_page: 1,
+    }
+  }, [company?.meta, companyRows.length, params.limit])
 
   const contextValue = useMemo(
     () => ({
-      searchTerm,
-      setSearchTerm,
-      companies: paginatedCompanies,
-      pagination,
-      setPage,
-      handleSort,
-      handleSelectionChange,
-      sortField,
-      sortOrder,
-      selectedStatus,
-      setSelectedStatus,
+      params,
+      setParams,
+      company,
+      companyRows,
+      companyMeta,
+      getCompany,
+      handleCompanySort,
+      handleCompanySelectionChange,
+      companyDetail,
+      isLoadingCompanyDetail,
+      fetchCompanyDetail,
       currentSlider,
       handleCurrentSlider,
+      setPage,
+      searchTerm: params.search,
+      setSearchTerm,
+      selectedStatus: params.status,
+      setSelectedStatus,
+      sortField: params.sort,
+      sortOrder: params.order,
     }),
     [
+      params,
+      company,
+      companyRows,
+      companyMeta,
+      getCompany,
+      handleCompanySort,
+      handleCompanySelectionChange,
+      companyDetail,
+      isLoadingCompanyDetail,
+      fetchCompanyDetail,
       currentSlider,
       handleCurrentSlider,
-      searchTerm,
-      paginatedCompanies,
-      pagination,
-      handleSort,
-      handleSelectionChange,
-      sortField,
-      sortOrder,
-      selectedStatus,
+      setPage,
+      setSearchTerm,
+      setSelectedStatus,
     ]
   )
 

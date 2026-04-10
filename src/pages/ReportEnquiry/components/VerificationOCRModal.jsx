@@ -74,7 +74,7 @@ export default function VerificationOCRModal({ open, data }) {
         {/* Face Match Score Card */}
         <div className="flex w-full items-center gap-4 rounded-xl border border-brand/100 bg-[#FCFAFF] p-4 shrink-0">
           {/* Circular Score Badge */}
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/600 text-[10px] font-semibold text-white">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/900 text-[10px] font-semibold text-white">
             {displayData.score}%
           </div>
           
@@ -86,7 +86,7 @@ export default function VerificationOCRModal({ open, data }) {
             <div className="h-2 w-full overflow-hidden rounded-full bg-white border border-brand/100">
               {/* Progress Bar Fill */}
               <div 
-                className="h-full rounded-full bg-brand/600 transition-all duration-500" 
+                className="h-full rounded-full bg-brand/900 transition-all duration-500" 
                 style={{ width: `${displayData.score}%` }} 
                 role="progressbar"
                 aria-valuenow={displayData.score}

@@ -147,8 +147,8 @@ export default function RoleTab() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between p-5 border-b border-gray-200">
           <div className="w-full max-w-sm">
             <MyTextField
-              focusColor="#7F56D9"
-              focusShadow="#7F56D93D"
+              focusColor="#42307D"
+              focusShadow="#42307D3D"
               placeholder="Search roles"
               startAdornment={
                 <SearchLg

@@ -37,8 +37,7 @@ function LoginProvider({ children }) {
     }
   }, [])
 
-  const login = useCallback(
-    async (body) => {
+  const login = async (body) => {
       // console.log('body', body)
 
       const formData = new FormData()
@@ -85,9 +84,8 @@ function LoginProvider({ children }) {
         .catch((e) => {
           myToaster(e)
         })
-    },
-    [setCookie]
-  )
+    }
+    
 
   const getUser = useCallback(
     async () =>

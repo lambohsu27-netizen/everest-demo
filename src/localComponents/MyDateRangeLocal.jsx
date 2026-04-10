@@ -291,7 +291,7 @@ const MyDateRangeLocal = ({
               disabled={!state[0].startDate || !state[0].endDate}
               className={`${
                 state[0].startDate && state[0].endDate
-                  ? 'bg-brand/600 text-white'
+                  ? 'bg-brand/900 text-white'
                   : 'border border-gray-light/200 bg-gray-light/100 text-gray-light/400'
               } text-sm-semibold shadow-shadows/shadow-xs flex flex-1 items-center justify-center gap-x-1 rounded-md px-[14px] py-2.5 text-center`}
               onClick={() => {

@@ -74,7 +74,7 @@ export default function RoleDetail() {
         <div className="flex flex-1 flex-col overflow-y-auto">
           {isLoadingRoleDetail ? (
             <div className="flex flex-1 items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-300 border-t-brand-600" />
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand/300 border-t-brand/900" />
             </div>
           ) : !roleDetail ? (
             <div className="text-sm-regular flex flex-1 items-center justify-center text-gray-500">Role not found.</div>

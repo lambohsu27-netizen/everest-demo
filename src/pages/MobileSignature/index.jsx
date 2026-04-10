@@ -100,7 +100,7 @@ export default function MobileSignature() {
           Clear
         </button>
         <button
-          className="flex-1 rounded-lg bg-brand-600 py-3 text-sm-medium text-white shadow-sm bg-brand/700"
+          className="flex-1 rounded-lg bg-brand/900 py-3 text-sm-medium text-white shadow-sm bg-brand/700"
           onClick={handleSign}
           disabled={isSubmitting}
         >

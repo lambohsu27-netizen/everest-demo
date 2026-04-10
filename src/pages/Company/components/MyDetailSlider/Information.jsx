@@ -1,113 +1,138 @@
-import { MyAvatar, MyCardFile, MyChip, MyDetailView } from '@interstellar-component'
-import moment from 'moment'
-import { useRef, useState } from 'react'
-import { pick } from 'lodash'
+import { MyCardFile, MyChip, MyDetailView } from '@interstellar-component'
 import SimpleBar from 'simplebar-react'
-const Information = () => {
-  const data = {
-    company_information: {
-      'Company Legal Name': 'PT Everest Teknologi Nusantara',
-      'Business / Brand Name': 'Everest',
-      'Business Entity Type': 'PT',
-      Industry: 'Technology',
-      'Registration Number': '9120301234567',
-      'Country of Incorporation': 'Indonesia',
-      'Company Address': 'Jl. HR Rasuna Said No. 10, Jakarta',
-      'Company Email': 'admin@everest.co.id',
-    },
 
-    authorized_representative: {
-      'Full Name': 'Phoenix Baker',
-      'Job Title': 'HR Manager',
-      'Email Address': 'baker@everest.co.id',
-      'Phone Number': '+62 882 1992 1992',
-      'ID Type': 'KTP',
-      'ID Number': '3175042603000008',
-    },
+/** Backend field names (list response / detail) shown as labels in detail view. */
+const COMPANY_FIELD_KEYS = [
+  'id',
+  'name',
+  'legal_name',
+  'logo_url',
+  'province',
+  'city',
+  'district',
+  'subdistrict',
+  'postal_code',
+  'company_address',
+  'npwp',
+  'nib',
+  'date_of_establishment',
+  'business_category',
+  'industry',
+  'number_of_employees',
+  'company_website',
+  'email',
+  'enrollment_status',
+  'enrollment_step',
+  'verification_status',
+  'agreement_signed_at',
+  'agreement_signed_by',
+  'created_by',
+  'updated_by',
+  'created_at',
+  'updated_at',
+  'deleted_at',
+]
 
-    attachments: [
-      {
-        full_url:
-          'https://kalachakra-dev.s3.ap-southeast-1.amazonaws.com/tron/uploads/files/po-library/attachments/dfb670bc-8ef4-43cb-b999-4df8f718f364.vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        id: 'e2f19c5a-9bf5-4b50-9a75-e80c5e9cdaad',
-        filename: 'daily-ticket-report (5).xlsx',
-        url: 'uploads/files/po-library/attachments/dfb670bc-8ef4-43cb-b999-4df8f718f364.vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        mime_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        size: 12557,
-        main_id: 'SMG0022557400102560',
-        lat: null,
-        lng: null,
-        address: null,
-        accuracy: null,
-        meta_data: null,
-        created_at: '2025-12-31T03:16:29.254Z',
-        updated_at: '2025-12-31T03:16:29.255Z',
-        deleted_at: null,
-        created_by_id: 'dafb7cf9-7d7f-4a94-91a3-c404e66e94f4',
-        updated_by_id: 'dafb7cf9-7d7f-4a94-91a3-c404e66e94f4',
-      },
-    ],
+function formatValue(value) {
+  if (value === null || value === undefined) return '—'
+  if (typeof value === 'object') return JSON.stringify(value)
+  return String(value)
+}
+
+function buildCompanyDatas(detail) {
+  if (!detail || typeof detail !== 'object') return {}
+  const datas = {}
+  COMPANY_FIELD_KEYS.forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(detail, key)) {
+      datas[key] = formatValue(detail[key])
+    }
+  })
+  if (Array.isArray(detail.user_companies)) {
+    datas.user_companies = JSON.stringify(detail.user_companies)
   }
-  return (
-    <>
-      <SimpleBar forceVisible="y" style={{ height: '100%' }}>
-        <div className="flex flex-1 flex-col gap-8 pb-8 pt-4">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-1 flex-col gap-y-6 px-4 text-gray-600">
-              <MyDetailView
-                header="Company Information"
-                datas={data?.company_information}
-                func={{
-                  Industry: (value) => (
-                    <MyChip
-                      label={value}
-                      rounded={'lg'}
-                      color={'modern'}
-                      variant={'outlined'}
-                      size={'sm'}
-                    />
-                  ),
-                }}
-              />
-            </div>
+  return datas
+}
 
+export default function Information({ data: detail, loading }) {
+  const companyDatas = buildCompanyDatas(detail)
+
+  const representative = detail?.authorized_representative
+  const attachments = Array.isArray(detail?.attachments) ? detail.attachments : []
+
+  if (loading) {
+    return (
+      <div className="flex flex-1 items-center justify-center px-4 py-12 text-sm text-gray-light/600">
+        Loading…
+        
+      </div>
+    )
+  }
+
+  return (
+    <SimpleBar forceVisible="y" style={{ height: '100%' }}>
+      <div className="flex flex-1 flex-col gap-8 pb-8 pt-4">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-1 flex-col gap-y-6 px-4 text-gray-600">
+            <MyDetailView
+              header="company"
+              datas={companyDatas}
+              func={{
+                industry: (value) => (
+                  <MyChip
+                    label={value}
+                    rounded="lg"
+                    color="modern"
+                    variant="outlined"
+                    size="sm"
+                  />
+                ),
+                business_category: (value) => (
+                  <MyChip
+                    label={value}
+                    rounded="lg"
+                    color="modern"
+                    variant="outlined"
+                    size="sm"
+                  />
+                ),
+              }}
+            />
+          </div>
+
+          {representative && typeof representative === 'object' ? (
             <div className="flex flex-col gap-6">
               <div className="flex flex-1 flex-col gap-y-6 px-4 text-gray/600">
                 <MyDetailView
-                  header="Authorized Representative (PIC)"
-                  datas={data?.authorized_representative}
+                  header="authorized_representative"
+                  datas={representative}
                 />
               </div>
             </div>
+          ) : null}
 
+          {attachments.length > 0 ? (
             <div className="mt-0.5 rounded-xl bg-gray/25 shadow-sm outline outline-1 outline-gray-200">
-              <label className="text-sm-semibold block px-4 pb-2 pt-3 text-gray-900">
-                Attachment
+              <label
+                className="text-sm-semibold block px-4 pb-2 pt-3 text-gray-900"
+                htmlFor="company-attachments"
+              >
+                attachments
               </label>
               <div className="flex flex-col gap-4 rounded-xl bg-white px-4 py-5 outline outline-1 outline-gray-200">
-                <div className="flex flex-col gap-1.5">
-                  {data?.attachments?.map((value, index) => (
+                <div className="flex flex-col gap-1.5" id="company-attachments">
+                  {attachments.map((value, index) => (
                     <MyCardFile
-                      key={index}
-                      onClickDownload={true}
-                      // progressUpload={progressUpload}
-                      // progress={progressList[i]}
-                      // onDeleteFile={() => {
-                      //   handleDeleteFile(value);
-                      // }}
-
+                      key={value.id ?? index}
+                      onClickDownload
                       file={value}
-                      // showImage={showImage}
-                    ></MyCardFile>
+                    />
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          ) : null}
         </div>
-      </SimpleBar>
-    </>
+      </div>
+    </SimpleBar>
   )
 }
-
-export default Information

@@ -57,7 +57,7 @@ function LoanAccountSlider() {
         style: { colors: '#717680', fontSize: '12px' }
       }
     },
-    colors: ['#7F56D9'],
+    colors: ['#42307D'],
     stroke: { curve: 'straight', width: 2 },
     markers: { size: 4 },
   }

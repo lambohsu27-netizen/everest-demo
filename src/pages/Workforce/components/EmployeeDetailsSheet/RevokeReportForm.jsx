@@ -96,7 +96,7 @@ export default function RevokeReportForm({ open, onClose, onRevoke }) {
         {/* Reason for revocation */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm-medium text-gray-light/700">
-            Reason for revocation <span className="text-brand/600">*</span>
+            Reason for revocation <span className="text-brand/900">*</span>
           </label>
           <MyAsyncDropdown
             name="reason"
@@ -122,7 +122,7 @@ export default function RevokeReportForm({ open, onClose, onRevoke }) {
         {/* Additional notes */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm-medium text-gray-light/700">
-            Additional notes <span className="text-brand/600">*</span>
+            Additional notes <span className="text-brand/900">*</span>
           </label>
           <MyTextArea
             name="notes"
@@ -136,7 +136,7 @@ export default function RevokeReportForm({ open, onClose, onRevoke }) {
         {/* Revocation effective */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm-medium text-gray-light/700">
-            Revocation effective <span className="text-brand/600">*</span>
+            Revocation effective <span className="text-brand/900">*</span>
           </label>
           <MyAsyncDropdown
             name="effectiveDate"

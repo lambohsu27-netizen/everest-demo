@@ -40,7 +40,7 @@ export default function JobApplicationLetterModal({ open, onClose, content, zInd
       zIndex={zIndex}
       forceBlur
       title="SURAT LAMARAN KERJA"
-      icon={<File02 className="text-brand/600" />}
+      icon={<File02 className="text-brand/900" />}
       bgColor="bg-white"
       disableBgPattern
       enableDoubleRing

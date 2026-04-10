@@ -15,7 +15,7 @@ function ContactFeatures() {
       <div className="flex w-full flex-col gap-8 md:flex-row">
         {/* Card 1 */}
         <div className="flex flex-1 flex-col gap-16 bg-[#fafafa] p-6 rounded-xl">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-brand/600 shadow-[0px_1px_2px_0px_#1018280d]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-brand/900 shadow-[0px_1px_2px_0px_#1018280d]">
             <MessageCircle01 className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col gap-5">
@@ -29,7 +29,7 @@ function ContactFeatures() {
 
         {/* Card 2 */}
         <div className="flex flex-1 flex-col gap-16 bg-[#fafafa] p-6 rounded-xl">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-brand/600 shadow-[0px_1px_2px_0px_#1018280d]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-brand/900 shadow-[0px_1px_2px_0px_#1018280d]">
             <Phone className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col gap-5">

@@ -29,7 +29,7 @@ function ModalTermsConditionView({ onClose }) {
             <MyBgPatternDecorativeCircle
               children={
                 <div className="w-fit rounded-full border-8 border-brand/50 bg-brand/100 p-3">
-                  <AlertCircle className="text-brand/600" />
+                  <AlertCircle className="text-brand/900" />
                 </div>
               }
             />

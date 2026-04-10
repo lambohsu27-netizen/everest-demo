@@ -146,7 +146,7 @@ export default function RoleForm({ mode }) {
                       <button
                         type="button"
                         onClick={clearSearch}
-                        className="rounded-full bg-brand/600 px-2.5 py-0.5 text-xs font-medium text-base-white hover:bg-brand/700"
+                        className="rounded-full bg-brand/900 px-2.5 py-0.5 text-xs font-medium text-base-white hover:bg-brand/700"
                       >
                         Cancel
                       </button>
@@ -166,7 +166,7 @@ export default function RoleForm({ mode }) {
               <div className="flex-1 overflow-y-auto">
                 {allPermissions.length === 0 ? (
                   <div className="flex items-center justify-center py-10">
-                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-brand/200 border-t-brand/600" />
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-brand/200 border-t-brand/900" />
                   </div>
                 ) : (
                   <div className="flex flex-col">
@@ -186,7 +186,7 @@ export default function RoleForm({ mode }) {
                                 <button
                                   type="button"
                                   onClick={() => toggleModule(moduleKey)}
-                                  className={`relative mt-0.5 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${enabled ? 'bg-brand/600' : 'bg-gray/200'}`}
+                                  className={`relative mt-0.5 inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${enabled ? 'bg-brand/900' : 'bg-gray/200'}`}
                                 >
                                   <span
                                     className={`inline-block h-4 w-4 transform rounded-full bg-base-white shadow-shadows/shadow-xs transition-transform duration-200 ${enabled ? 'translate-x-[17px]' : 'translate-x-[2px]'} mt-[2px]`}
@@ -215,7 +215,7 @@ export default function RoleForm({ mode }) {
                                       <label key={subKey} className="flex cursor-pointer items-center gap-2">
                                         <span
                                           onClick={() => toggleSub(moduleKey, subKey)}
-                                          className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border ${checked ? 'border-brand/600 bg-brand/600' : 'border-gray/300 bg-base-white'}`}
+                                          className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border ${checked ? 'border-brand/900 bg-brand/900' : 'border-gray/300 bg-base-white'}`}
                                         >
                                           {checked && (
                                             <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -273,7 +273,7 @@ export default function RoleForm({ mode }) {
                       <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
                           <p className="text-sm font-medium leading-5 text-gray/700 font-inter">
-                            Role name <span className="text-brand/600">*</span>
+                            Role name <span className="text-brand/900">*</span>
                           </p>
                           <MyTextField
                             name="role_name"
@@ -285,8 +285,8 @@ export default function RoleForm({ mode }) {
                               setName(e.target.value)
                               if (nameError) setNameError('')
                             }}
-                            focusColor="#7F56D9"
-                            focusShadow="#7F56D93D"
+                            focusColor="#42307D"
+                            focusShadow="#42307D3D"
                           />
                         </div>
                       </div>

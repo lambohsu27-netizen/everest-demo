@@ -20,7 +20,6 @@ import MyMemberStatusChip from './MyMemberStatusChip'
 
 const STATUS_TABS = [
   { label: 'All status', value: 'All status' },
-  { label: 'In progress', value: 'in_progress' },
   { label: 'Active', value: 'active' },
   { label: 'Expired', value: 'expired' },
 ]
@@ -99,16 +98,12 @@ function CompanyTable() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 px-3.5 py-2">
-                <MyButton
-                  color="error"
-                  variant="outlined"
-                  size="md"
-                  type="button"
-                  disabled={selectedCount === 0}
-                >
-                  <Trash01 className="h-5 w-5" />
-                  <p className="text-sm-semibold">Delete</p>
-                </MyButton>
+                {selectedCount > 0 ? (
+                  <MyButton color="error" variant="outlined" size="md" type="button">
+                    <Trash01 className="h-5 w-5" />
+                    <p className="text-sm-semibold">Delete</p>
+                  </MyButton>
+                ) : null}
                 <MyButton
                   color="primary"
                   variant="filled"
@@ -157,7 +152,7 @@ function CompanyTable() {
             onSelectionChange={handleCompanySelectionChange}
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
-            onClick={(row) => handleCurrentSlider({ current: 'details-slider' }, row.id)}
+            onClick={(row) => handleCurrentSlider({ current: 'details-slider' }, row.id, row)}
           >
             <MyColumn
               header="Company name & ID"

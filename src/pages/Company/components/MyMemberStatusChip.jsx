@@ -78,10 +78,10 @@ export default function MyMemberStatusChip({ status }) {
 
   return (
     <span
-      className={`inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${styles.pill}`}
+      className={`inline-flex w-fit max-w-full shrink-0 self-start items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${styles.pill}`}
     >
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${styles.dot}`} aria-hidden />
-      <span className="truncate">{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </span>
   )
 }

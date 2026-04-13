@@ -1,8 +1,37 @@
+import React, { useMemo } from 'react'
+import moment from 'moment'
 import { MyAvatar, MyButton, MyTextField } from '@interstellar-component'
 import SimpleBar from 'simplebar-react'
-import { Save01 } from '@untitled-ui/icons-react'
+import { Key01, Passcode, Save01, User01 } from '@untitled-ui/icons-react'
 
-export default function Result({ loading }) {
+function formatActivityTimestamp(iso) {
+  if (!iso) return '—'
+  return moment(iso).format('h:mma D MMM YYYY')
+}
+
+export default function Result({ loading, data }) {
+  const credentials = useMemo(() => {
+    const g = data?.general_information
+    if (!g || typeof g !== 'object') {
+      return { username: '', password: '', apiKey: '' }
+    }
+    const s = (v) => (v == null ? '' : String(v))
+    return {
+      username: s(g.clik_username),
+      password: s(g.clik_password),
+      apiKey: s(g.clik_api_key),
+    }
+  }, [data?.general_information])
+
+  const activities = useMemo(() => {
+    const raw = data?.activity
+    if (!Array.isArray(raw)) return []
+    return [...raw].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+  }, [data?.activity])
+
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center px-4 py-12 text-sm text-gray-light/600">
@@ -15,76 +44,123 @@ export default function Result({ loading }) {
     <SimpleBar forceVisible="y" style={{ height: '100%' }}>
       <div className="flex flex-1 flex-col gap-8 pb-8 pt-4">
         <div className="flex flex-1 flex-col gap-y-6 px-4">
-          <div className="rounded-xl bg-gray-50 shadow-sm outline outline-1 outline-gray-200">
-            <label className="text-sm-semibold block px-5 pb-2 pt-3 text-gray-900" htmlFor="company-api-credential">
-              General Information
-            </label>
-            <div className="flex flex-col gap-y-4 rounded-xl bg-white px-5 py-5 outline outline-1 outline-gray-200">
-              <div className="flex flex-col gap-2">
-                <label
-                  className="text-sm-medium text-gray/700 after:ml-0.5 after:text-brand/900 "
-                  htmlFor="company-api-credential"
-                >
-                  API credential
-                </label>
-                <MyTextField
-                  id="company-api-credential"
-                  name="code"
-                  placeholder="e.g. 3h3nnrf8inni871bb31884h12"
-                />
-                <p className="mt-0.5 mb-2 text-sm-regular text-gray-600">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 bg-gray-50 px-5 py-3">
+              <h2 className="text-sm-semibold text-gray-900">General Information</h2>
+            </div>
+            <div className="flex flex-col gap-4 px-5 py-4">
+              <div>
+                <h3 className="text-sm-medium text-gray-800">Credentials</h3>
+                <p className="mt-1 text-xs-regular leading-relaxed text-gray-600">
                   Used to authenticate and authorize API requests from system.
                 </p>
-                <hr />
-                <div className="mt-3 flex items-center justify-between">
-                  <p className="text-sm-semibold">Resend email</p>
-                  <div className="flex items-center gap-3">
-                    <MyButton color="secondary" variant="outlined" size="sm">
-                      <p className="text-sm-semibold">Reset</p>
-                    </MyButton>
+              </div>
 
-                    <MyButton color="primary" variant="outlined" size="sm">
-                      <Save01 className="size-5" stroke="currentColor" />
-                      <p className="text-sm-semibold">Validate</p>
-                    </MyButton>
-                  </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm-medium text-gray-700" htmlFor="company-result-username">
+                    Username
+                  </label>
+                  <MyTextField
+                    id="company-result-username"
+                    name="username"
+                    value={credentials.username}
+                    placeholder="e.g. 3h3nnrf8inni871bb31884h12"
+                    margin="7px 12px"
+                    startAdornment={
+                      <User01 className="size-[18px] text-gray-400" stroke="currentColor" />
+                    }
+                  />
                 </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm-medium text-gray-700" htmlFor="company-result-password">
+                    Password
+                  </label>
+                  <MyTextField
+                    id="company-result-password"
+                    name="password"
+                    type="password"
+                    value={credentials.password}
+                    placeholder="e.g. 3h3nnrf8inni871bb31884h12"
+                    margin="7px 12px"
+                    startAdornment={
+                      <Passcode className="size-[18px] text-gray-400" stroke="currentColor" />
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm-medium text-gray-700" htmlFor="company-result-api-key">
+                    API key
+                  </label>
+                  <MyTextField
+                    id="company-result-api-key"
+                    name="api_key"
+                    value={credentials.apiKey}
+                    placeholder="e.g. 3h3nnrf8inni871bb31884h12"
+                    margin="7px 12px"
+                    startAdornment={
+                      <Key01 className="size-[18px] text-gray-400" stroke="currentColor" />
+                    }
+                  />
+                </div>
+              </div>
+
+              <hr className="border-gray-200" />
+              <div className="flex justify-end gap-3 pt-1">
+                <MyButton color="secondary" variant="outlined" size="sm" type="button">
+                  <p className="text-sm-semibold">Reset</p>
+                </MyButton>
+                <MyButton color="primary" variant="outlined" size="sm" type="button">
+                  <Save01 className="size-4" stroke="currentColor" aria-hidden />
+                  <p className="text-sm-semibold">Validate</p>
+                </MyButton>
               </div>
             </div>
           </div>
-          <div className="mt-0.5 rounded-xl bg-gray/25 shadow-sm outline outline-1 outline-gray-200">
-            <label className="text-sm-semibold block px-4 pb-2 pt-3 text-gray-900">Activity</label>
-            <div className="flex flex-col gap-4 rounded-xl bg-white px-4 py-5 outline outline-1 outline-gray-200">
-              <div className="relative mb-5 flex flex-col">
-                <div className="relative flex items-center gap-4">
-                  <div className="absolute bottom-0 left-[23px] top-10 h-full w-[2px] bg-gray-300" />
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-col">
-                      <div className="flex flex-row gap-2">
-                        <div className="relative flex items-center justify-center rounded-full bg-white p-1">
-                          <MyAvatar photo={null} size={50} />
+
+          <div className="mt-2 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
+              <h2 className="text-sm-semibold text-gray-900">Activity</h2>
+            </div>
+            <div className="px-4 py-5">
+              {activities.length === 0 ? (
+                <p className="text-sm-regular text-gray-500">No activity yet.</p>
+              ) : (
+                <div className="relative">
+                  <div
+                    className="absolute bottom-4 left-5 top-5 w-px bg-gray-200"
+                    aria-hidden
+                  />
+                  <ul className="relative flex flex-col gap-6">
+                    {activities.map((act) => (
+                      <li key={act.id} className="relative flex gap-3">
+                        <div className="relative z-[1] shrink-0 rounded-full bg-white p-0.5 ring-2 ring-white">
+                          <MyAvatar
+                            photo={act.user?.avatar_url ?? null}
+                            size={40}
+                          />
                         </div>
-                        <div className="flex flex-col">
-                          <div className="flex flex-row gap-2">
-                            <p className="text-sm-medium text-gray/700">Phoenix Baker</p>
-                            <p className="text-sm-regular text-gray/600">3:10pm 20 Jan 2025</p>
+                        <div className="min-w-0 flex-1 pt-0.5">
+                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                            <span className="text-sm-medium text-gray-800">
+                              {act.user?.name ?? '—'}
+                            </span>
+                            <time
+                              className="text-sm-regular text-gray-500"
+                              dateTime={act.created_at}
+                            >
+                              {formatActivityTimestamp(act.created_at)}
+                            </time>
                           </div>
-                          <p className="text-sm-regular text-gray/600">
-                            Membership application is rejected Click here to re submit
+                          <p className="mt-1 text-sm-regular text-gray-600">
+                            {act.action ?? '—'}
                           </p>
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="ml-14 flex flex-col gap-3">
-                      <div className="mt-1 rounded-tr-xl rounded-b-xl border border-gray/200 p-2 text-sm-regular text-gray/700 shadow-sm">
-                        Nama yang menandatangani surat kuasa tidak sesuai dengan akta perubahan anggaran
-                        dasar
-                      </div>
-                    </div>
-                  </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

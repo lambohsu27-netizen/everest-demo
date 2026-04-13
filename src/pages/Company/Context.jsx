@@ -5,10 +5,91 @@ import { CompanyService } from './service'
 
 const CompanyContext = createContext()
 
+/** Gabungkan field dari `company_information` / `compliance_documents` ke root untuk header & subtitle. */
+function enrichCompanyDetailPayload(data) {
+  if (!data || typeof data !== 'object') return data
+  const ci = data.company_information
+  const out = { ...data }
+  if (ci && typeof ci === 'object') {
+    out.name = out.name ?? ci.name
+    out.legal_name = out.legal_name ?? ci.legal_name
+    out.email = out.email ?? ci.email
+  }
+  const cd = data.compliance_documents
+  if (cd && typeof cd === 'object') {
+    out.nib = out.nib ?? cd.nib
+    out.npwp = out.npwp ?? cd.npwp
+  }
+  return out
+}
+
+/**
+ * Gabungkan response detail per `type` agar header (nama, NIB, enrollment, dll.) tidak hilang
+ * saat pindah tab — response result/billing sering tidak menyertakan `company_information`.
+ */
+function mergeCompanyDetail(prev, incoming, id) {
+  const next = enrichCompanyDetailPayload(incoming)
+  if (!next || typeof next !== 'object') return prev
+  if (!prev || typeof prev !== 'object' || String(prev.id) !== String(id)) {
+    return next
+  }
+
+  const ci = next.company_information ?? prev.company_information
+  const cd = next.compliance_documents ?? prev.compliance_documents
+  const gi =
+    next.general_information !== undefined
+      ? next.general_information
+      : prev.general_information
+
+  return {
+    ...prev,
+    ...next,
+    company_information: ci,
+    compliance_documents: cd,
+    general_information: gi,
+    activity: next.activity !== undefined ? next.activity : prev.activity,
+    name: next.name ?? prev.name ?? ci?.name,
+    legal_name: next.legal_name ?? prev.legal_name ?? ci?.legal_name,
+    company_id: next.company_id ?? prev.company_id,
+    enrollment_status: next.enrollment_status ?? prev.enrollment_status,
+    enrollment_step: next.enrollment_step ?? prev.enrollment_step,
+    nib: next.nib ?? prev.nib ?? cd?.nib,
+    npwp: next.npwp ?? prev.npwp ?? cd?.npwp,
+    email: next.email ?? prev.email ?? ci?.email,
+  }
+}
+
+/** Subtitle di slider: NIB / company_id berformat / id. */
+export function formatCompanyDetailSubtitle(detail) {
+  if (!detail || typeof detail !== 'object') return ''
+  const cd = detail.compliance_documents
+  const nib = detail.nib ?? cd?.nib
+  if (nib != null && String(nib).trim() !== '') return String(nib)
+  const cid = detail.company_id
+  if (cid != null && String(cid).trim() !== '') {
+    const s = String(cid).trim()
+    if (/^id[-\s]/i.test(s)) return s
+    if (/^\d{10,}$/.test(s)) return s
+    const rest = s.replace(/^id-?/i, '').trim()
+    return rest ? `ID-${rest}` : ''
+  }
+  if (detail.id != null && String(detail.id).trim() !== '') return String(detail.id)
+  return ''
+}
+
 /** Keep API row shape; only merge `checked` for table selection. */
 function withSelectionRow(item) {
   if (!item || typeof item !== 'object') return null
   return { ...item, checked: Boolean(item.checked) }
+}
+
+/** Samakan dengan label chip: in progress → in_progress */
+function normalizeEnrollmentStatusKey(status) {
+  if (status == null || status === '') return ''
+  return String(status)
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_')
 }
 
 /** MyColumn `field` → query `sort` param (backend snake_case). */
@@ -52,14 +133,13 @@ function CompanyProvider({ children }) {
     setSlider(!!open)
   }, [currentSlider, setSlider])
 
-  const fetchCompanyDetail = useCallback(async (id) => {
+  const fetchCompanyDetail = useCallback(async (id, query = {}) => {
     if (id == null || id === '') return
-    setCompanyDetail(null)
     setIsLoadingCompanyDetail(true)
     try {
-      const res = await CompanyService.getDetailCompany(id)
+      const res = await CompanyService.getDetailCompany(id, query)
       const d = res?.data !== undefined ? res.data : res
-      setCompanyDetail(d)
+      setCompanyDetail((prev) => mergeCompanyDetail(prev, d, id))
     } catch (e) {
       myToaster(e)
       setCompanyDetail(null)
@@ -69,15 +149,23 @@ function CompanyProvider({ children }) {
   }, [])
 
   const handleCurrentSlider = useCallback(
-    (slider, id) => {
+    (slider, id, listRow) => {
       if (slider?.current) {
         setCurrentSlider({
           status: true,
           current: slider.current,
           id: id ?? null,
         })
-        if (id != null && id !== '' && slider.current === 'details-slider') {
-          fetchCompanyDetail(id)
+        if (slider.current === 'details-slider' && listRow && typeof listRow === 'object') {
+          const resolvedId = id ?? listRow.id
+          setCompanyDetail({
+            id: resolvedId,
+            name: listRow.name,
+            legal_name: listRow.legal_name,
+            company_id: listRow.company_id,
+            enrollment_status: listRow.enrollment_status,
+            enrollment_step: listRow.enrollment_step,
+          })
         }
       } else {
         setCurrentSlider((v) => ({ ...v, current: null }))
@@ -87,7 +175,7 @@ function CompanyProvider({ children }) {
         }, 200)
       }
     },
-    [fetchCompanyDetail]
+    []
   )
 
   const getCompany = useCallback(async () => {
@@ -106,23 +194,34 @@ function CompanyProvider({ children }) {
     try {
       const res = await CompanyService.getCompany(query)
       const rawRows = Array.isArray(res.data) ? res.data : []
-      const rows = rawRows.map((r) => withSelectionRow(r)).filter(Boolean)
+      let rows = rawRows.map((r) => withSelectionRow(r)).filter(Boolean)
+      const statusFilter = params.status && params.status !== 'All status' ? params.status : null
+      if (statusFilter) {
+        const want = normalizeEnrollmentStatusKey(statusFilter)
+        rows = rows.filter(
+          (r) => normalizeEnrollmentStatusKey(r.enrollment_status) === want
+        )
+      }
       const rawMeta = res.meta
       const perPageForMeta = Number(rawMeta?.per_page ?? rawMeta?.limit ?? limit) || limit
+      const totalForMeta = statusFilter ? rows.length : Number(rawMeta?.total ?? rows.length)
       const meta =
         rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)
           ? {
               ...rawMeta,
+              total: totalForMeta,
               total_page:
-                rawMeta.total_page ??
-                rawMeta.last_page ??
-                Math.max(1, Math.ceil(Number(rawMeta.total ?? rows.length) / perPageForMeta)),
+                statusFilter
+                  ? Math.max(1, Math.ceil(totalForMeta / perPageForMeta))
+                  : rawMeta.total_page ??
+                    rawMeta.last_page ??
+                    Math.max(1, Math.ceil(Number(rawMeta.total ?? rows.length) / perPageForMeta)),
             }
           : {
               current_page: 1,
               per_page: limit,
               total: rows.length,
-              total_page: 1,
+              total_page: Math.max(1, Math.ceil(rows.length / perPageForMeta)),
             }
       setCompany({
         data: rows,

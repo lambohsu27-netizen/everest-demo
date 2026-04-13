@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   MyButtonGroupV2,
   MyTabPanel,
@@ -6,18 +6,42 @@ import {
 } from '@interstellar-component'
 import { XClose } from '@untitled-ui/icons-react'
 import Result from './Result'
-import { useCompany } from '../../Context'
+import { formatCompanyDetailSubtitle, useCompany } from '../../Context'
 import Information from './Information'
 import MyMemberStatusChip from '../MyMemberStatusChip'
 
+const TAB_TO_DETAIL_TYPE = {
+  result: 'result',
+  billing: 'billing',
+  information: 'information',
+}
+
 function MyDetailSlider() {
-  const { handleCurrentSlider, companyDetail, isLoadingCompanyDetail } = useCompany()
+  const {
+    handleCurrentSlider,
+    currentSlider,
+    fetchCompanyDetail,
+    companyDetail,
+    isLoadingCompanyDetail,
+  } = useCompany()
 
   const [tab, setTab] = useState('result')
 
+  useEffect(() => {
+    if (!currentSlider.status || currentSlider.current !== 'details-slider') return
+    const { id } = currentSlider
+    if (id == null || id === '') return
+    const type = TAB_TO_DETAIL_TYPE[tab] ?? 'result'
+    fetchCompanyDetail(id, { type })
+  }, [currentSlider, tab, fetchCompanyDetail])
+
   const title =
-    companyDetail?.name ?? companyDetail?.legal_name ?? '—'
-  const subtitle = companyDetail?.nib ?? companyDetail?.id ?? ''
+    companyDetail?.company_information?.name ??
+    companyDetail?.name ??
+    companyDetail?.company_information?.legal_name ??
+    companyDetail?.legal_name ??
+    '—'
+  const subtitle = formatCompanyDetailSubtitle(companyDetail)
   const enrollmentStatus = companyDetail?.enrollment_status ?? ''
 
   return (
@@ -65,7 +89,7 @@ function MyDetailSlider() {
       <div className="flex-1 overflow-hidden">
         <MyTabView value={tab}>
           <MyTabPanel value="result">
-            <Result loading={isLoadingCompanyDetail} />
+            <Result data={companyDetail} loading={isLoadingCompanyDetail} />
           </MyTabPanel>
           <MyTabPanel value="billing">
             <div className="px-4 py-6 text-sm text-gray-light/600">Billing coming soon.</div>

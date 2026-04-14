@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { SearchMd, XClose } from '@untitled-ui/icons-react'
 import { MyButton, MyTextField } from '@interstellar-component'
-import { useSettings } from '../../../Context'
+import { useSettings } from '../../Context'
 
 export default function RoleForm({ mode }) {
   const {

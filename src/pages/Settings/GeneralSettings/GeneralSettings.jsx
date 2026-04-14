@@ -1,7 +1,7 @@
 import { MyButton } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../../Context'
+import { useSettings } from '../Context'
 
 export default function GeneralSettings() {
   const { hasPermission } = useApp()

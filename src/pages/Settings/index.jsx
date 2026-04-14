@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import StackedPageSheet from '@src/components/StackedPageSheet'
-import SettingsHeader from './components/Common/SettingsHeader'
+import SettingsHeader from './Common/SettingsHeader'
 import { SettingsProvider } from './Context'
 
 export default function Settings() {

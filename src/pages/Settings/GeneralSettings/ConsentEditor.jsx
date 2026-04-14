@@ -1,6 +1,6 @@
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../../Context'
+import { useSettings } from '../Context'
 import EditorSection from './EditorSection'
 
 export default function ConsentEditor() {

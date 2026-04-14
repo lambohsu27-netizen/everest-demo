@@ -8,7 +8,7 @@ import {
 } from '@untitled-ui/icons-react'
 import { MyButton, MyDropzone, myToaster } from '@interstellar-component'
 import { postSSE } from '@src/services/NetworkUtils'
-import { useSettings } from '../../../Context'
+import { useSettings } from '../../Context'
 
 const ACCEPT = ['csv', 'xls', 'xlsx']
 const MAX_SIZE = 150 * 1024 * 1024 // 150 MB

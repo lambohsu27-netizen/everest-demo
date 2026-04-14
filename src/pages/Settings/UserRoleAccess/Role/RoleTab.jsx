@@ -20,7 +20,7 @@ import {
 } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
-import { useSettings } from '../../../Context'
+import { useSettings } from '../../Context'
 import RoleDetail from './RoleDetail'
 import RoleForm from './RoleForm'
 

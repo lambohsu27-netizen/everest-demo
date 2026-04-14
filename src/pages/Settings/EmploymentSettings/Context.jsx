@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { myToaster } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
-import { SettingsService } from '../../service'
+import { SettingsService } from '../service'
 
 const EmploymentSettingsContext = createContext()
 

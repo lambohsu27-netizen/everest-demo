@@ -35,12 +35,12 @@ import RegisterCompanyInfo from '@src/pages/RegisterCompanyInfo'
 import { RegisterCompanyInfoProvider } from '@src/pages/RegisterCompanyInfo/Context'
 
 import Settings from '@src/pages/Settings'
-import GeneralSettings from '@src/pages/Settings/components/GeneralSettings/GeneralSettings'
-import UserRoleAccess from '@src/pages/Settings/components/UserRoleAccess/UserRoleAccess'
-import UserTab from '@src/pages/Settings/components/UserRoleAccess/User/UserTab'
-import RoleTab from '@src/pages/Settings/components/UserRoleAccess/Role/RoleTab'
-import EmploymentLevel from '@src/pages/Settings/components/EmploymentSettings/EmploymentLevel'
-import ConsentEditor from '@src/pages/Settings/components/GeneralSettings/ConsentEditor'
+import GeneralSettings from '@src/pages/Settings/GeneralSettings/GeneralSettings'
+import UserRoleAccess from '@src/pages/Settings/UserRoleAccess/UserRoleAccess'
+import UserTab from '@src/pages/Settings/UserRoleAccess/User/UserTab'
+import RoleTab from '@src/pages/Settings/UserRoleAccess/Role/RoleTab'
+import EmploymentLevel from '@src/pages/Settings/EmploymentSettings/EmploymentLevel'
+import ConsentEditor from '@src/pages/Settings/GeneralSettings/ConsentEditor'
 import StepEmailVerified from '@src/pages/Register/components/StepEmailVerified'
 
 export function AuthenticatedRoutes() {

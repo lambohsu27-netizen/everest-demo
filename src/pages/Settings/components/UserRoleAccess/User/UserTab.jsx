@@ -89,11 +89,13 @@ export default function UserTab() {
     <>
       {/* ── Sliders ──────────────────────────────────────────── */}
       <MyModalSlider
+        scrim
         open={userPanel === 'detail'}
         element={<UserDetail />}
         onClose={closeUserPanel}
       />
       <MyModalSlider
+        scrim
         open={userPanel === 'create' || userPanel === 'edit'}
         element={
           userPanel === 'create' || userPanel === 'edit' ? (
@@ -103,6 +105,7 @@ export default function UserTab() {
         onClose={closeUserPanel}
       />
       <MyModalSlider
+        scrim
         open={userPanel === 'import'}
         element={<ImportUserSlider />}
         onClose={closeUserPanel}
@@ -113,7 +116,7 @@ export default function UserTab() {
         open={deleteConfirmOpen}
         title="Delete users"
         message={`Are you sure you want to delete ${selectedUserIds.length} user(s)? This action cannot be undone.`}
-        icon={<Trash01 className="text-error-600" />}
+        icon={<Trash01 className="text-error/600" />}
         bgColor="bg-error-100"
         onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDelete}

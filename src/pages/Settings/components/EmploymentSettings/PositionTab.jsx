@@ -81,6 +81,7 @@ export default function PositionTab() {
   return (
     <>
       <MyModalSlider
+        scrim
         open={formSliderOpen}
         onClose={() => handlePositionSlider(null)}
         element={
@@ -99,6 +100,7 @@ export default function PositionTab() {
         }
       />
       <MyModalSlider
+        scrim
         open={detailsSliderOpen}
         onClose={() => handlePositionSlider(null)}
         element={

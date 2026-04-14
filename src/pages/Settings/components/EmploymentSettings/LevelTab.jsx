@@ -90,6 +90,7 @@ export default function LevelTab() {
   return (
     <>
     <MyModalSlider
+        scrim
         open={formSliderOpen}
         onClose={() => handleCurrentSlider(null)}
         element={
@@ -108,6 +109,7 @@ export default function LevelTab() {
         }
       />
       <MyModalSlider
+        scrim
         open={detailsSliderOpen}
         onClose={() => handleCurrentSlider(null)}
         element={

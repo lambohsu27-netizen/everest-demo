@@ -81,11 +81,13 @@ export default function RoleTab() {
     <>
       {/* Sliders */}
       <MyModalSlider
+        scrim
         open={rolePanel === 'detail'}
         element={<RoleDetail />}
         onClose={closeRolePanel}
       />
       <MyModalSlider
+        scrim
         open={rolePanel === 'create' || rolePanel === 'edit'}
         element={
           rolePanel === 'create' || rolePanel === 'edit' ? (

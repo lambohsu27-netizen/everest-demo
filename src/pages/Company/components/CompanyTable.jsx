@@ -80,6 +80,7 @@ function CompanyTable() {
   return (
     <>
       <MyModalSlider
+        scrim
         open={currentSlider?.current === 'details-slider'}
         element={<MyDetailSlider />}
         onClose={() => handleCurrentSlider(null)}

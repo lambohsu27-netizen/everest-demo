@@ -153,6 +153,7 @@ function Enquiry() {
   return (
     <>
       <MyModalSlider
+        scrim
         open={currentSlider?.current === 'form-slider'}
         element={<Formslider />}
         onClose={() => {
@@ -164,6 +165,7 @@ function Enquiry() {
         }}
       />
       <MyModalSlider
+        scrim
         open={currentSlider?.current === 'details-slider'}
         element={<DetailsSlider />}
         onClose={() => {

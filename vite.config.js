@@ -12,7 +12,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    port: 3111,
+    port: 3000,
     allowedHosts: ['*'],
     proxy: {
       '/api-wilayah': {

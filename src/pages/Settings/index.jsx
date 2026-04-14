@@ -8,8 +8,8 @@ export default function Settings() {
   return (
     <SettingsProvider>
       {/* <StackedPageSheet backUrl="/dashboard" closeUrl="/dashboard"> */}
-        <div className="flex w-full h-full flex-col overflow-y-auto font-inter p-8">
-          <div className="w-full">
+        <div className="flex w-full h-full flex-col font-inter p-8 min-h-0">
+          <div className="flex w-full flex-1 min-h-0 flex-col">
             <SettingsHeader />
             <Outlet />
           </div>

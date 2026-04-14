@@ -123,24 +123,23 @@ export default function UserTab() {
       />
 
       {/* ── Table Card ───────────────────────────────────────── */}
-      <div className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden border border-gray/200 bg-white shadow-sm rounded-xl">
         {/* Header row */}
-        <div className="flex flex-col justify-between gap-4 border-b border-gray-200 p-5 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-4 border-b border-gray/200 px-6 py-3 sm:flex-row sm:items-center bg-gray/25">
           <div className="flex items-center gap-3">
-            <h3 className="text-[18px] font-semibold text-gray-900">
+            <h3 className="text-[14px] font-semibold text-gray-900">
               User
             </h3>
-            <span className="rounded-full border border-brand/200 bg-brand/50 px-2.5 py-0.5 text-xs font-medium text-brand/700">
+            <span className="rounded-full border border-gray-blue/200 bg-gray-blue/50 px-2 py-0.5 text-xs font-medium text-gray-blue/700">
               {userPagination.total} item
             </span>
           </div>
           <div className="flex flex-wrap gap-3">
-            {canDeleteUser && (
+            {canDeleteUser && selectedUserIds.length > 0 && (
               <MyButton
                 color="error"
                 size="md"
                 variant="outlined"
-                disabled={selectedUserIds.length === 0}
                 onClick={() => setDeleteConfirmOpen(true)}
               >
                 <Trash01
@@ -253,6 +252,7 @@ export default function UserTab() {
         </div>
 
         {/* Data table */}
+        <div className="flex-1 min-h-0 overflow-y-auto">
         <MyDataTable
           values={userTableValues}
           selectionMode="multiple"
@@ -334,6 +334,7 @@ export default function UserTab() {
             )}
           />
         </MyDataTable>
+        </div>
 
         {/* Pagination */}
         <div className="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4">

@@ -26,7 +26,7 @@ export default function SettingsHeader() {
             className={({ isActive }) =>
               `flex h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
                 isActive
-                  ? 'bg-[#F9F5FF] text-[#6941C6]'
+                  ? 'bg-brand/50 text-brand/700'
                   : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
               }`
             }

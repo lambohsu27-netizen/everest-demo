@@ -14,15 +14,7 @@ export default function UserRoleAccess() {
   const activeTab = tabs.find((tab) => location.pathname.includes(tab.to))?.to || tabs[0].to
 
   return (
-    <div className="flex flex-col pt-8">
-      {/* Header */}
-      <div className="flex flex-col gap-1 w-full pb-6">
-        <h2 className="text-lg font-semibold text-[#181d27]">User and role access</h2>
-        <p className="text-sm text-[#535862]">
-          Define employee levels and their associated consent and screening rules.
-        </p>
-      </div>
-
+    <div className="flex flex-1 min-h-0 flex-col pt-5">
       {/* Sub-tabs */}
       <div className="mb-6">
         <MyHorizontalTabV2
@@ -32,7 +24,6 @@ export default function UserRoleAccess() {
           fitContent
         />
       </div>
-
       <Outlet />
     </div>
   )

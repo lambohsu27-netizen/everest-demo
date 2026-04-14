@@ -27,7 +27,7 @@ export default function ConsentEditor() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden">
       <EditorSection
         title="Candidate"
         content={candidateContent}

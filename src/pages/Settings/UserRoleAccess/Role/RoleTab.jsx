@@ -59,11 +59,7 @@ export default function RoleTab() {
 
   const roleTableValues = {
     data: roles,
-    meta: {
-      current_page: rolePagination.page,
-      per_page: rolePagination.limit,
-      total: rolePagination.total,
-    },
+    meta: rolePagination,
     checkedAll: roles.length > 0 && roles.every((r) => r.checked),
   }
 
@@ -102,26 +98,26 @@ export default function RoleTab() {
         title="Delete roles"
         message={`Are you sure you want to delete ${selectedRoleIds.length} role(s)? This action cannot be undone.`}
         icon={<Trash01 className="text-error-600" />}
-        bgColor="bg-error-100"
+        positiveButtonColor="error"
+        positiveActionWord="Delete"
         onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
       />
 
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between p-5 border-b border-gray-200">
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden border border-gray/200 bg-white shadow-sm rounded-xl">
+        <div className="flex flex-col justify-between gap-4 border-b border-gray/200 px-6 py-3 sm:flex-row sm:items-center bg-gray/25">
           <div className="flex items-center gap-3">
-            <h3 className="text-[18px] font-semibold text-gray-900">Role</h3>
-            <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
+            <h3 className="text-[14px] font-semibold text-gray-900">Role</h3>
+            <span className="rounded-full border border-gray-blue/200 bg-gray-blue/50 px-2 py-0.5 text-xs font-medium text-gray-blue/700">
               {rolePagination.total} item
             </span>
           </div>
           <div className="flex flex-wrap gap-3">
-            {canDeleteRole && (
+            {canDeleteRole && selectedRoleIds.length > 0 && (
               <MyButton
                 color="error"
                 size="md"
                 variant="outlined"
-                disabled={selectedRoleIds.length === 0}
                 onClick={() => setDeleteConfirmOpen(true)}
               >
                 <Trash01 className="w-5 h-5 text-error/700" stroke="currentColor" />
@@ -195,6 +191,7 @@ export default function RoleTab() {
           </div>
         </div>
 
+        <div className="flex flex-1 min-h-0 flex-col">
         <MyDataTable
           values={roleTableValues}
           selectionMode="multiple"
@@ -219,19 +216,20 @@ export default function RoleTab() {
             )}
           />
         </MyDataTable>
+        </div>
 
         {/* Pagination */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
           <span className="text-sm text-gray-600 font-medium">
-            Page {rolePagination.page} of {rolePagination.total_pages}
+            Page {rolePagination.current_page} of {rolePagination.total_page}
           </span>
           <div className="flex gap-3">
             <MyButton
               color="secondary"
               variant="outlined"
               size="sm"
-              disabled={rolePagination.page <= 1}
-              onClick={() => handleRolePageChange(rolePagination.page - 1)}
+              disabled={rolePagination.current_page <= 1}
+              onClick={() => handleRolePageChange(rolePagination.current_page - 1)}
             >
               Previous
             </MyButton>
@@ -239,8 +237,8 @@ export default function RoleTab() {
               color="secondary"
               variant="outlined"
               size="sm"
-              disabled={rolePagination.page >= rolePagination.total_pages}
-              onClick={() => handleRolePageChange(rolePagination.page + 1)}
+              disabled={rolePagination.current_page >= rolePagination.total_page}
+              onClick={() => handleRolePageChange(rolePagination.current_page + 1)}
             >
               Next
             </MyButton>

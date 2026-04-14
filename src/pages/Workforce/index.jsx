@@ -23,7 +23,7 @@ function Workforce() {
   const { sliderStack, popSlider } = useWorkforce()
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-gray-50/50">
+    <div className="flex h-full w-full flex-col bg-gray-50/50">
       {/* Dynamic Stacked Sliders */}
       {sliderStack.map((slider, index) => {
         const Component = SLIDER_COMPONENTS[slider.current]
@@ -42,7 +42,7 @@ function Workforce() {
         )
       })}
 
-      <div className="w-full">
+      <div className="flex w-full flex-1 min-h-0 flex-col">
         <WorkforceHeader />
         <WorkforceTable />
         <Outlet />

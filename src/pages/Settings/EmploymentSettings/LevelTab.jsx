@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FilterLines, Trash01, Plus, SearchLg, Edit01 } from '@untitled-ui/icons-react'
 import { debounce } from 'lodash'
 import {
@@ -9,8 +9,8 @@ import {
   MyButton,
   MyTextField,
   MyFilterModal,
-  MyChip,
   MyModalSlider,
+  MyConfirmModal,
 } from '@interstellar-component'
 import { useEmploymentSettings } from './Context'
 import NewLevelSlider from './NewLevelSlider'
@@ -82,13 +82,30 @@ export default function LevelTab() {
     getEmploymentLevel()
   }, [getEmploymentLevel])
 
-  const handleDeleteSelected = () => {
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+
+  const openDeleteConfirm = () => {
     if (selectedIds.length === 0) return
-    deleteEmploymentLevels(selectedIds)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    setDeleteConfirmOpen(false)
+    await deleteEmploymentLevels(selectedIds)
   }
 
   return (
     <>
+      <MyConfirmModal
+        open={deleteConfirmOpen}
+        title="Delete employment levels"
+        message={`Are you sure you want to delete ${selectedIds.length} level(s)? This action cannot be undone.`}
+        icon={<Trash01 className="text-error/600" />}
+        positiveButtonColor="error"
+        positiveActionWord="Delete"
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     <MyModalSlider
         scrim
         open={formSliderOpen}
@@ -123,38 +140,27 @@ export default function LevelTab() {
           />
         }
       />
-      <section className="w-full rounded-xl border border-gray-light/200 shadow-shadows/shadow-xs">
-        <div className="flex flex-col">
-          <div className="flex flex-col justify-between gap-4 rounded-t-xl bg-gray-light/50 py-4 pl-6 sm:flex-row sm:items-center">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-x-2">
-                <p className="text-sm-semibold text-gray-light/900">Level</p>
-                <MyChip
-                  label={`${levelMeta.total ?? levelRows.length} item`}
-                  rounded="full"
-                  color="modern"
-                  variant="outlined"
-                  size="sm"
-                />
-              </div>
+      <section className="flex flex-1 min-h-0 flex-col overflow-hidden border border-gray/200 bg-white shadow-sm rounded-xl">
+        <div className="flex flex-1 min-h-0 flex-col">
+          <div className="flex flex-col justify-between gap-4 border-b border-gray/200 px-6 py-3 sm:flex-row sm:items-center bg-gray/25">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[14px] font-semibold text-gray-900">Level</h3>
+              <span className="rounded-full border border-gray-blue/200 bg-gray-blue/50 px-2 py-0.5 text-xs font-medium text-gray-blue/700">
+                {levelMeta.total ?? levelRows.length} item
+              </span>
             </div>
-            <div className="flex flex-wrap items-center gap-3 pr-4">
+            <div className="flex flex-wrap items-center gap-3">
               {selectedCount > 0 && (
-                <>
-                  <p className="text-sm-semibold text-gray-light/600">
-                    {selectedCount} selected
-                  </p>
-                  <MyButton
-                    color="error"
-                    size="sm"
-                    variant="outlined"
-                    type="button"
-                    onClick={handleDeleteSelected}
-                  >
-                    <Trash01 className="size-5 text-error/700" stroke="currentColor" />
-                    <span className="text-sm-semibold">Delete</span>
-                  </MyButton>
-                </>
+                <MyButton
+                  color="error"
+                  size="md"
+                  variant="outlined"
+                  type="button"
+                  onClick={openDeleteConfirm}
+                >
+                  <Trash01 className="size-5 text-error/700" stroke="currentColor" />
+                  <span className="text-sm-semibold">Delete</span>
+                </MyButton>
               )}
               {/* <MyButton color="secondary" size="sm" variant="outlined" type="button">
                 <DownloadCloud01 className="size-5" stroke="currentColor" />
@@ -166,7 +172,7 @@ export default function LevelTab() {
               </MyButton> */}
               <MyButton
                 color="primary"
-                size="sm"
+                size="md"
                 variant="filled"
                 onClick={() => handleCurrentSlider({ current: 'form-slider' })}
               >
@@ -176,45 +182,43 @@ export default function LevelTab() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-gray-light/200 px-4 py-3">
-            <div className="flex w-full flex-1 flex-wrap justify-between gap-3">
-              <div className="w-full max-w-[375px]">
-                <MyTextField
-                  placeholder="Search levels"
-                  id="input-search-level"
-                  focusColor="#42307D"
-                   
-                  startAdornment={
-                    <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
-                  }
-                  onChangeForm={debounce((e) => {
-                    setParams((p) => ({ ...p, page: 1, search: e.target.value }))
-                  }, 500)}
-                />
-              </div>
-              <div className="flex items-center gap-5">
-                <MyFilterModal
-                  id="filter-employment-level"
-                  currentFilters={employmentLevel.filter}
-                  onChange={handleEmpFilterChange}
-                  target={(open, handleClick) => (
-                    <MyButton
-                      removeWhite
-                      onClick={handleClick}
-                      color="secondary"
-                      variant="text"
-                      size="md"
-                    >
-                      <FilterLines className="size-5" stroke="currentColor" />
-                      <span className="text-sm-semibold">Filter</span>
-                    </MyButton>
-                  )}
-                />
-              </div>
+          <div className="flex flex-col gap-4 border-b border-gray-200 p-5 xl:flex-row xl:items-center xl:justify-between">
+            <div className="w-full max-w-sm">
+              <MyTextField
+                placeholder="Search levels"
+                id="input-search-level"
+                focusColor="#42307D"
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                onChangeForm={debounce((e) => {
+                  setParams((p) => ({ ...p, page: 1, search: e.target.value }))
+                }, 500)}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <MyFilterModal
+                id="filter-employment-level"
+                currentFilters={employmentLevel.filter}
+                onChange={handleEmpFilterChange}
+                target={(open, handleClick) => (
+                  <MyButton
+                    removeWhite
+                    onClick={handleClick}
+                    color="gray"
+                    variant="tertiary"
+                    size="sm"
+                    customClassname="text-gray-700"
+                  >
+                    <FilterLines className="h-4 w-4 text-gray-500" stroke="currentColor" />
+                    Filters
+                  </MyButton>
+                )}
+              />
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-1 min-h-0 flex-col">
             <MyDataTable
               values={levelTableValues}
               selectionMode="multiple"

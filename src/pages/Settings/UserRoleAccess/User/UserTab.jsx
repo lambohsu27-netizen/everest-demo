@@ -66,11 +66,7 @@ export default function UserTab() {
 
   const userTableValues = {
     data: users,
-    meta: {
-      current_page: userPagination.page,
-      per_page: userPagination.limit,
-      total: userPagination.total,
-    },
+    meta: userPagination,
     checkedAll:
       users.length > 0 && users.every((u) => u.checked),
   }
@@ -117,7 +113,8 @@ export default function UserTab() {
         title="Delete users"
         message={`Are you sure you want to delete ${selectedUserIds.length} user(s)? This action cannot be undone.`}
         icon={<Trash01 className="text-error/600" />}
-        bgColor="bg-error-100"
+        positiveButtonColor="error"
+        positiveActionWord="Delete"
         onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
       />
@@ -252,16 +249,17 @@ export default function UserTab() {
         </div>
 
         {/* Data table */}
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-1 min-h-0 flex-col">
         <MyDataTable
           values={userTableValues}
           selectionMode="multiple"
           onSelectionChange={handleUserSelectionChange}
           loading={isLoadingUsers}
-          onPageChange={handleUserPageChange}
+          onChangePagination={handleUserPageChange}
           currentSortFieldFromParams={userSortField}
           currentSortOrderFromParams={userSortOrder}
           onClick={(row) => openUserDetail(row.id)}
+          paginator
         >
           <MyColumn
             header="Name"
@@ -334,40 +332,6 @@ export default function UserTab() {
             )}
           />
         </MyDataTable>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4">
-          <span className="text-sm font-medium text-gray-600">
-            Page {userPagination.page} of{' '}
-            {userPagination.total_pages}
-          </span>
-          <div className="flex gap-3">
-            <MyButton
-              color="secondary"
-              variant="outlined"
-              size="sm"
-              disabled={userPagination.page <= 1}
-              onClick={() =>
-                handleUserPageChange(userPagination.page - 1)
-              }
-            >
-              Previous
-            </MyButton>
-            <MyButton
-              color="secondary"
-              variant="outlined"
-              size="sm"
-              disabled={
-                userPagination.page >= userPagination.total_pages
-              }
-              onClick={() =>
-                handleUserPageChange(userPagination.page + 1)
-              }
-            >
-              Next
-            </MyButton>
-          </div>
         </div>
       </div>
     </>

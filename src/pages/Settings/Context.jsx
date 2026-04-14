@@ -9,25 +9,24 @@ const SettingsContext = createContext()
  * List endpoints return `meta` (current_page, total_page, total) or legacy `paginator` (page, limit, total).
  * Table state expects { page, limit, total, total_pages }.
  */
-function normalizeListPagination(res, requestedLimit = 10) {
-  const raw = res?.meta ?? res?.paginator
-  if (!raw) {
+/**
+ * Returns the BE pagination shape: { current_page, prev_page, next_page, total_page, total }.
+ * Accepts metadata at res.meta, res.paginator, or directly on res.
+ */
+function normalizeListPagination(res) {
+  const raw = res?.meta ?? res?.paginator ?? res
+  if (!raw || typeof raw !== 'object') {
     const len = Array.isArray(res?.data) ? res.data.length : 0
-    return { page: 1, limit: requestedLimit, total: len, total_pages: 1 }
+    return { current_page: 1, prev_page: null, next_page: null, total_page: 1, total: len }
   }
-  if (raw.current_page != null) {
-    return {
-      page: Number(raw.current_page),
-      limit: Number(raw.per_page ?? raw.limit ?? requestedLimit),
-      total: Number(raw.total ?? 0),
-      total_pages: Number(raw.total_page ?? raw.total_pages ?? 1),
-    }
-  }
+  const currentPage = Number(raw.current_page ?? raw.page ?? 1)
+  const totalPage = Number(raw.total_page ?? raw.total_pages ?? 1)
   return {
-    page: Number(raw.page ?? 1),
-    limit: Number(raw.limit ?? requestedLimit),
+    current_page: currentPage,
+    prev_page: raw.prev_page ?? (currentPage > 1 ? currentPage - 1 : null),
+    next_page: raw.next_page ?? (currentPage < totalPage ? currentPage + 1 : null),
+    total_page: totalPage,
     total: Number(raw.total ?? 0),
-    total_pages: Number(raw.total_pages ?? 1),
   }
 }
 
@@ -134,10 +133,11 @@ function SettingsProvider({ children }) {
   // ── Role Access (API-backed) ─────────────────────────────────────────────────
   const [roles, setRoles] = useState([])
   const [rolePagination, setRolePagination] = useState({
+    current_page: 1,
+    prev_page: null,
+    next_page: null,
+    total_page: 1,
     total: 0,
-    page: 1,
-    limit: 10,
-    total_pages: 1,
   })
   const [rolePage, setRolePage] = useState(1)
   const [roleSearchTerm, setRoleSearchTerm] = useState('')
@@ -169,7 +169,7 @@ function SettingsProvider({ children }) {
       }
       const res = await SettingsService.getRoles(params)
       setRoles(res.data)
-      setRolePagination(normalizeListPagination(res, limit))
+      setRolePagination(res.meta)
       if (res.filter) setRoleFilters(res.filter)
     } catch (err) {
       myToaster(err)
@@ -295,10 +295,11 @@ function SettingsProvider({ children }) {
   // ── User Management (API-backed) ────────────────────────────────────────────
   const [users, setUsers] = useState([])
   const [userPagination, setUserPagination] = useState({
+    current_page: 1,
+    prev_page: null,
+    next_page: null,
+    total_page: 1,
     total: 0,
-    page: 1,
-    limit: 10,
-    total_pages: 1,
   })
   const [userPage, setUserPage] = useState(1)
   const [userSearchTerm, setUserSearchTerm] = useState('')
@@ -331,7 +332,7 @@ function SettingsProvider({ children }) {
       }
       const res = await SettingsService.getUsers(params)
       setUsers(res.data)
-      setUserPagination(normalizeListPagination(res, limit))
+      setUserPagination(res.meta)
       if (res.filter) setUserFilters(res.filter)
     } catch (err) {
       myToaster(err)

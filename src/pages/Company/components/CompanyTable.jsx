@@ -73,6 +73,9 @@ function CompanyTable() {
       current_page: currentPage,
       per_page: perPage,
       total,
+      total_page: totalPages,
+      prev_page: currentPage > 1 ? currentPage - 1 : null,
+      next_page: currentPage < totalPages ? currentPage + 1 : null,
     },
     loading: company.loading,
     checkedAll: rows.length > 0 && rows.every((d) => d.checked),
@@ -87,40 +90,36 @@ function CompanyTable() {
         onClose={() => handleCurrentSlider(null)}
       />
 
-      <div className="px-8 pb-8 pt-2">
-        <div className="w-full rounded-xl border border-gray-light/200 shadow-shadows/shadow-xs">
-          <div className="flex flex-col">
-            <div className="flex justify-between items-center rounded-t-xl bg-gray-light/50 py-4 pl-6">
-              <div className="flex flex-col gap-13">
-                <div className="flex gap-x-2">
-                  <h3 className="text-[18px] font-semibold text-gray-900">Company List</h3>
-                  <span className="rounded-full bg-brand/50 border border-brand/200 px-2.5 py-0.5 text-xs font-medium text-brand/700">
-                    {itemCountLabel} item
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-3 px-3.5 py-2">
-                {selectedCount > 0 ? (
-                  <MyButton color="error" variant="outlined" size="md" type="button">
-                    <Trash01 className="h-5 w-5" />
-                    <p className="text-sm-semibold">Delete</p>
-                  </MyButton>
-                ) : null}
-                <MyButton
-                  color="primary"
-                  variant="filled"
-                  size="md"
-                  type="button"
-                  onClick={() => navigate('/register-company-info')}
-                >
-                  <Plus className="h-5 w-5" />
-                  <p className="text-sm-semibold">New company</p>
+      <div className="flex flex-1 min-h-0 flex-col px-8 pb-8 pt-2">
+        <div className="flex flex-1 min-h-0 flex-col overflow-hidden border border-gray/200 bg-white shadow-sm rounded-xl">
+          <div className="flex flex-col justify-between gap-4 border-b border-gray/200 px-6 py-3 sm:flex-row sm:items-center bg-gray/25">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[14px] font-semibold text-gray-900">Company List</h3>
+              <span className="rounded-full border border-gray-blue/200 bg-gray-blue/50 px-2 py-0.5 text-xs font-medium text-gray-blue/700">
+                {itemCountLabel} item
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {selectedCount > 0 ? (
+                <MyButton color="error" variant="outlined" size="md" type="button">
+                  <Trash01 className="h-5 w-5" />
+                  <p className="text-sm-semibold">Delete</p>
                 </MyButton>
-              </div>
+              ) : null}
+              <MyButton
+                color="primary"
+                variant="filled"
+                size="md"
+                type="button"
+                onClick={() => navigate('/register-company-info')}
+              >
+                <Plus className="h-5 w-5" />
+                <p className="text-sm-semibold">New company</p>
+              </MyButton>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 rounded-t-lg border border-gray-light/200 px-4 py-5">
+          <div className="flex flex-col gap-4 border-b border-gray-200 p-5 xl:flex-row xl:items-center xl:justify-between">
             <div className="w-full max-w-sm">
               <MyTextField
                 id="input-search-company"
@@ -148,6 +147,7 @@ function CompanyTable() {
             </div>
           </div>
 
+          <div className="flex flex-1 min-h-0 flex-col">
           <MyDataTable
             values={values}
             selectionMode="multiple"
@@ -155,6 +155,8 @@ function CompanyTable() {
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
             onClick={(row) => handleCurrentSlider({ current: 'details-slider' }, row.id, row)}
+            paginator
+            onChangePagination={setPage}
           >
             <MyColumn
               header="Company name & ID"
@@ -199,31 +201,6 @@ function CompanyTable() {
               )}
             />
           </MyDataTable>
-
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
-            <span className="text-sm text-gray-600 font-medium">
-              Page {currentPage} of {totalPages}
-            </span>
-            <div className="flex gap-3">
-              <MyButton
-                color="secondary"
-                variant="outlined"
-                size="sm"
-                disabled={currentPage <= 1}
-                onClick={() => setPage(currentPage - 1)}
-              >
-                Previous
-              </MyButton>
-              <MyButton
-                color="secondary"
-                variant="outlined"
-                size="sm"
-                disabled={currentPage >= totalPages}
-                onClick={() => setPage(currentPage + 1)}
-              >
-                Next
-              </MyButton>
-            </div>
           </div>
         </div>
       </div>

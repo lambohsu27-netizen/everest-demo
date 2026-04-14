@@ -81,6 +81,56 @@ function SettingsProvider({ children }) {
     fetchGeneralSettings()
   }, [fetchGeneralSettings])
 
+  // ── Consent Editor ──────────────────────────────────────────────────────────
+  const [candidateContent, setCandidateContent] = useState('')
+  const [existingContent, setExistingContent] = useState('')
+  const [isLoadingConsent, setIsLoadingConsent] = useState(false)
+  const [isSavingConsent, setIsSavingConsent] = useState({ candidate: false, existing: false })
+  const savedConsent = useRef({ candidate: '', existing: '' })
+
+  const fetchConsentEditor = useCallback(async () => {
+    setIsLoadingConsent(true)
+    try {
+      const res = await SettingsService.getConsentEditor()
+      const { candidate, existing } = res.data
+      const cVal = candidate?.content || ''
+      const eVal = existing?.content || ''
+      setCandidateContent(cVal)
+      setExistingContent(eVal)
+      savedConsent.current = { candidate: cVal, existing: eVal }
+    } catch (err) {
+      myToaster(err)
+    } finally {
+      setIsLoadingConsent(false)
+    }
+  }, [])
+
+  const updateConsentEditor = useCallback(async (code) => {
+    setIsSavingConsent((prev) => ({ ...prev, [code]: true }))
+    try {
+      const content = code === 'candidate' ? candidateContent : existingContent
+      const res = await SettingsService.updateConsentEditor(code, { content })
+      myToaster(res)
+      savedConsent.current[code] = content
+    } catch (err) {
+      myToaster(err)
+    } finally {
+      setIsSavingConsent((prev) => ({ ...prev, [code]: false }))
+    }
+  }, [candidateContent, existingContent])
+
+  const cancelConsentEditor = useCallback((code) => {
+    if (code === 'candidate') {
+      setCandidateContent(savedConsent.current.candidate)
+    } else {
+      setExistingContent(savedConsent.current.existing)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchConsentEditor()
+  }, [fetchConsentEditor])
+
   // ── Role Access (API-backed) ─────────────────────────────────────────────────
   const [roles, setRoles] = useState([])
   const [rolePagination, setRolePagination] = useState({
@@ -445,6 +495,16 @@ function SettingsProvider({ children }) {
       updateGeneralSettings,
       cancelGeneralSettings,
 
+      // Consent Editor
+      candidateContent,
+      setCandidateContent,
+      existingContent,
+      setExistingContent,
+      isLoadingConsent,
+      isSavingConsent,
+      updateConsentEditor,
+      cancelConsentEditor,
+
       // Role Access
       roles,
       rolePagination,
@@ -522,6 +582,12 @@ function SettingsProvider({ children }) {
       isLoadingGeneral,
       updateGeneralSettings,
       cancelGeneralSettings,
+      candidateContent,
+      existingContent,
+      isLoadingConsent,
+      isSavingConsent,
+      updateConsentEditor,
+      cancelConsentEditor,
       roles,
       rolePagination,
       rolePage,

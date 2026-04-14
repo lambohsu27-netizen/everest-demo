@@ -46,5 +46,5 @@ export const SettingsService = {
 
   // consent editor
   getConsentEditor: async () => await get('/v1/settings/consent-editor'),
-  updateConsentEditor: async (data) => await put('/v1/settings/consent-editor', data),
+  updateConsentEditor: async (code, data) => await put(`/v1/settings/consent-editor/${code}`, data),
 }

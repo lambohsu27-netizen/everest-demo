@@ -4,9 +4,10 @@ import SimpleBar from 'simplebar-react'
 // UI Icons
 import { XClose, DownloadCloud01 } from '@untitled-ui/icons-react'
 // Shared Components
-import { MyButton, MyDropzone } from '@interstellar-component'
+import { MyButton, MyDropzone, myToaster } from '@interstellar-component'
 // Context
 import { useWorkforce } from '../Context'
+import { WorkforceService } from '../service'
 
 // ── Accepted file types ────────────────────────────────────────────────────────
 const ACCEPT = ['csv', 'xls', 'xlsx']
@@ -14,7 +15,7 @@ const MAX_SIZE = 150 * 1024 * 1024 // 150 MB
 
 // ── Main component ─────────────────────────────────────────────────────────────
 function ImportWorkforceSlider() {
-  const { handleCurrentSlider } = useWorkforce()
+  const { handleCurrentSlider, getWorkforce } = useWorkforce()
   const [files, setFiles] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -22,21 +23,24 @@ function ImportWorkforceSlider() {
 
   const handleSubmit = async () => {
     if (!files.length) return
+    const file = files[0]?.file ?? files[0]
+    if (!file) return
     setIsSubmitting(true)
     try {
-      // TODO: wire to real upload API
+      await WorkforceService.importWorkforce(file)
+      myToaster({ status: 'success', message: 'Workforce imported successfully.' })
+      await getWorkforce()
+      handleClose()
+    } catch (e) {
+      myToaster(e)
     } finally {
       setIsSubmitting(false)
-      handleClose()
     }
   }
 
   const handleDownloadTemplate = () => {
-    // TODO: replace with real template URL
-    const link = document.createElement('a')
-    link.href = '/templates/workforce-template.xlsx'
-    link.download = 'workforce-template.xlsx'
-    link.click()
+    const url = WorkforceService.downloadImportTemplate()
+    if (url) window.open(url, '_blank')?.focus()
   }
 
   return (

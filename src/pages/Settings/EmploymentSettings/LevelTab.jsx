@@ -183,13 +183,13 @@ export default function LevelTab() {
                   placeholder="Search levels"
                   id="input-search-level"
                   focusColor="#42307D"
-                  focusShadow="#42307D3D"
+                   
                   startAdornment={
                     <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
                   }
                   onChangeForm={debounce((e) => {
                     setParams((p) => ({ ...p, page: 1, search: e.target.value }))
-                  }, 800)}
+                  }, 500)}
                 />
               </div>
               <div className="flex items-center gap-5">

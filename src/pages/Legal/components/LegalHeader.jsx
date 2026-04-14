@@ -1,5 +1,6 @@
 import React from 'react'
-import { SearchMd } from '@untitled-ui/icons-react'
+import { SearchLg } from '@untitled-ui/icons-react'
+import { MyTextField } from '@interstellar-component'
 
 function LegalHeader() {
   return (
@@ -13,14 +14,14 @@ function LegalHeader() {
             <h1 className="text-5xl font-semibold leading-[60px] tracking-tight text-[#181d27]">
               Terms and conditions
             </h1>
-            <div className="relative w-full max-w-[320px]">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3.5 text-base text-gray-900 shadow-sm placeholder-gray-500 focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+            <div className="w-full max-w-[320px]">
+              <MyTextField
                 placeholder="Search"
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                focusColor="#42307D"
+                 
               />
             </div>
           </div>

@@ -1,21 +1,27 @@
+import { useMemo } from 'react'
+import { debounce } from 'lodash'
 import {
-  SearchMd,
+  SearchLg,
   FilterLines,
   DownloadCloud01,
   SwitchVertical01
 } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable } from '@interstellar-component'
+import { MyColumn, MyDataTable, MyTextField } from '@interstellar-component'
 import { useAuditTrail } from '../Context'
 
 function AuditTrailTable() {
   const {
-    searchTerm,
     setSearchTerm,
     auditTrails,
     sortField,
     sortOrder,
     handleSort,
   } = useAuditTrail()
+
+  const debouncedSearch = useMemo(
+    () => debounce((e) => setSearchTerm(e.target.value), 500),
+    [setSearchTerm]
+  )
 
   const values = {
     data: auditTrails || [],
@@ -48,16 +54,15 @@ function AuditTrailTable() {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative w-full sm:max-w-xs">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+            <div className="w-full sm:max-w-xs">
+              <MyTextField
                 placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                focusColor="#42307D"
+                 
+                onChangeForm={debouncedSearch}
               />
             </div>
 

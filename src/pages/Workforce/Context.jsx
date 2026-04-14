@@ -1,192 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { myToaster } from '@interstellar-component'
+import { WorkforceService } from './service'
 
 const WorkforceContext = createContext()
 
-const INITIAL_WORKFORCE = [
-  {
-    id: 1,
-    name: 'Ahmad Ghozali',
-    employeeId: 'ID-00192',
-    hasReport: true,
-    level: 'Supervisor',
-    category: 'Employee',
-    company: 'PT Everest Maju Sejahtera',
-    consentStatus: 'Active',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00192',
-    email: 'ahmad.ghozali@everest.com',
-    phoneNumber: '+62 812 3456 7890',
-    joinedDate: '12 Jan 2022',
-    role: 'Operations Supervisor',
-    department: 'Operations',
-    employmentType: 'Full-time',
-    address: 'Jl. Sudirman No. 123, Jakarta Selatan',
-  },
-  {
-    id: 2,
-    name: 'Diah Astuti',
-    employeeId: 'ID-00193',
-    hasReport: false,
-    level: 'Staff',
-    category: 'Employee',
-    company: 'PT Annapurna Berdiri TInggi',
-    consentStatus: 'Active',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00193',
-    email: 'diah.astuti@annapurna.com',
-    phoneNumber: '+62 813 4567 8901',
-    joinedDate: '05 Mar 2023',
-    role: 'Administrative Staff',
-    department: 'Administration',
-    employmentType: 'Full-time',
-    address: 'Jl. Thamrin No. 45, Jakarta Pusat',
-  },
-  {
-    id: 3,
-    name: 'Pandu Prakoso',
-    employeeId: 'ID-00194',
-    hasReport: true,
-    level: 'Manager',
-    category: 'Employee',
-    company: 'PT Annapurna Berdiri TInggi',
-    consentStatus: 'Pending',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00194',
-    email: 'pandu.prakoso@annapurna.com',
-    phoneNumber: '+62 814 5678 9012',
-    joinedDate: '10 Nov 2021',
-    role: 'Human Resources Manager',
-    department: 'HR',
-    employmentType: 'Full-time',
-    address: 'Jl. Gatot Subroto No. 67, Jakarta Selatan',
-  },
-  {
-    id: 4,
-    name: 'Kartini Melviana',
-    employeeId: 'ID-00195',
-    hasReport: true,
-    level: 'Director',
-    category: 'Employee',
-    company: 'PT Everest Maju Sejahtera',
-    consentStatus: 'Expired',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00195',
-    email: 'kartini.m@everest.com',
-    phoneNumber: '+62 815 6789 0123',
-    joinedDate: '15 Aug 2020',
-    role: 'Finance Director',
-    department: 'Finance',
-    employmentType: 'Full-time',
-    address: 'Jl. Rasuna Said No. 89, Jakarta Selatan',
-  },
-  {
-    id: 5,
-    name: 'Liana Semesta',
-    employeeId: 'ID-00196',
-    hasReport: true,
-    level: 'Director',
-    category: 'Candidate',
-    company: 'PT Annapurna Berdiri TInggi',
-    consentStatus: 'Pending',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00196',
-    email: 'liana.semesta@candidate.com',
-    phoneNumber: '+62 816 7890 1234',
-    joinedDate: '-',
-    role: 'Marketing Director Candidate',
-    department: 'Marketing',
-    employmentType: 'Contract',
-    address: 'Jl. Kuningan No. 12, Jakarta Selatan',
-  },
-  {
-    id: 6,
-    name: 'Lola Chaniago',
-    employeeId: 'ID-00197',
-    hasReport: true,
-    level: 'Manager',
-    category: 'Candidate',
-    company: 'PT Everest Maju Sejahtera',
-    consentStatus: 'New',
-    consentExpiry: '23 Jan 2025',
-    avatar: 'https://i.pravatar.cc/150?u=ID-00197',
-    email: 'lola.chaniago@candidate.com',
-    phoneNumber: '+62 817 8901 2345',
-    joinedDate: '-',
-    role: 'Sales Manager Candidate',
-    department: 'Sales',
-    employmentType: 'Full-time',
-    address: 'Jl. Kebon Jeruk No. 34, Jakarta Barat',
-  },
-  {
-    id: 7,
-    name: 'Satrio Pena',
-    employeeId: 'ID-00198',
-    hasReport: true,
-    level: 'Intern',
-    category: 'Candidate',
-    company: 'PT Everest Maju Sejahtera',
-    consentStatus: 'New',
-    consentExpiry: '23 Jan 2025',
-    avatar: null,
-    email: 'satrio.pena@candidate.com',
-    phoneNumber: '+62 818 9012 3456',
-    joinedDate: '-',
-    role: 'Graphic Designer Intern',
-    department: 'Creative',
-    employmentType: 'Internship',
-    address: 'Jl. Palmerah No. 56, Jakarta Barat',
-  },
-]
-
 export const LOAN_CATEGORIES = [
-  {
-    kolBadge: 'KOL 5',
-    title: 'Credit card',
-    accountCount: '3 account',
-    amount: 'Rp 52,000,000',
-    color: 'Error',
-    icon: 'CreditCard02',
-  },
-  {
-    kolBadge: 'KOL 4',
-    title: 'Paylater',
-    accountCount: '2 account',
-    amount: 'Rp 6,400,000',
-    color: 'Warning',
-    icon: 'ShoppingBag03',
-  },
-  {
-    kolBadge: 'KOL 5',
-    title: 'KKB',
-    accountCount: '1 account',
-    amount: 'Rp 172,000,000',
-    color: 'Orange',
-    icon: 'Car01',
-  },
-  {
-    kolBadge: 'KOL 5',
-    title: 'KPR',
-    accountCount: 'No active loan',
-    amount: 'Rp 0',
-    color: 'Blue',
-    icon: 'Home03',
-  },
-  {
-    kolBadge: 'KOL 5',
-    title: 'KTA',
-    accountCount: '2 account',
-    amount: 'Rp 154,100,000',
-    color: 'Success',
-    icon: 'CoinsStacked03',
-  },
-  {
-    kolBadge: 'KOL 5',
-    title: 'Other',
-    accountCount: 'No active loan',
-    amount: 'Rp 0',
-    color: 'Gray',
-    icon: 'DotsVertical',
-  },
+  { kolBadge: 'KOL 5', title: 'Credit card', accountCount: '3 account', amount: 'Rp 52,000,000', color: 'Error', icon: 'CreditCard02' },
+  { kolBadge: 'KOL 4', title: 'Paylater', accountCount: '2 account', amount: 'Rp 6,400,000', color: 'Warning', icon: 'ShoppingBag03' },
+  { kolBadge: 'KOL 5', title: 'KKB', accountCount: '1 account', amount: 'Rp 172,000,000', color: 'Orange', icon: 'Car01' },
+  { kolBadge: 'KOL 5', title: 'KPR', accountCount: 'No active loan', amount: 'Rp 0', color: 'Blue', icon: 'Home03' },
+  { kolBadge: 'KOL 5', title: 'KTA', accountCount: '2 account', amount: 'Rp 154,100,000', color: 'Success', icon: 'CoinsStacked03' },
+  { kolBadge: 'KOL 5', title: 'Other', accountCount: 'No active loan', amount: 'Rp 0', color: 'Gray', icon: 'DotsVertical' },
 ]
 
 export const LOAN_ACCOUNTS = {
@@ -195,28 +19,63 @@ export const LOAN_ACCOUNTS = {
     { id: 2, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 5,000,000', isActive: true },
     { id: 3, bank: 'CIMB', name: 'CIMB Niaga Card', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 45,477,000', isActive: false },
   ],
-  'Paylater': [
+  Paylater: [
     { id: 1, bank: 'SP', name: 'Shopee Paylater', kol: 'Kol 4', label: 'Jumlah pinjaman', amount: 'Rp 4,000,000', isActive: false },
     { id: 2, bank: 'TR', name: 'Traveloka Paylater', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 2,400,000', isActive: true },
   ],
-  'KKB': [
+  KKB: [
     { id: 1, bank: 'BCA', name: 'BCA Finance - Toyota Avanza', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 172,000,000', isActive: true },
   ],
-  'KPR': [],
-  'KTA': [
+  KPR: [],
+  KTA: [
     { id: 1, bank: 'MN', name: 'Mandiri KTA', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 100,000,000', isActive: false },
     { id: 2, bank: 'BRI', name: 'BRI KTA', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 54,100,000', isActive: true },
   ],
-  'Other': [],
+  Other: [],
+}
+
+const SORT_FIELD_TO_API = {
+  full_name: 'full_name',
+  code: 'code',
+  category: 'category',
+  consent_status: 'consent_status',
+  consent_expiry: 'consent_expiry',
+  created_at: 'created_at',
+}
+
+const CATEGORY_TAB_TO_API = {
+  'All category': null,
+  Employee: 'employee',
+  Candidate: 'candidate',
+}
+
+function withSelectionRow(item) {
+  if (!item || typeof item !== 'object') return null
+  return { ...item, checked: Boolean(item.checked) }
 }
 
 function WorkforceProvider({ children }) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [workforce, setWorkforce] = useState(INITIAL_WORKFORCE)
-  const [sortField, setSortField] = useState(null)
-  const [sortOrder, setSortOrder] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState('All category')
-  const [page, setPage] = useState(1)
+  const [workforce, setWorkforce] = useState({
+    data: [],
+    meta: {},
+    filter: [],
+    loading: false,
+  })
+
+  const [workforceDetail, setWorkforceDetail] = useState(null)
+  const [isLoadingWorkforceDetail, setIsLoadingWorkforceDetail] = useState(false)
+
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+    search: '',
+    filter: [],
+    sort: null,
+    order: null,
+    category: 'All category',
+  })
+
+  // Stacked slider state (kept from original: credit/loan sliders stack on top)
   const [sliderStack, setSliderStack] = useState([])
   const [activeAccountId, setActiveAccountId] = useState(null)
 
@@ -227,17 +86,11 @@ function WorkforceProvider({ children }) {
   const popSlider = useCallback(() => {
     setSliderStack((prev) => {
       const newStack = prev.slice(0, -1)
-      if (newStack.length === 1) { // We went back to the base slider
-        setActiveAccountId(null)
-      }
+      if (newStack.length === 1) setActiveAccountId(null)
       return newStack
     })
   }, [])
 
-  /**
-   * Specifically for account detail - ensures we only have ONE detail slider open
-   * and replaces its content if another account is clicked.
-   */
   const handleAccountDetail = useCallback((acc) => {
     setActiveAccountId(acc.id)
     setSliderStack((prev) => {
@@ -257,127 +110,176 @@ function WorkforceProvider({ children }) {
     }
   }, [])
 
-  const handlePageChange = useCallback((newPage) => {
-    setPage(newPage)
+  const getWorkforce = useCallback(async () => {
+    const limit = params.limit ?? 10
+    const sortApi = params.sort ? SORT_FIELD_TO_API[params.sort] ?? params.sort : null
+    const categoryApi = CATEGORY_TAB_TO_API[params.category] ?? null
+    const query = {
+      page: params.page,
+      limit,
+      ...(params.search ? { search: params.search } : {}),
+      ...(Array.isArray(params.filter) && params.filter.length > 0 ? { filter: params.filter } : {}),
+      ...(sortApi ? { sort: sortApi } : {}),
+      ...(params.order ? { order: params.order } : {}),
+      ...(categoryApi ? { category: categoryApi } : {}),
+    }
+    setWorkforce((s) => ({ ...s, loading: true }))
+    try {
+      const res = await WorkforceService.getWorkforce(query)
+      const rawRows = Array.isArray(res?.data) ? res.data : []
+      const rows = rawRows.map((r) => withSelectionRow(r)).filter(Boolean)
+      const rawMeta = res?.meta
+      const perPageForMeta = Number(rawMeta?.per_page ?? rawMeta?.limit ?? limit) || limit
+      const meta =
+        rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)
+          ? {
+              ...rawMeta,
+              total: Number(rawMeta.total ?? rows.length),
+              total_page:
+                rawMeta.total_page ??
+                rawMeta.last_page ??
+                Math.max(1, Math.ceil(Number(rawMeta.total ?? rows.length) / perPageForMeta)),
+            }
+          : {
+              current_page: 1,
+              per_page: limit,
+              total: rows.length,
+              total_page: Math.max(1, Math.ceil(rows.length / perPageForMeta)),
+            }
+      setWorkforce({
+        data: rows,
+        meta,
+        filter: res?.filter ?? [],
+        loading: false,
+      })
+    } catch (e) {
+      myToaster(e)
+      setWorkforce((s) => ({ ...s, loading: false }))
+    }
+  }, [params])
+
+  useEffect(() => {
+    getWorkforce()
+  }, [getWorkforce])
+
+  const fetchWorkforceDetail = useCallback(async (id, query = {}) => {
+    if (id == null || id === '') return
+    setIsLoadingWorkforceDetail(true)
+    try {
+      const res = await WorkforceService.getWorkforceDetail(id, query)
+      setWorkforceDetail(res?.data !== undefined ? res.data : res)
+    } catch (e) {
+      myToaster(e)
+      setWorkforceDetail(null)
+    } finally {
+      setIsLoadingWorkforceDetail(false)
+    }
   }, [])
 
-  // Reset page to 1 when search or category changes
-  useEffect(() => {
-    setPage(1)
-  }, [searchTerm, selectedCategory])
+  const handleWorkforceSort = useCallback(({ sort, order }) => {
+    setParams((p) => ({ ...p, page: 1, sort: sort ?? null, order: order ?? null }))
+  }, [])
+
+  const handleWorkforceSelectionChange = useCallback((updated) => {
+    setWorkforce((prev) => ({ ...prev, data: updated.data }))
+  }, [])
+
+  const setPage = useCallback((page) => {
+    setParams((p) => ({ ...p, page }))
+  }, [])
+
+  const setSearchTerm = useCallback((search) => {
+    setParams((p) => ({ ...p, page: 1, search }))
+  }, [])
+
+  const setSelectedCategory = useCallback((category) => {
+    setParams((p) => ({ ...p, page: 1, category }))
+  }, [])
+
+  const getEmployeeById = useCallback(
+    (id) => {
+      if (id == null) return null
+      const rows = Array.isArray(workforce?.data) ? workforce.data : []
+      return rows.find((r) => String(r.id) === String(id)) ?? null
+    },
+    [workforce?.data]
+  )
+
+  const workforceRows = useMemo(
+    () => (Array.isArray(workforce?.data) ? workforce.data : []),
+    [workforce?.data]
+  )
+
+  const workforceMeta = useMemo(() => {
+    const m = workforce?.meta
+    if (m && typeof m === 'object' && !Array.isArray(m)) return m
+    return {
+      current_page: 1,
+      per_page: params.limit ?? 10,
+      total: workforceRows.length,
+      total_page: 1,
+    }
+  }, [workforce?.meta, workforceRows.length, params.limit])
 
   const currentSlider = useMemo(
     () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
     [sliderStack]
   )
 
-  const getEmployeeById = useCallback(
-    (id) => INITIAL_WORKFORCE.find((emp) => emp.id === parseInt(id, 10)),
-    []
-  )
-
-  const handleSort = useCallback(
-    ({ sort, order }) => {
-      setSortField(sort)
-      setSortOrder(order)
-
-      if (!sort || !order) {
-        setWorkforce(INITIAL_WORKFORCE)
-        return
-      }
-
-      const sortedData = [...workforce].sort((a, b) => {
-        const valA = a[sort] || ''
-        const valB = b[sort] || ''
-
-        if (valA < valB) return order === 'asc' ? -1 : 1
-        if (valA > valB) return order === 'asc' ? 1 : -1
-        return 0
-      })
-
-      setWorkforce(sortedData)
-    },
-    [workforce]
-  )
-
-  const handleSelectionChange = useCallback((updated) => {
-    setWorkforce(updated.data)
-  }, [])
-
-  const filteredWorkforce = useMemo(() => {
-    let result = workforce
-    if (selectedCategory !== 'All category') {
-      result = result.filter((w) => w.category === selectedCategory)
-    }
-    if (searchTerm) {
-      const lowerSearch = searchTerm.toLowerCase()
-      result = result.filter(
-        (w) =>
-          w.name.toLowerCase().includes(lowerSearch) ||
-          w.employeeId.toLowerCase().includes(lowerSearch)
-      )
-    }
-    return result
-  }, [workforce, selectedCategory, searchTerm])
-
-  const limit = 10
-  const paginatedWorkforce = useMemo(() => {
-    const start = (page - 1) * limit
-    return filteredWorkforce.slice(start, start + limit)
-  }, [filteredWorkforce, page])
-
-  const pagination = useMemo(
-    () => ({
-      page,
-      limit,
-      total: filteredWorkforce.length,
-      total_pages: Math.ceil(filteredWorkforce.length / limit),
-    }),
-    [filteredWorkforce.length, page]
-  )
-
   const contextValue = useMemo(
     () => ({
-      searchTerm,
+      params,
+      setParams,
+      workforce,
+      workforceRows,
+      workforceMeta,
+      getWorkforce,
+      handleWorkforceSort,
+      handleWorkforceSelectionChange,
+      workforceDetail,
+      isLoadingWorkforceDetail,
+      fetchWorkforceDetail,
+      searchTerm: params.search,
       setSearchTerm,
-      workforce: paginatedWorkforce,
-      pagination,
-      setPage: handlePageChange,
-      handleSort,
-      handleSelectionChange,
-      sortField,
-      sortOrder,
-      selectedCategory,
+      selectedCategory: params.category,
       setSelectedCategory,
+      sortField: params.sort,
+      sortOrder: params.order,
+      setPage,
       getEmployeeById,
-      currentSlider,
-      activeAccountId,
+      // Stacked sliders
       sliderStack,
-      handleCurrentSlider,
+      currentSlider,
       pushSlider,
       popSlider,
+      handleCurrentSlider,
       handleAccountDetail,
+      activeAccountId,
       loanCategories: LOAN_CATEGORIES,
       loanAccounts: LOAN_ACCOUNTS,
     }),
     [
-      searchTerm,
-      paginatedWorkforce,
-      pagination,
-      handlePageChange,
-      handleSort,
-      handleSelectionChange,
-      sortField,
-      sortOrder,
-      selectedCategory,
+      params,
+      workforce,
+      workforceRows,
+      workforceMeta,
+      getWorkforce,
+      handleWorkforceSort,
+      handleWorkforceSelectionChange,
+      workforceDetail,
+      isLoadingWorkforceDetail,
+      fetchWorkforceDetail,
+      setSearchTerm,
+      setSelectedCategory,
+      setPage,
       getEmployeeById,
-      currentSlider,
-      activeAccountId,
       sliderStack,
-      handleCurrentSlider,
+      currentSlider,
       pushSlider,
       popSlider,
+      handleCurrentSlider,
       handleAccountDetail,
+      activeAccountId,
     ]
   )
 

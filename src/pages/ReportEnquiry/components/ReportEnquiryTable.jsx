@@ -1,12 +1,12 @@
-import React from 'react'
-import { SearchMd, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyButton, MyHorizontalTabV2 } from '@interstellar-component'
+import React, { useMemo } from 'react'
+import { debounce } from 'lodash'
+import { SearchLg, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
+import { MyColumn, MyDataTable, MyButton, MyHorizontalTabV2, MyTextField } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
 import MySLAStatusChip from './MySLAStatusChip'
 
 function ReportEnquiryTable() {
   const {
-    searchTerm,
     setSearchTerm,
     enquiries,
     sortField,
@@ -19,6 +19,11 @@ function ReportEnquiryTable() {
     enquiryCategory,
     setEnquiryCategory,
   } = useReportEnquiry()
+
+  const debouncedSearch = useMemo(
+    () => debounce((e) => setSearchTerm(e.target.value), 500),
+    [setSearchTerm]
+  )
 
   const values = {
     data: enquiries || [],
@@ -81,16 +86,15 @@ function ReportEnquiryTable() {
           </div>
 
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="relative w-full max-w-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+            <div className="w-full max-w-sm">
+              <MyTextField
                 placeholder="Search for tickets"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                focusColor="#42307D"
+                 
+                onChangeForm={debouncedSearch}
               />
             </div>
 

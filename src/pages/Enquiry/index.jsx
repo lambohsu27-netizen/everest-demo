@@ -353,6 +353,8 @@ function Enquiry() {
                         startAdornment={
                           <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
                         }
+                        focusColor="#42307D"
+                         
                         onChangeForm={debounce(
                           (e) =>
                             setParams((value) => ({
@@ -360,7 +362,7 @@ function Enquiry() {
                               search: e.target.value,
                               page: 1,
                             })),
-                          1000
+                          500
                         )}
                       />
                     </div>
@@ -413,6 +415,8 @@ function Enquiry() {
                         startAdornment={
                           <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
                         }
+                        focusColor="#42307D"
+                         
                         onChangeForm={debounce(
                           (e) =>
                             setParams((value) => ({
@@ -420,7 +424,7 @@ function Enquiry() {
                               search: e.target.value,
                               page: 1,
                             })),
-                          1000
+                          500
                         )}
                       />
                     </div>

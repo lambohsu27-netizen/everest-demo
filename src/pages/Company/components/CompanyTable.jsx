@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { debounce } from 'lodash'
 import {
-  SearchMd,
+  SearchLg,
   FilterLines,
   Trash01,
   Plus,
@@ -13,6 +13,7 @@ import {
   MyModalSlider,
   MyButton,
   MyHorizontalTabV2,
+  MyTextField,
 } from '@interstellar-component'
 import { useCompany } from '../Context'
 import MyDetailSlider from './MyDetailSlider/DetailSlider'
@@ -120,16 +121,16 @@ function CompanyTable() {
           </div>
 
           <div className="flex items-center justify-between gap-3 rounded-t-lg border border-gray-light/200 px-4 py-5">
-            <div className="relative w-full max-w-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
+            <div className="w-full max-w-sm">
+              <MyTextField
                 id="input-search-company"
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
                 placeholder="Search for company"
-                onChange={(e) => debouncedSearch(e.target.value)}
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                focusColor="#42307D"
+                 
+                onChangeForm={(e) => debouncedSearch(e.target.value)}
               />
             </div>
 

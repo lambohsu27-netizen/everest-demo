@@ -268,7 +268,7 @@ export default function UserForm({ mode }) {
                       helperText={errors.name || ''}
                       onChangeForm={(e) => { setName(e.target.value); clearError('name') }}
                       focusColor="#42307D"
-                      focusShadow="#42307D3D"
+                       
                     />
                   </div>
 
@@ -285,7 +285,7 @@ export default function UserForm({ mode }) {
                       helperText={errors.email || ''}
                       onChangeForm={(e) => { setEmail(e.target.value); clearError('email') }}
                       focusColor="#42307D"
-                      focusShadow="#42307D3D"
+                       
                       startAdornment={<Mail01 className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -303,7 +303,7 @@ export default function UserForm({ mode }) {
                       helperText={errors.phone || ''}
                       onChangeForm={(e) => { setPhone(e.target.value); clearError('phone') }}
                       focusColor="#42307D"
-                      focusShadow="#42307D3D"
+                       
                       startAdornment={<Phone className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -335,7 +335,7 @@ export default function UserForm({ mode }) {
                       getOptionLabel={(e) => e?.name || ''}
                       onChange={(_e, val) => { setSelectedRole(val); clearError('roleId') }}
                       focusColor="#42307D"
-                      focusShadow="#42307D3D"
+                       
                     />
                   </div>
 
@@ -354,7 +354,7 @@ export default function UserForm({ mode }) {
                       getOptionLabel={(e) => e?.name || ''}
                       onChange={(_e, val) => setSelectedCompanies(val)}
                       focusColor="#42307D"
-                      focusShadow="#42307D3D"
+                       
                     />
                   </div>
                 </div>
@@ -380,7 +380,7 @@ export default function UserForm({ mode }) {
                         isError={!!errors.password}
                         helperText={errors.password || ''}
                         focusColor="#42307D"
-                        focusShadow="#42307D3D"
+                         
                       />
                     </div>
                     <button

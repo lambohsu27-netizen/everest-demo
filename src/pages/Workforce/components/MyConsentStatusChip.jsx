@@ -3,17 +3,19 @@ import PropTypes from 'prop-types'
 import { MyChip } from '@interstellar-component'
 
 const statusConfig = {
-  New: 'primary',
-  Pending: 'warning',
-  Expired: 'error',
-  Active: 'success',
+  new: { color: 'primary', label: 'New' },
+  pending: { color: 'warning', label: 'Pending' },
+  expired: { color: 'error', label: 'Expired' },
+  active: { color: 'success', label: 'Active' },
 }
 
 export default function MyConsentStatusChip({ status }) {
+  const key = typeof status === 'string' ? status.toLowerCase() : ''
+  const cfg = statusConfig[key]
   return (
     <MyChip
-      label={status}
-      color={statusConfig[status] || 'gray'}
+      label={cfg?.label ?? status ?? '—'}
+      color={cfg?.color ?? 'gray'}
       variant="modern"
       size="sm"
       rounded="lg"
@@ -23,5 +25,5 @@ export default function MyConsentStatusChip({ status }) {
 }
 
 MyConsentStatusChip.propTypes = {
-  status: PropTypes.string.isRequired,
+  status: PropTypes.string,
 }

@@ -286,7 +286,7 @@ export default function RoleForm({ mode }) {
                               if (nameError) setNameError('')
                             }}
                             focusColor="#42307D"
-                            focusShadow="#42307D3D"
+                             
                           />
                         </div>
                       </div>

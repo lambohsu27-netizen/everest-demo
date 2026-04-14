@@ -1,8 +1,16 @@
-import { MyButton, MyChip, MyContextMenu, MyPopper, MyHorizontalTabV2 } from '@interstellar-component'
+import {
+  MyButton,
+  MyChip,
+  MyContextMenu,
+  MyPopper,
+  MyHorizontalTabV2,
+  MyStackedModalSlider,
+} from '@interstellar-component'
 import { useState } from 'react'
 import {
   Calendar,
   ChevronDown,
+  Edit01,
   File06,
   FilterLines,
   LinkBroken02,
@@ -11,11 +19,13 @@ import {
 } from '@untitled-ui/icons-react'
 import PropTypes from 'prop-types'
 import { useEmployeeDetailsSheet } from './Context'
+import EditEmployeeSlider from './EditEmployeeSlider'
 import RevokeReportForm from './RevokeReportForm'
 
 export default function ProfileHeader({ employee }) {
   const { currentTabs, setCurrentTabs } = useEmployeeDetailsSheet()
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
   const tabs = [
     { label: 'Report', value: 'report' },
@@ -28,22 +38,26 @@ export default function ProfileHeader({ employee }) {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          {employee.avatar ? (
+          {employee.avatar_url ?? employee.avatar ? (
             <img
-              src={employee.avatar}
-              alt={employee.name}
+              src={employee.avatar_url ?? employee.avatar}
+              alt={employee.full_name ?? employee.name ?? ''}
               className="h-14 w-14 rounded-full object-cover ring-1 ring-gray-200"
             />
           ) : (
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand/50 text-xl font-bold text-brand/700 ring-1 ring-gray-200">
-              {employee.name.charAt(0)}
+              {(employee.full_name ?? employee.name ?? '?').charAt(0)}
             </div>
           )}
 
           {/* Name & ID */}
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-gray-900">{employee.name}</h1>
-            <p className="text-sm text-gray-500 font-medium">{employee.employeeId}</p>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {employee.full_name ?? employee.name ?? '—'}
+            </h1>
+            <p className="text-sm text-gray-500 font-medium">
+              {employee.code ?? employee.employeeId ?? ''}
+            </p>
           </div>
         </div>
 
@@ -69,10 +83,17 @@ export default function ProfileHeader({ employee }) {
               menuButtonGroups={[
                 [
                   {
+                    icon: <Edit01 />,
+                    label: 'Edit',
+                    onClick: () => {
+                      setIsEditOpen(true)
+                      close()
+                    },
+                  },
+                  {
                     icon: <Repeat04 />,
                     label: 'Refresh report',
                     onClick: () => {
-                      // console.log('Refresh report')
                       close()
                     },
                   },
@@ -139,6 +160,16 @@ export default function ProfileHeader({ employee }) {
           </MyButton>
         </div>
       </div>
+      <MyStackedModalSlider
+        open={isEditOpen}
+        offset={0}
+        zIndex={1000}
+        element={
+          <EditEmployeeSlider employee={employee} onClose={() => setIsEditOpen(false)} />
+        }
+        onClose={() => setIsEditOpen(false)}
+        scrim
+      />
       <RevokeReportForm
         open={isRevokeModalOpen}
         onClose={() => setIsRevokeModalOpen(false)}
@@ -152,8 +183,11 @@ export default function ProfileHeader({ employee }) {
 
 ProfileHeader.propTypes = {
   employee: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    employeeId: PropTypes.string.isRequired,
+    full_name: PropTypes.string,
+    name: PropTypes.string,
+    code: PropTypes.string,
+    employeeId: PropTypes.string,
+    avatar_url: PropTypes.string,
     avatar: PropTypes.string,
   }).isRequired,
 }

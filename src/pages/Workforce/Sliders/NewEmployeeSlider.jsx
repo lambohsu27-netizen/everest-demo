@@ -1,59 +1,36 @@
-// Libraries
+import { useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 import SimpleBar from 'simplebar-react'
-// UI Icons
 import { XClose, User01, Mail01 } from '@untitled-ui/icons-react'
-// Shared Components
-import { MyButton, MyTextField, MyAutocomplete, MyDoubleCard, MyHorizontalTabV2, WhatsApp } from '@interstellar-component'
-// Context
+import {
+  MyButton,
+  MyTextField,
+  MyAsyncDropdown,
+  MyDoubleCard,
+  MyHorizontalTabV2,
+  WhatsApp,
+  myToaster,
+} from '@interstellar-component'
 import { useWorkforce } from '../Context'
+import { WorkforceService } from '../service'
 
-// ── validation schema ──────────────────────────────────────────────────────────
 const schema = yup.object({
   category: yup.string().required('Category is required'),
-  entity: yup
-    .object({ label: yup.string(), value: yup.string() })
-    .nullable()
-    .required('Entity is required'),
+  entity: yup.object().nullable().required('Entity is required'),
   fullName: yup.string().required('Full name is required'),
-  level: yup
-    .object({ label: yup.string(), value: yup.string() })
-    .nullable()
-    .required('Level is required'),
-  position: yup
-    .object({ label: yup.string(), value: yup.string() })
-    .nullable()
-    .required('Position is required'),
+  level: yup.object().nullable().required('Level is required'),
+  position: yup.object().nullable().required('Position is required'),
   whatsapp: yup.string().required('WhatsApp number is required'),
   email: yup.string().email('Invalid email').optional(),
 })
 
-// ── static options (swap with real API calls later) ────────────────────────────
-const ENTITY_OPTIONS = [
-  { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-  { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-]
+function pickIdNameList(res) {
+  const list = Array.isArray(res?.data) ? res.data : []
+  return list.map((item) => ({ id: item.id, name: item.name ?? item.title ?? '' }))
+}
 
-const LEVEL_OPTIONS = [
-  { label: 'Intern', value: 'intern' },
-  { label: 'Staff', value: 'staff' },
-  { label: 'Supervisor', value: 'supervisor' },
-  { label: 'Manager', value: 'manager' },
-  { label: 'Director', value: 'director' },
-]
-
-const POSITION_OPTIONS = [
-  { label: 'Operations Supervisor', value: 'ops-supervisor' },
-  { label: 'Administrative Staff', value: 'admin-staff' },
-  { label: 'HR Manager', value: 'hr-manager' },
-  { label: 'Finance Director', value: 'finance-director' },
-  { label: 'Marketing Director', value: 'marketing-director' },
-]
-
-// ── helpers ────────────────────────────────────────────────────────────────────
-/** Inline label for form fields */
 function FieldLabel({ children, required }) {
   return (
     <p className="text-sm-medium text-gray/700 mb-1">
@@ -63,29 +40,48 @@ function FieldLabel({ children, required }) {
   )
 }
 
-/** Compact select built on MyAutocomplete */
-function SelectField({ label, required, name, control, options, placeholder, errors }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <FieldLabel required={required}>{label}</FieldLabel>
-      <MyAutocomplete
-        name={name}
-        control={control}
-        options={options}
-        placeholder={placeholder}
-        errors={errors}
-      />
-    </div>
-  )
-}
+function NewEmployeeSlider({ mode, employee, onClose } = {}) {
+  const { handleCurrentSlider, getWorkforce, currentSlider, fetchWorkforceDetail } = useWorkforce()
 
-// ── main component ─────────────────────────────────────────────────────────────
-function NewEmployeeSlider() {
-  const { handleCurrentSlider } = useWorkforce()
+  const isEdit = mode === 'edit' || currentSlider?.mode === 'edit'
+  const editingEmployee = employee ?? currentSlider?.employee ?? null
+  const editingId = editingEmployee?.id ?? null
+  const closeSlider = () => {
+    if (typeof onClose === 'function') onClose()
+    else handleCurrentSlider(null)
+  }
+
+  const [fullEmployee, setFullEmployee] = useState(null)
+  const [isPrefillReady, setIsPrefillReady] = useState(!isEdit)
+
+  // Edit mode: fetch full detail for employment_detail IDs
+  useEffect(() => {
+    if (!isEdit || !editingId) return undefined
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await WorkforceService.getWorkforceDetail(editingId)
+        const data = res?.data !== undefined ? res.data : res
+        if (!cancelled) {
+          setFullEmployee(data)
+          setIsPrefillReady(true)
+        }
+      } catch (e) {
+        if (!cancelled) {
+          myToaster(e)
+          setIsPrefillReady(true)
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [isEdit, editingId])
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
@@ -100,16 +96,106 @@ function NewEmployeeSlider() {
     },
   })
 
-  const onSubmit = handleSubmit(() => {
-    // TODO: wire to real API
-    handleCurrentSlider(null)
+  useEffect(() => {
+    if (!isEdit || !editingEmployee || !isPrefillReady) return
+    const src = { ...(editingEmployee ?? {}), ...(fullEmployee ?? {}) }
+    const ed = fullEmployee?.employment_detail ?? {}
+    const companyId = src.company?.id ?? src.company_id ?? ed.company_id
+    const companyName = src.company?.name ?? ed.company?.name
+    const levelId =
+      src.employment_level?.id ?? src.employment_level_id ?? ed.employment_level_id
+    const levelName = src.employment_level?.name ?? ed.employment_level?.name
+    const positionId = src.position?.id ?? src.position_id ?? ed.position_id
+    const positionName = src.position?.name ?? ed.position?.name
+
+    const cat = typeof src.category === 'string' ? src.category : 'candidate'
+    reset({
+      category: cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase(),
+      entity: companyId ? { id: companyId, name: companyName ?? '' } : null,
+      fullName: src.full_name ?? '',
+      level: levelId ? { id: levelId, name: levelName ?? '' } : null,
+      position: positionId ? { id: positionId, name: positionName ?? '' } : null,
+      whatsapp: src.phone ?? '',
+      email: src.email ?? '',
+    })
+  }, [isEdit, editingEmployee, fullEmployee, isPrefillReady, reset])
+
+  const asyncEntityOptions = useMemo(
+    () => async (paramsArg) => {
+      try {
+        const res = await WorkforceService.getCompanyOptions({
+          search: paramsArg?.search ?? '',
+        })
+        return { loading: false, data: pickIdNameList(res) }
+      } catch {
+        return { loading: false, data: [] }
+      }
+    },
+    []
+  )
+
+  const asyncLevelOptions = useMemo(
+    () => async (paramsArg) => {
+      try {
+        const res = await WorkforceService.getLevelOptions({
+          limit: 100,
+          ...(paramsArg?.search ? { search: paramsArg.search } : {}),
+        })
+        return { loading: false, data: pickIdNameList(res) }
+      } catch {
+        return { loading: false, data: [] }
+      }
+    },
+    []
+  )
+
+  const asyncPositionOptions = useMemo(
+    () => async (paramsArg) => {
+      try {
+        const res = await WorkforceService.getPositionOptions({
+          limit: 100,
+          ...(paramsArg?.search ? { search: paramsArg.search } : {}),
+        })
+        return { loading: false, data: pickIdNameList(res) }
+      } catch {
+        return { loading: false, data: [] }
+      }
+    },
+    []
+  )
+
+  const onSubmit = handleSubmit(async (values) => {
+    const basePayload = {
+      full_name: values.fullName,
+      company_id: values.entity?.id,
+      employment_level_id: values.level?.id,
+      position_id: values.position?.id,
+      phone: values.whatsapp,
+      ...(values.email ? { email: values.email } : {}),
+    }
+    try {
+      if (isEdit && editingId) {
+        await WorkforceService.updateWorkforce(editingId, basePayload)
+        myToaster({ status: 'success', message: 'Employee updated successfully.' })
+        await fetchWorkforceDetail(editingId)
+      } else {
+        await WorkforceService.createWorkforce({
+          ...basePayload,
+          category: values.category.toLowerCase(),
+        })
+        myToaster({ status: 'success', message: 'Employee created successfully.' })
+      }
+      closeSlider()
+      await getWorkforce()
+    } catch (e) {
+      myToaster(e)
+    }
   })
 
-  const handleClose = () => handleCurrentSlider(null)
+  const handleClose = () => closeSlider()
 
   return (
     <div className="flex h-screen w-[420px] flex-col">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header className="relative flex items-start gap-x-4 px-6 py-6 border-b border-gray/100">
         <button
           type="button"
@@ -119,26 +205,24 @@ function NewEmployeeSlider() {
           <XClose size={24} stroke="currentColor" />
         </button>
 
-        {/* Title + subtitle */}
         <div className="flex flex-1 flex-col gap-1 pt-1">
-          <p className="text-lg-semibold text-gray/900">New employee</p>
+          <p className="text-lg-semibold text-gray/900">
+            {isEdit ? 'Edit employee' : 'New employee'}
+          </p>
           <p className="text-sm-regular text-gray/600">
-            Enter employee details to save them in the system.
+            {isEdit
+              ? 'Update employee details and save your changes.'
+              : 'Enter employee details to save them in the system.'}
           </p>
         </div>
       </header>
 
-      {/* ── Scrollable body ─────────────────────────────────────────────────── */}
       <form noValidate onSubmit={onSubmit} className="flex flex-1 flex-col overflow-hidden">
         <section className="flex-1 overflow-hidden">
           <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
             <div className="flex flex-col gap-6 px-6 py-6">
-
-              {/* General Information card */}
               <MyDoubleCard heading="General Information" innerClassName="p-4">
                 <div className="flex flex-col gap-5">
-
-                  {/* Category toggle */}
                   <div className="flex flex-col gap-1.5">
                     <FieldLabel>Category</FieldLabel>
                     <Controller
@@ -161,18 +245,25 @@ function NewEmployeeSlider() {
                     )}
                   </div>
 
-                  {/* Entity */}
-                  <SelectField
-                    label="Entity"
-                    required
-                    name="entity"
-                    control={control}
-                    options={ENTITY_OPTIONS}
-                    placeholder="Select entity"
-                    errors={errors?.entity?.message ?? errors?.entity?.value?.message}
-                  />
+                  <div className="flex flex-col gap-0.5">
+                    <FieldLabel required>Entity</FieldLabel>
+                    <Controller
+                      name="entity"
+                      control={control}
+                      render={({ field }) => (
+                        <MyAsyncDropdown
+                          asyncFunction={asyncEntityOptions}
+                          value={field.value}
+                          placeholder="Select entity"
+                          error={errors?.entity?.message}
+                          isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                          getOptionLabel={(e) => e?.name || ''}
+                          onChange={(_e, val) => field.onChange(val)}
+                        />
+                      )}
+                    />
+                  </div>
 
-                  {/* Full name */}
                   <div className="flex flex-col gap-0.5">
                     <FieldLabel required>Full name</FieldLabel>
                     <MyTextField
@@ -184,29 +275,44 @@ function NewEmployeeSlider() {
                     />
                   </div>
 
-                  {/* Level */}
-                  <SelectField
-                    label="Level"
-                    required
-                    name="level"
-                    control={control}
-                    options={LEVEL_OPTIONS}
-                    placeholder="Select level"
-                    errors={errors?.level?.message ?? errors?.level?.value?.message}
-                  />
+                  <div className="flex flex-col gap-0.5">
+                    <FieldLabel required>Level</FieldLabel>
+                    <Controller
+                      name="level"
+                      control={control}
+                      render={({ field }) => (
+                        <MyAsyncDropdown
+                          asyncFunction={asyncLevelOptions}
+                          value={field.value}
+                          placeholder="Select level"
+                          error={errors?.level?.message}
+                          isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                          getOptionLabel={(e) => e?.name || ''}
+                          onChange={(_e, val) => field.onChange(val)}
+                        />
+                      )}
+                    />
+                  </div>
 
-                  {/* Position */}
-                  <SelectField
-                    label="Position"
-                    required
-                    name="position"
-                    control={control}
-                    options={POSITION_OPTIONS}
-                    placeholder="Select position"
-                    errors={errors?.position?.message ?? errors?.position?.value?.message}
-                  />
+                  <div className="flex flex-col gap-0.5">
+                    <FieldLabel required>Position</FieldLabel>
+                    <Controller
+                      name="position"
+                      control={control}
+                      render={({ field }) => (
+                        <MyAsyncDropdown
+                          asyncFunction={asyncPositionOptions}
+                          value={field.value}
+                          placeholder="Select position"
+                          error={errors?.position?.message}
+                          isOptionEqualToValue={(option, val) => option?.id === val?.id}
+                          getOptionLabel={(e) => e?.name || ''}
+                          onChange={(_e, val) => field.onChange(val)}
+                        />
+                      )}
+                    />
+                  </div>
 
-                  {/* WhatsApp */}
                   <div className="flex flex-col gap-0.5">
                     <FieldLabel required>WhatsApp</FieldLabel>
                     <MyTextField
@@ -218,7 +324,6 @@ function NewEmployeeSlider() {
                     />
                   </div>
 
-                  {/* Email */}
                   <div className="flex flex-col gap-0.5">
                     <FieldLabel>Email</FieldLabel>
                     <MyTextField
@@ -232,15 +337,12 @@ function NewEmployeeSlider() {
                       Used as an alternative method for sending the form link.
                     </p>
                   </div>
-
                 </div>
               </MyDoubleCard>
-
             </div>
           </SimpleBar>
         </section>
 
-        {/* ── Footer ──────────────────────────────────────────────────────────── */}
         <footer className="flex items-center justify-end gap-3 border-t border-gray/200 px-6 py-4">
           <MyButton
             type="button"
@@ -252,14 +354,8 @@ function NewEmployeeSlider() {
             <p className="text-sm-semibold">Cancel</p>
           </MyButton>
 
-          <MyButton
-            type="submit"
-            color="primary"
-            variant="filled"
-            size="md"
-            disabled={isSubmitting}
-          >
-            <p className="text-sm-semibold">Submit</p>
+          <MyButton type="submit" color="primary" variant="filled" size="md" disabled={isSubmitting}>
+            <p className="text-sm-semibold">{isSubmitting ? 'Submitting...' : 'Submit'}</p>
           </MyButton>
         </footer>
       </form>

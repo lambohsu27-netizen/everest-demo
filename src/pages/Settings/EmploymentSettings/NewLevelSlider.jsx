@@ -499,7 +499,7 @@ export default function NewLevelSlider({
                           </div>
                         )}
                         focusColor="#42307D"
-                        focusShadow="#42307D3D"
+                         
                       />
                       <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
                         How often screening should be repeated for this employment level.

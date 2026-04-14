@@ -196,6 +196,7 @@ export default function UserTab() {
                   stroke="currentColor"
                 />
               }
+              focusShadow="#365CC3"
               onChangeForm={debounce((e) => {
                 setUserPage(1)
                 fetchUsers(1, e.target.value)

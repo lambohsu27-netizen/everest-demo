@@ -14,6 +14,21 @@ function generateRandomPassword(length = 16) {
   return result
 }
 
+/** Huruf, angka, dan spasi (untuk nama). */
+function sanitizeNameInput(value) {
+  return String(value ?? '').replace(/[^a-zA-Z0-9 ]/g, '')
+}
+
+/** Huruf, angka, dan simbol umum alamat email. */
+function sanitizeEmailInput(value) {
+  return String(value ?? '').replace(/[^a-zA-Z0-9@._+-]/g, '')
+}
+
+/** Hanya angka (nomor telepon). */
+function sanitizePhoneInput(value) {
+  return String(value ?? '').replace(/\D/g, '')
+}
+
 export default function UserForm({ mode }) {
   const {
     userDetail,
@@ -47,9 +62,9 @@ export default function UserForm({ mode }) {
   // Populate form for edit mode
   useEffect(() => {
     if (isEdit && userDetail) {
-      setName(userDetail.name ?? '')
-      setEmail(userDetail.email ?? '')
-      setPhone(userDetail.phone ?? '')
+      setName(sanitizeNameInput(userDetail.name ?? ''))
+      setEmail(sanitizeEmailInput(userDetail.email ?? ''))
+      setPhone(sanitizePhoneInput(userDetail.phone ?? ''))
       if (userDetail.role_id) {
         setSelectedRole({
           id: userDetail.role_id,
@@ -116,6 +131,7 @@ export default function UserForm({ mode }) {
     if (!email.trim()) errs.email = 'Email is required.'
     if (!phone.trim()) errs.phone = 'Phone is required.'
     if (!selectedRole) errs.roleId = 'Role is required.'
+    // if (!selectedCompanies) errs.companyIds = 'Company is required.'
     if (!isEdit && !password) errs.password = 'Password is required. Click generate.'
     return errs
   }
@@ -266,7 +282,10 @@ export default function UserForm({ mode }) {
                       placeholder="e.g. Eve Leroy"
                       isError={!!errors.name}
                       helperText={errors.name || ''}
-                      onChangeForm={(e) => { setName(e.target.value); clearError('name') }}
+                      onChangeForm={(e) => {
+                        setName(sanitizeNameInput(e.target.value))
+                        clearError('name')
+                      }}
                       focusColor="#42307D"
                        
                     />
@@ -279,11 +298,15 @@ export default function UserForm({ mode }) {
                     </p>
                     <MyTextField
                       name="email"
+                      type='email'
                       value={email}
                       placeholder="e.g. eve.leroy@kalachakra.io"
                       isError={!!errors.email}
                       helperText={errors.email || ''}
-                      onChangeForm={(e) => { setEmail(e.target.value); clearError('email') }}
+                      onChangeForm={(e) => {
+                        setEmail(sanitizeEmailInput(e.target.value))
+                        clearError('email')
+                      }}
                       focusColor="#42307D"
                        
                       startAdornment={<Mail01 className="h-5 w-5 text-gray-500" />}
@@ -297,11 +320,16 @@ export default function UserForm({ mode }) {
                     </p>
                     <MyTextField
                       name="phone"
+                      type="text"
+                      inputMode="numeric"
                       value={phone}
-                      placeholder="e.g. +62 817 8817 3723"
+                      placeholder="e.g. 6281788173723"
                       isError={!!errors.phone}
                       helperText={errors.phone || ''}
-                      onChangeForm={(e) => { setPhone(e.target.value); clearError('phone') }}
+                      onChangeForm={(e) => {
+                        setPhone(sanitizePhoneInput(e.target.value))
+                        clearError('phone')
+                      }}
                       focusColor="#42307D"
                        
                       startAdornment={<Phone className="h-5 w-5 text-gray-500" />}
@@ -385,8 +413,9 @@ export default function UserForm({ mode }) {
                     </div>
                     <button
                       type="button"
+                      disabled={!password?.trim()}
                       onClick={() => copyToClipboard(password)}
-                      className="text-sm font-semibold text-brand/700 hover:text-brand/800"
+                      className="text-sm font-semibold text-brand/700 hover:text-brand/800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-brand/700"
                     >
                       <Copy01 className="ml-3 size-5" stroke="currentColor" />
                     </button>

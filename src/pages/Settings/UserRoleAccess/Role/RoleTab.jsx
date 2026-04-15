@@ -124,7 +124,7 @@ export default function RoleTab() {
                 <p className="text-sm-semibold">Delete</p>
               </MyButton>
             )}
-            <MyButton
+            {/* <MyButton
               color="primary"
               size="md"
               variant="outlined"
@@ -132,7 +132,7 @@ export default function RoleTab() {
             >
               <DownloadCloud01 className="h-5 w-5" />
               <p className="text-sm-semibold">Download</p>
-            </MyButton>
+            </MyButton> */}
             {canAddRole && (
               <MyButton color="primary" size="md" variant="filled" onClick={openCreateRole}>
                 <Plus className="w-5 h-5 text-white" stroke="currentColor" />

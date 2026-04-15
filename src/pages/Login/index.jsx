@@ -175,7 +175,7 @@ function Login() {
               >
                 <p className="text-md-semibold">Sign in</p>
               </MyButton>
-              <p className="text-sm text-center text-gray-600">
+              {/* <p className="text-sm text-center text-gray-600">
                 Don’t have an account?{' '}
                 <span
                   onClick={() => nav('/register')}
@@ -183,7 +183,7 @@ function Login() {
                 >
                   Sign up
                 </span>
-              </p>
+              </p> */}
             </div>
           </form>
           <div className="absolute bottom-10 left-10 md:left-16">

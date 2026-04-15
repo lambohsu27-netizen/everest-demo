@@ -9,7 +9,7 @@ export const ForgetPasswordSchema = Yup.object().shape({
 export const setNewPasswordSchema = Yup.object().shape({
   password: Yup.string()
     .required('New password is required')
-    .min(12, 'New password must be at least 12 characters.') // Validasi panjang minimal
+    .min(12, 'New password must be at least 8 characters.') // Validasi panjang minimal
     .matches(/(?=.*[a-z])/, 'Must contain at least one lowercase letter.')
     .matches(/(?=.*[A-Z])/, 'Must contain at least one uppercase letter.')
     .matches(/(?=.*\d)/, 'Must contain at least one number.')

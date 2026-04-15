@@ -1,24 +1,45 @@
 import React from 'react'
 import { MyChip } from '@interstellar-component'
 
+const DASH = '—'
+
+function formatDate(value) {
+  if (!value) return DASH
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function getName(obj) {
+  if (!obj) return null
+  if (typeof obj === 'string') return obj
+  return obj.name ?? null
+}
+
 /**
  * @param {object} props
  * @param {object} props.employee
  */
 export default function GeneralInfoCard({ employee }) {
+  const consentStatus = employee.consent_status ?? employee.consentStatus
+  const consentExpiry = employee.consent_expiry ?? employee.consentExpiry
+  const code = employee.workforce_code ?? employee.code ?? employee.employeeId
+
   const fields = [
-    { label: 'Name & ID', value: employee.name, subtext: employee.employeeId },
-    { label: 'Mobile phone', value: employee.phoneNumber },
+    { label: 'Name & ID', value: employee.full_name ?? employee.name, subtext: code },
+    { label: 'Mobile phone', value: employee.phone ?? employee.phoneNumber },
     { label: 'Email address', value: employee.email },
-    { label: 'Jenis Kelamin', value: employee.gender || 'Wanita' },
-    { label: 'Tempat Lahir', value: employee.birthPlace || 'Bekasi' },
-    { label: 'Tanggal Lahir', value: employee.birthDate || '10 Jan 2021' },
-    { label: 'NIK', value: employee.nik || '3275 0427 0800 0007' },
-    { label: 'Level', value: employee.level },
+    { label: 'Jenis Kelamin', value: employee.gender },
+    { label: 'Tanggal Lahir', value: formatDate(employee.date_of_birth ?? employee.birthDate) },
+    { label: 'NIK', value: employee.id_number ?? employee.nik },
+    { label: 'Level', value: getName(employee.employment_level) ?? employee.level },
+    { label: 'Position', value: getName(employee.position) ?? employee.position_title },
     { label: 'Category', value: employee.category },
-    { label: 'Company', value: employee.company },
-    { label: 'Consent Status', value: employee.consentStatus, isBadge: true },
-    { label: 'Consent expiry', value: employee.consentExpiry },
+    { label: 'Company', value: getName(employee.company) },
+    ...(consentStatus !== undefined
+      ? [{ label: 'Consent Status', value: consentStatus ?? DASH, isBadge: true }]
+      : []),
+    { label: 'Consent expiry', value: formatDate(consentExpiry) },
   ]
 
   return (
@@ -49,7 +70,7 @@ export default function GeneralInfoCard({ employee }) {
                 />
               ) : (
                 <>
-                  <span className="text-sm font-medium text-gray-900">{field.value}</span>
+                  <span className="text-sm font-medium text-gray-900">{field.value ?? DASH}</span>
                   {field.subtext && (
                     <span className="text-xs text-gray-400 font-medium">{field.subtext}</span>
                   )}

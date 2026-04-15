@@ -230,7 +230,7 @@ function WorkforceTable() {
             onSelectionChange={handleWorkforceSelectionChange}
             currentSortFieldFromParams={sortField}
             currentSortOrderFromParams={sortOrder}
-            onClick={(row) => navigate(`/workforce/employee/${row.id}`)}
+            onClick={(row) => navigate(`/workforce/employee/${row.id}`, { state: { row } })}
             paginator
             onChangePagination={setPage}
           >

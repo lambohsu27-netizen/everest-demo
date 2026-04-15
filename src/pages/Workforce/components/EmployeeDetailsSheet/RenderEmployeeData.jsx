@@ -8,13 +8,19 @@ import NoReportData from './NoReportData'
  * @param {object} props
  * @param {object} props.employee
  */
-export default function RenderEmployeeData({ employee }) {
+export default function RenderEmployeeData({ employee, isLoadingDetail = false }) {
   const { currentTabs } = useEmployeeDetailsSheet()
 
-  // TODO: replace with real backend flag once available
-  const hasReportData = employee.hasReport ?? false
+  const hasReportData = Boolean(employee.credit_report)
 
   const renderContent = () => {
+    if (isLoadingDetail) {
+      return (
+        <div className="flex items-center justify-center py-24">
+          <p className="text-sm font-medium text-gray-500">Loading…</p>
+        </div>
+      )
+    }
     if (currentTabs.type === 'personal_information') {
       return <PersonalInformation employee={employee} />
     }
@@ -25,9 +31,9 @@ export default function RenderEmployeeData({ employee }) {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-1 min-h-0 flex-col gap-8">
       <ProfileHeader employee={employee} />
-      <div>{renderContent()}</div>
+      <div className="flex-1 min-h-0 overflow-y-auto">{renderContent()}</div>
     </div>
   )
 }

@@ -4,34 +4,23 @@ import { WorkforceService } from './service'
 
 const WorkforceContext = createContext()
 
-export const LOAN_CATEGORIES = [
-  { kolBadge: 'KOL 5', title: 'Credit card', accountCount: '3 account', amount: 'Rp 52,000,000', color: 'Error', icon: 'CreditCard02' },
-  { kolBadge: 'KOL 4', title: 'Paylater', accountCount: '2 account', amount: 'Rp 6,400,000', color: 'Warning', icon: 'ShoppingBag03' },
-  { kolBadge: 'KOL 5', title: 'KKB', accountCount: '1 account', amount: 'Rp 172,000,000', color: 'Orange', icon: 'Car01' },
-  { kolBadge: 'KOL 5', title: 'KPR', accountCount: 'No active loan', amount: 'Rp 0', color: 'Blue', icon: 'Home03' },
-  { kolBadge: 'KOL 5', title: 'KTA', accountCount: '2 account', amount: 'Rp 154,100,000', color: 'Success', icon: 'CoinsStacked03' },
-  { kolBadge: 'KOL 5', title: 'Other', accountCount: 'No active loan', amount: 'Rp 0', color: 'Gray', icon: 'DotsVertical' },
-]
+const CATEGORY_META = {
+  'Credit / Financing': { color: 'Success', icon: 'CoinsStacked03' },
+  'Bond / Securities': { color: 'Blue', icon: 'ShoppingBag03' },
+  'Irrevocable LC': { color: 'Warning', icon: 'File06' },
+  'Bank Guarantee': { color: 'Orange', icon: 'Shield02' },
+  'Other Facilities': { color: 'Gray', icon: 'DotsVertical' },
+}
 
-export const LOAN_ACCOUNTS = {
-  'Credit card': [
-    { id: 1, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 1,523,000', isActive: false },
-    { id: 2, bank: 'BCA', name: 'BCA Master Card', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 5,000,000', isActive: true },
-    { id: 3, bank: 'CIMB', name: 'CIMB Niaga Card', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 45,477,000', isActive: false },
-  ],
-  Paylater: [
-    { id: 1, bank: 'SP', name: 'Shopee Paylater', kol: 'Kol 4', label: 'Jumlah pinjaman', amount: 'Rp 4,000,000', isActive: false },
-    { id: 2, bank: 'TR', name: 'Traveloka Paylater', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 2,400,000', isActive: true },
-  ],
-  KKB: [
-    { id: 1, bank: 'BCA', name: 'BCA Finance - Toyota Avanza', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 172,000,000', isActive: true },
-  ],
-  KPR: [],
-  KTA: [
-    { id: 1, bank: 'MN', name: 'Mandiri KTA', kol: 'Kol 5', label: 'Jumlah pinjaman', amount: 'Rp 100,000,000', isActive: false },
-    { id: 2, bank: 'BRI', name: 'BRI KTA', kol: 'Kol 2', label: 'Jumlah pinjaman', amount: 'Rp 54,100,000', isActive: true },
-  ],
-  Other: [],
+function formatIDR(n) {
+  const v = Number(n) || 0
+  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+function deriveBankCode(provider) {
+  if (!provider) return 'XX'
+  const words = String(provider).replace(/^PT\.?\s+/i, '').split(/\s+/).filter(Boolean)
+  return (words[0] ?? 'XX').slice(0, 3).toUpperCase()
 }
 
 const SORT_FIELD_TO_API = {
@@ -210,6 +199,48 @@ function WorkforceProvider({ children }) {
     [workforce?.data]
   )
 
+  const creditFacilitiesByCategory = useMemo(() => {
+    const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+    const grouped = {}
+    facilities.forEach((fac) => {
+      const key = fac.category ?? 'Other Facilities'
+      grouped[key] ??= { accounts: [], totalBalance: 0, activeCount: 0 }
+      grouped[key].accounts.push(fac)
+      grouped[key].totalBalance += Number(fac.debit_balance) || 0
+      if (fac.contract_phase === 'Active') grouped[key].activeCount += 1
+    })
+    return grouped
+  }, [workforceDetail?.credit_report?.major_credit_facilities])
+
+  const loanCategories = useMemo(() => {
+    const kol = workforceDetail?.credit_report?.credit_summary?.collectability_status?.kol
+    const kolBadge = kol ? `KOL ${kol}` : null
+    return Object.entries(creditFacilitiesByCategory).map(([title, { accounts, totalBalance }]) => ({
+      title,
+      accountCount: accounts.length > 0 ? `${accounts.length} account` : 'No active loan',
+      amount: formatIDR(totalBalance),
+      kolBadge,
+      color: CATEGORY_META[title]?.color ?? 'Gray',
+      icon: CATEGORY_META[title]?.icon ?? 'DotsVertical',
+    }))
+  }, [creditFacilitiesByCategory, workforceDetail?.credit_report?.credit_summary])
+
+  const loanAccounts = useMemo(() => {
+    const out = {}
+    Object.entries(creditFacilitiesByCategory).forEach(([title, { accounts }]) => {
+      out[title] = accounts.map((acc, i) => ({
+        id: `${title}-${i}`,
+        bank: deriveBankCode(acc.provider),
+        name: acc.provider ?? '—',
+        kol: acc.contract_status ?? null,
+        label: acc.contract_type ?? 'Jumlah pinjaman',
+        amount: formatIDR(acc.debit_balance),
+        isActive: acc.contract_phase === 'Active',
+      }))
+    })
+    return out
+  }, [creditFacilitiesByCategory])
+
   const workforceMeta = useMemo(() => {
     const m = workforce?.meta
     if (m && typeof m === 'object' && !Array.isArray(m)) return m
@@ -255,8 +286,8 @@ function WorkforceProvider({ children }) {
       handleCurrentSlider,
       handleAccountDetail,
       activeAccountId,
-      loanCategories: LOAN_CATEGORIES,
-      loanAccounts: LOAN_ACCOUNTS,
+      loanCategories,
+      loanAccounts,
     }),
     [
       params,
@@ -273,6 +304,8 @@ function WorkforceProvider({ children }) {
       setSelectedCategory,
       setPage,
       getEmployeeById,
+      loanCategories,
+      loanAccounts,
       sliderStack,
       currentSlider,
       pushSlider,

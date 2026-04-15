@@ -5,63 +5,60 @@ import {
   MarkerPin01,
   PenTool01,
   Phone,
-  SearchSm,
   Stars01,
 } from '@untitled-ui/icons-react'
+import { useWorkforce } from '../../../../../../Context'
 import RiskSignalCard from './RiskSignalCard'
 
 export default function RiskSignalsSection() {
   const navigate = useNavigate()
   const { id } = useParams()
+  const { workforceDetail } = useWorkforce()
+  const rs = workforceDetail?.credit_report?.risk_signals ?? {}
 
   const handleViewDetails = (signal) => {
-    // Navigate to the details sheet with the correct tab selected
     navigate(`/workforce/employee/${id}/risk-signals?tab=${signal.title}`)
   }
+
   const signals = [
     {
       icon: Phone,
       title: 'Phone numbers',
-      count: '8',
-      highlightText: 'number with 348 label',
-      description:
-        '8 numbers with multiple inconsistent contact labels detected, which may indicate unstable contact history.',
+      count: String(rs.contact_count ?? 0),
+      highlightText: 'contact records',
+      description: `${rs.contact_count ?? 0} contact record(s) found across reports.`,
       color: 'text-green-400',
     },
     {
       icon: MarkerPin01,
       title: 'Address Records',
-      count: '12',
+      count: String(rs.address_count ?? 0),
       highlightText: 'address',
-      description:
-        '12 recorded addresses with frequent location changes, suggesting low residential stability.',
+      description: `${rs.address_count ?? 0} address record(s) associated with this subject.`,
       color: 'text-blue-light/600',
     },
     {
       icon: PenTool01,
-      title: 'Court Decision',
-      count: '2',
-      highlightText: 'court decisions',
-      description:
-        'Records include financial disputes and debt-related cases, which may increase financial risk exposure.',
+      title: 'Negative Events',
+      count: String(rs.negative_event_count ?? 0),
+      highlightText: 'negative events',
+      description: `${rs.negative_event_count ?? 0} negative event(s) detected (write-offs, petitions, etc.).`,
       color: 'text-error/600',
     },
     {
       icon: Briefcase02,
       title: 'Employment Records',
-      count: '10',
+      count: String(rs.employment_count ?? 0),
       highlightText: 'employment',
-      description:
-        'Frequent job changes across several employers may indicate limited employment stability.',
+      description: `${rs.employment_count ?? 0} employment record(s) on file.`,
       color: 'text-fuchsia-600',
     },
     {
       icon: FileSearch02,
       title: 'Footprints',
-      count: '27',
+      count: String(rs.footprint_enquiry_count ?? 0),
       highlightText: 'Footprints enquiry',
-      description:
-        'High number of external enquiries across financial institutions may suggest frequent loan applications or financial distress.',
+      description: `${rs.footprint_enquiry_count ?? 0} external enquiry/ies across financial institutions.`,
       color: 'text-yellow-600',
     },
   ]

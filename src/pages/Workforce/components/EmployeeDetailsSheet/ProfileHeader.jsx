@@ -22,6 +22,21 @@ import { useEmployeeDetailsSheet } from './Context'
 import EditEmployeeSlider from './EditEmployeeSlider'
 import RevokeReportForm from './RevokeReportForm'
 
+const CONSENT_CHIP_COLOR = {
+  active: 'success',
+  new: 'brand',
+  expired: 'error',
+  revoked: 'error',
+  pending: 'warning',
+}
+
+function formatConsentExpiry(value) {
+  if (!value) return null
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 export default function ProfileHeader({ employee }) {
   const { currentTabs, setCurrentTabs } = useEmployeeDetailsSheet()
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false)
@@ -31,6 +46,11 @@ export default function ProfileHeader({ employee }) {
     { label: 'Report', value: 'report' },
     { label: 'Personal information', value: 'personal_information' },
   ]
+
+  const consentStatus = employee.consent_status ?? employee.consentStatus
+  const consentExpiry = employee.consent_expiry ?? employee.consentExpiry
+  const expiryLabel = formatConsentExpiry(consentExpiry)
+  const code = employee.workforce_code ?? employee.code ?? employee.employeeId
 
   return (
     <div className="flex flex-col gap-6 pb-8 border-b border-gray-200 bg-white">
@@ -55,9 +75,7 @@ export default function ProfileHeader({ employee }) {
             <h1 className="text-2xl font-bold text-gray-900">
               {employee.full_name ?? employee.name ?? '—'}
             </h1>
-            <p className="text-sm text-gray-500 font-medium">
-              {employee.code ?? employee.employeeId ?? ''}
-            </p>
+            <p className="text-sm text-gray-500 font-medium">{code ?? ''}</p>
           </div>
         </div>
 
@@ -114,24 +132,30 @@ export default function ProfileHeader({ employee }) {
       </div>
 
       {/* Badges Section */}
-      <div className="flex items-center gap-2">
-        <MyChip
-          label="Active consent"
-          color="success"
-          variant="modern"
-          size="sm"
-          rounded="lg"
-          dot
-        />
-        <MyChip
-          label="26 Juni 2026"
-          color="modern"
-          variant="modern"
-          size="sm"
-          rounded="lg"
-          startAdornment={<File06 className="h-3 w-3 text-brand/700" />}
-        />
-      </div>
+      {(consentStatus || expiryLabel) && (
+        <div className="flex items-center gap-2">
+          {consentStatus && (
+            <MyChip
+              label={`${consentStatus.charAt(0).toUpperCase()}${consentStatus.slice(1)} consent`}
+              color={CONSENT_CHIP_COLOR[String(consentStatus).toLowerCase()] ?? 'modern'}
+              variant="modern"
+              size="sm"
+              rounded="lg"
+              dot
+            />
+          )}
+          {expiryLabel && (
+            <MyChip
+              label={expiryLabel}
+              color="modern"
+              variant="modern"
+              size="sm"
+              rounded="lg"
+              startAdornment={<File06 className="h-3 w-3 text-brand/700" />}
+            />
+          )}
+        </div>
+      )}
 
       {/* Tabs & Filters Section */}
       <div className="flex items-center justify-between gap-4 mt-2">

@@ -3,17 +3,17 @@ import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
 import { useWorkforce } from '../../../../../../Context'
 
-// Figma: Size=sm, Series=5, Legend=True
-// Chart: 200×200, Hole=50%, horizontal layout with 24px gap to vertical legend
-const SERIES_DATA = [
-  { label: 'Consumer Loans', color: '#7f56d9', value: 35 },
-  { label: 'Working Capital', color: '#9e77ed', value: 25 },
-  { label: 'Credit Card', color: '#b692f6', value: 15 },
-  { label: 'Installment Loans', color: '#d6bbfb', value: 15 },
-  { label: 'Other Facilities', color: '#e9eaeb', value: 10 },
-]
+const PALETTE = ['#7f56d9', '#9e77ed', '#b692f6', '#d6bbfb', '#e9eaeb', '#c4b5fd', '#a78bfa']
 
 export default function CreditCompositionCard() {
+  const { handleCurrentSlider, workforceDetail } = useWorkforce()
+  const composition = workforceDetail?.credit_report?.credit_overview?.composition ?? []
+  const SERIES_DATA = composition.map((c, i) => ({
+    label: c.category,
+    color: PALETTE[i % PALETTE.length],
+    value: Number(c.total) || 0,
+  }))
+
   const options = {
     chart: {
       type: 'donut',
@@ -39,13 +39,11 @@ export default function CreditCompositionCard() {
       active: { filter: { type: 'none' } },
     },
     tooltip: {
-      y: { formatter: (val) => `${val}%` },
+      y: { formatter: (val) => `${val}` },
     },
   }
 
   const series = SERIES_DATA.map((s) => s.value)
-
-  const { handleCurrentSlider } = useWorkforce()
 
   return (
     <ReportSummaryCard

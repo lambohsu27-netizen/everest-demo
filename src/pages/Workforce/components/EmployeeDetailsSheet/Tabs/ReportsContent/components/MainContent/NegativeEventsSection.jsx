@@ -1,34 +1,50 @@
-import React from 'react'
-import { SearchSm, FilterLines } from '@untitled-ui/icons-react'
-import { MyButton } from '@interstellar-component'
+import React, { useMemo, useState } from 'react'
+import { debounce } from 'lodash'
+import { SearchLg, FilterLines } from '@untitled-ui/icons-react'
+import { MyButton, MyTextField } from '@interstellar-component'
+import { useWorkforce } from '../../../../../../Context'
+
+const DASH = '—'
+
+function formatDate(value) {
+  if (!value) return DASH
+  const d = new Date(String(value).replace(/\//g, '-'))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
 
 export default function NegativeEventsSection() {
-  const events = [
-    {
-      provider: 'PT Babados Bangkit Bersama',
-      type: 'General Business Company',
-      event: 'Bankruptcy petition',
-      date: '8 Jan 2024',
-      expiry: '8 Jan 2024',
-      lastReference: '8 Jan 2024',
-    },
-    {
-      provider: 'PT Babados Bangkit Bersama',
-      type: 'General Business Company',
-      event: 'Write-off',
-      date: '8 Jan 2024',
-      expiry: '8 Jan 2024',
-      lastReference: '8 Jan 2024',
-    },
-    {
-      provider: 'PT Babados Bangkit Bersama',
-      type: 'General Business Company',
-      event: 'Write-off',
-      date: '8 Jan 2024',
-      expiry: '8 Jan 2024',
-      lastReference: '8 Jan 2024',
-    },
-  ]
+  const { workforceDetail } = useWorkforce()
+  const [search, setSearch] = useState('')
+
+  const allEvents = useMemo(
+    () =>
+      (workforceDetail?.credit_report?.negative_events ?? []).map((e) => ({
+        provider: e.provider ?? DASH,
+        type: e.provider_type ?? '',
+        event: e.event ?? e.event_details ?? DASH,
+        date: formatDate(e.event_date),
+        expiry: formatDate(e.event_expiry_date),
+        lastReference: formatDate(e.event_date),
+      })),
+    [workforceDetail?.credit_report?.negative_events]
+  )
+
+  const events = useMemo(() => {
+    if (!search) return allEvents
+    const q = search.toLowerCase()
+    return allEvents.filter(
+      (e) =>
+        e.provider.toLowerCase().includes(q) ||
+        e.event.toLowerCase().includes(q) ||
+        (e.type ?? '').toLowerCase().includes(q)
+    )
+  }, [allEvents, search])
+
+  const onSearchChange = useMemo(
+    () => debounce((e) => setSearch(e.target.value ?? ''), 500),
+    []
+  )
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -42,14 +58,14 @@ export default function NegativeEventsSection() {
       <div className="flex flex-col border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
         {/* Toolbar */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-          <div className="relative w-80">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchSm className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
+          <div className="w-full max-w-sm">
+            <MyTextField
               placeholder="Search for event"
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
+              startAdornment={
+                <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+              }
+              focusColor="#42307D"
+              onChangeForm={onSearchChange}
             />
           </div>
           <MyButton color="secondary" variant="outlined" size="md" customClassname="gap-2">
@@ -89,17 +105,11 @@ export default function NegativeEventsSection() {
           </table>
         </div>
 
-        {/* Pagination Placeholder */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-white">
-          <span className="text-sm text-gray-600 font-medium">Page 1 of 4</span>
-          <div className="flex gap-3">
-            <MyButton color="secondary" variant="outlined" size="sm">
-              Previous
-            </MyButton>
-            <MyButton color="secondary" variant="outlined" size="sm">
-              Next
-            </MyButton>
-          </div>
+        {/* Footer count */}
+        <div className="flex items-center px-6 py-4 border-t border-gray-200 bg-white">
+          <span className="text-sm text-gray-600 font-medium">
+            {events.length} event{events.length === 1 ? '' : 's'}
+          </span>
         </div>
       </div>
     </div>

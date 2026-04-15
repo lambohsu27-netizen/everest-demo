@@ -5,8 +5,17 @@ import SummaryListCard from './SummaryListCard'
 import TrendChartCard from './TrendChartCard'
 import CreditScoreTrend from './CreditScoreTrend'
 import CollectabilityTrend from './CollectabilityTrend'
+import { useWorkforce } from '../../../../../../../Context'
+
+function formatIDR(n) {
+  const v = Number(n)
+  if (!v) return 'Rp 0'
+  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
 
 export default function CreditSummarySection() {
+  const { workforceDetail } = useWorkforce()
+  const summary = workforceDetail?.credit_report?.credit_summary ?? {}
   return (
     <div className="flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-1 pb-4 border-b border-gray-200">
@@ -28,30 +37,24 @@ export default function CreditSummarySection() {
           <StatCard
             className="min-w-64"
             title="Total Outstanding Loans"
-            value="Rp 384,500,000"
-            trend="15%"
-            trendUp
+            value={formatIDR(summary.total_outstanding_loans)}
           />
           <StatCard
             className="min-w-64"
             title="Total Overdue Loans"
-            value="Rp 11,500,000"
-            trend="15%"
-            trendUp={false}
+            value={formatIDR(summary.total_overdue_loans)}
           />
           <StatCard
             className="min-w-64"
             title="Total plafon efektif"
-            value="Rp 930,280,161"
-            trend="15%"
-            trendUp={false}
+            value={formatIDR(summary.total_plafon_efektif)}
           />
         </div>
 
         {/* Charts */}
         <TrendChartCard
-          title="Credit Score Trend"
-          subtitle="Historical view of the individual's credit score over time."
+          title="Outstanding & Overdue Trend"
+          subtitle="Historical view of outstanding balances and overdue amounts over time."
         >
           <CreditScoreTrend />
         </TrendChartCard>

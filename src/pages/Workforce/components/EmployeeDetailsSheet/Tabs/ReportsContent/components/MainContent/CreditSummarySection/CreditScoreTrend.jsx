@@ -1,12 +1,33 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
+import { useWorkforce } from '../../../../../../../Context'
+
+const MONTH_ORDER = {
+  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+}
+
+function parseTrendDate(s) {
+  if (!s) return 0
+  const [year, mon] = String(s).split(' ')
+  return Number(year) * 12 + (MONTH_ORDER[mon] ?? 0)
+}
 
 export default function CreditScoreTrend() {
+  const { workforceDetail } = useWorkforce()
+  const trend = workforceDetail?.credit_report?.credit_score_trend ?? []
+
+  const { categories, outstanding, overdue } = useMemo(() => {
+    const sorted = [...trend].sort((a, b) => parseTrendDate(a.date) - parseTrendDate(b.date))
+    return {
+      categories: sorted.map((d) => d.date),
+      outstanding: sorted.map((d) => Number(d.outstanding) || 0),
+      overdue: sorted.map((d) => Number(d.overdue) || 0),
+    }
+  }, [trend])
+
   const series = [
-    {
-      name: 'Credit Score',
-      data: [620, 650, 640, 645, 648, 655, 640, 660, 650, 665, 655, 680, 690, 685, 710, 720, 722, 730, 725, 710, 705, 720, 715, 712, 725, 740, 750, 745, 770],
-    },
+    { name: 'Outstanding', data: outstanding },
+    { name: 'Overdue', data: overdue },
   ]
 
   const options = {
@@ -20,7 +41,7 @@ export default function CreditScoreTrend() {
         enabled: false,
       },
     },
-    colors: ['#42307D'],
+    colors: ['#42307D', '#F04438'],
     dataLabels: {
       enabled: false,
     },
@@ -58,39 +79,7 @@ export default function CreditScoreTrend() {
       },
     },
     xaxis: {
-      categories: [
-        'Jan',
-        '',
-        '',
-        'Feb',
-        '',
-        '',
-        'Mar',
-        '',
-        '',
-        'Apr',
-        '',
-        '',
-        'May',
-        '',
-        '',
-        'Jun',
-        '',
-        '',
-        'Jul',
-        '',
-        '',
-        'Aug',
-        '',
-        '',
-        'Sep',
-        '',
-        'Oct',
-        '',
-        'Nov',
-        '',
-        'Dec',
-      ],
+      categories,
       axisBorder: {
         show: false,
       },
@@ -110,8 +99,6 @@ export default function CreditScoreTrend() {
     },
     yaxis: {
       min: 0,
-      max: 1000,
-      tickAmount: 5,
       labels: {
         style: {
           colors: '#667085',
@@ -119,9 +106,10 @@ export default function CreditScoreTrend() {
           fontFamily: 'Inter',
           fontWeight: 400,
         },
-        formatter: (val) => val.toLocaleString(),
+        formatter: (val) => `Rp ${Number(val).toLocaleString('en-US')}`,
       },
     },
+    legend: { show: true, position: 'top', horizontalAlign: 'right' },
     tooltip: {
       theme: 'light',
       x: {
@@ -133,7 +121,7 @@ export default function CreditScoreTrend() {
   return (
     <div className="w-full relative">
       <div className="absolute left-[-45px] top-1/2 -translate-y-1/2 rotate-[-90deg] whitespace-nowrap text-xs font-medium text-gray-500">
-        Historical score
+        Amount (IDR)
       </div>
       <div className="pl-4">
         <ReactApexChart options={options} series={series} type="area" height={250} />

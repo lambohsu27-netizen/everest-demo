@@ -1,59 +1,70 @@
-import React, { useState } from 'react'
-import { SearchMd, FilterLines, Stars01 } from '@untitled-ui/icons-react'
+import React, { useMemo, useState } from 'react'
+import { debounce } from 'lodash'
+import { SearchLg, FilterLines, Stars01 } from '@untitled-ui/icons-react'
 import {
   MyButton,
   MyDataTable,
   MyColumn,
   MyDoubleCard,
+  MyTextField,
 } from '@interstellar-component'
+import { useWorkforce } from '../../../Context'
 import RiskAssessmentTable from '../../EmployeeDetailsSheet/Tabs/ReportsContent/components/Sidebar/RiskAssessmentTable'
 
+function formatDate(value) {
+  if (!value) return '—'
+  const d = new Date(String(value).replace(/\//g, '-'))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export default function FootprintsTab() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const { workforceDetail } = useWorkforce()
+  const footprint = workforceDetail?.credit_report?.footprint ?? {}
+  const enquiryCounts = footprint.enquiry_counts ?? {}
+  const [search, setSearch] = useState('')
+
+  const allRows = useMemo(
+    () =>
+      (footprint.last_enquiries ?? []).map((e, i) => ({
+        id: i,
+        name: e.institute ?? '—',
+        subtext: e.type ?? '',
+        purpose: e.purpose ?? '—',
+        date: formatDate(e.date),
+      })),
+    [footprint.last_enquiries]
+  )
+
+  const filteredRows = useMemo(() => {
+    if (!search) return allRows
+    const q = search.toLowerCase()
+    return allRows.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        r.subtext.toLowerCase().includes(q) ||
+        r.purpose.toLowerCase().includes(q)
+    )
+  }, [allRows, search])
+
+  const onSearchChange = useMemo(() => debounce((e) => setSearch(e.target.value ?? ''), 500), [])
+
+  const totalEnquiries = enquiryCounts['12_months'] ?? allRows.length
 
   const indicators = [
-    { label: 'Total enquiries', value: '5' },
-    { label: 'Overall risk', badge: 'Low', badgeColor: 'success' },
+    { label: 'Total enquiries (12m)', value: String(totalEnquiries) },
+    {
+      label: 'Overall risk',
+      badge: totalEnquiries > 20 ? 'High' : totalEnquiries > 10 ? 'Medium' : 'Low',
+      badgeColor: totalEnquiries > 20 ? 'error' : totalEnquiries > 10 ? 'warning' : 'success',
+    },
   ]
 
   const metrics = [
-    { label: '1 month', value: '334' },
-    { label: '3 months', value: '1,201' },
-    { label: '6 months', value: '382' },
-    { label: '12 months', value: '2,201' },
-  ]
-
-  const footprintsData = [
-    {
-      name: 'CLIK',
-      subtext: 'New Application Enquiry',
-      purpose: 'Supporting the loan process',
-      date: '8 Jan 2024',
-    },
-    {
-      name: 'PT Anugerah TexIndotama',
-      subtext: 'New Application Enquiry',
-      purpose: 'Supporting the loan process',
-      date: '8 Jan 2024',
-    },
-    {
-      name: 'CLIK',
-      subtext: 'Monitoring Enquiry',
-      purpose: 'Supporting the loan process',
-      date: '8 Jan 2024',
-    },
-    {
-      name: 'Bank Central Asia',
-      subtext: 'New Application Enquiry',
-      purpose: 'Human resource management at financial institution',
-      date: '8 Jan 2024',
-    },
-    {
-      name: 'PT Tirtayasa',
-      subtext: 'Monitoring Enquiry',
-      purpose: 'Human resource management at financial institution',
-      date: '8 Jan 2024',
-    },
+    { label: '1 month', value: String(enquiryCounts['1_month'] ?? 0) },
+    { label: '3 months', value: String(enquiryCounts['3_months'] ?? 0) },
+    { label: '6 months', value: String(enquiryCounts['6_months'] ?? 0) },
+    { label: '12 months', value: String(enquiryCounts['12_months'] ?? 0) },
   ]
 
   return (
@@ -73,10 +84,9 @@ export default function FootprintsTab() {
         <div className="flex flex-col gap-5">
           <MyDoubleCard heading="Key takeaway">
             <p className="text-sm-regular text-gray-600 leading-relaxed">
-              Credit records show multiple enquiries from financial institutions and
-              organizations, primarily related to loan applications and employment verification
-              processes. Most enquiries appear to be associated with standard credit checks and
-              monitoring activities.
+              {totalEnquiries > 0
+                ? `${totalEnquiries} enquiry/ies found across financial institutions, primarily related to loan applications and employment verification processes.`
+                : 'No credit enquiry records found for this individual.'}
             </p>
           </MyDoubleCard>
 
@@ -111,19 +121,16 @@ export default function FootprintsTab() {
         <div className="flex flex-col gap-0 border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden">
           {/* Table Controls */}
           <div className="flex p-4 items-center justify-between border-b border-gray-200 gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchMd className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full rounded-lg border border-gray-300 bg-white p-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+            <div className="w-full max-w-sm">
+              <MyTextField
                 placeholder="Search for footprints"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                startAdornment={
+                  <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                }
+                focusColor="#42307D"
+                onChangeForm={onSearchChange}
               />
             </div>
-
             <div className="flex items-center gap-3">
               <MyButton color="secondary" variant="outlined" size="md">
                 <FilterLines className="h-4 w-4" />
@@ -133,7 +140,7 @@ export default function FootprintsTab() {
           </div>
 
           {/* Table */}
-          <MyDataTable values={{ data: footprintsData }} className="border-none shadow-none">
+          <MyDataTable values={{ data: filteredRows }}>
             <MyColumn
               header="Institution"
               field="name"
@@ -160,17 +167,11 @@ export default function FootprintsTab() {
             />
           </MyDataTable>
 
-          {/* Footer / Pagination Placeholder */}
-          <div className="flex items-center justify-between p-4 border-t border-gray-200">
-            <span className="text-sm-regular text-gray-600">Page 1 of 4</span>
-            <div className="flex items-center gap-2">
-              <MyButton color="secondary" variant="outlined" size="sm">
-                Previous
-              </MyButton>
-              <MyButton color="secondary" variant="outlined" size="sm">
-                Next
-              </MyButton>
-            </div>
+          {/* Footer */}
+          <div className="flex items-center px-6 py-4 border-t border-gray-200">
+            <span className="text-sm text-gray-600 font-medium">
+              {filteredRows.length} record{filteredRows.length === 1 ? '' : 's'}
+            </span>
           </div>
         </div>
       </div>

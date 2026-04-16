@@ -18,26 +18,26 @@ import FootprintsTab from './Tabs/FootprintsTab'
 export default function RiskSignalsDetailsSheet() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const initialTab = searchParams.get('tab') || 'Phone numbers'
+  const initialTab = searchParams.get('tab') || 'Phone Numbers'
   const [activeTab, setActiveTab] = useState(initialTab)
 
   const tabs = [
-    { name: 'Phone numbers', icon: Phone },
-    { name: 'Address records', icon: MarkerPin01 },
-    { name: 'Employment records', icon: Briefcase02 },
-    { name: 'Court decision', icon: PenTool01 },
+    { name: 'Phone Numbers', icon: Phone },
+    { name: 'Address Records', icon: MarkerPin01 },
+    { name: 'Employment Records', icon: Briefcase02 },
+    { name: 'Court Decision', icon: PenTool01 },
     { name: 'Footprints', icon: FileSearch02 },
   ]
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'Phone numbers':
+      case 'Phone Numbers':
         return <PhoneNumbersTab />
-      case 'Address records':
+      case 'Address Records':
         return <AddressRecordsTab />
-      case 'Employment records':
+      case 'Employment Records':
         return <EmploymentRecordsTab />
-      case 'Court decision':
+      case 'Court Decision':
         return <CourtDecisionTab />
       case 'Footprints':
         return <FootprintsTab />

@@ -6,7 +6,7 @@ import { useWorkforce } from '../Context'
 
 export default function LoanCategorySlider() {
   const { popSlider, handleAccountDetail, currentSlider, activeAccountId, loanCategories, loanAccounts } = useWorkforce()
-  
+
   const fallbackCategory = loanCategories?.[0]?.title ?? null
   const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || fallbackCategory)
   const [selectedStatus, setSelectedStatus] = useState('All')
@@ -82,12 +82,14 @@ export default function LoanCategorySlider() {
               />
 
               {/* Category tabs */}
-              <MyHorizontalTabV2
-                fitContent
-                value={selectedCategory}
-                onChange={setSelectedCategory}
-                tabs={categoryTabs}
-              />
+              <div className="overflow-x-auto -mx-6 px-6 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+                <MyHorizontalTabV2
+                  fitContent
+                  value={selectedCategory}
+                  onChange={setSelectedCategory}
+                  tabs={categoryTabs}
+                />
+              </div>
             </div>
 
             {/* Total Credit Section */}
@@ -114,11 +116,10 @@ export default function LoanCategorySlider() {
                   <button
                     key={acc.id}
                     onClick={() => handleAccountClick(acc)}
-                    className={`flex flex-col gap-4 p-4 rounded-xl border transition-all text-left w-full outline-none hover:bg-gray/25 ${
-                      acc.id === activeAccountId
+                    className={`flex flex-col gap-4 p-4 rounded-xl border transition-all text-left w-full outline-none hover:bg-gray/25 ${acc.id === activeAccountId
                         ? 'border-primary-600 ring-4 ring-primary-50 px-4'
                         : 'border-gray-200 shadow-xs'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -128,13 +129,21 @@ export default function LoanCategorySlider() {
                         </div>
                         <span className="text-sm-semibold text-gray/900">{acc.name}</span>
                       </div>
-                      <MyChip
-                        label={acc.kol}
-                        color={acc.kol === 'Kol 5' ? 'error' : 'warning'}
-                        variant="outlined"
-                        size="sm"
-                        rounded="full"
-                      />
+                      {acc.kol && (
+                        <MyChip
+                          label={acc.kol}
+                          color={
+                            acc.kol.includes('5') || acc.kol.includes('4')
+                              ? 'error'
+                              : acc.kol.includes('3') || acc.kol.includes('2')
+                                ? 'warning'
+                                : 'success'
+                          }
+                          variant="outlined"
+                          size="sm"
+                          rounded="full"
+                        />
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between">

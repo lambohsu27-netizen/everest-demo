@@ -23,7 +23,7 @@ export default function RiskSignalsSection() {
   const signals = [
     {
       icon: Phone,
-      title: 'Phone numbers',
+      title: 'Phone Numbers',
       count: String(rs.contact_count ?? 0),
       highlightText: 'contact records',
       description: `${rs.contact_count ?? 0} contact record(s) found across reports.`,
@@ -39,10 +39,10 @@ export default function RiskSignalsSection() {
     },
     {
       icon: PenTool01,
-      title: 'Negative Events',
-      count: String(rs.negative_event_count ?? 0),
-      highlightText: 'negative events',
-      description: `${rs.negative_event_count ?? 0} negative event(s) detected (write-offs, petitions, etc.).`,
+      title: 'Court Decision',
+      count: String(rs.court_decision_count ?? 0),
+      highlightText: 'court decisions',
+      description: 'Records include financial disputes and debt-related cases, which may increase financial risk exposure.',
       color: 'text-error/600',
     },
     {

@@ -226,20 +226,21 @@ function WorkforceProvider({ children }) {
   }, [creditFacilitiesByCategory, workforceDetail?.credit_report?.credit_summary])
 
   const loanAccounts = useMemo(() => {
+    const kol = workforceDetail?.credit_report?.credit_summary?.collectability_status?.kol
     const out = {}
     Object.entries(creditFacilitiesByCategory).forEach(([title, { accounts }]) => {
       out[title] = accounts.map((acc, i) => ({
         id: `${title}-${i}`,
         bank: deriveBankCode(acc.provider),
         name: acc.provider ?? '—',
-        kol: acc.contract_status ?? null,
-        label: acc.contract_type ?? 'Jumlah pinjaman',
+        kol: kol ? `Kol ${kol}` : null,
+        label: 'Jumlah pinjaman',
         amount: formatIDR(acc.debit_balance),
         isActive: acc.contract_phase === 'Active',
       }))
     })
     return out
-  }, [creditFacilitiesByCategory])
+  }, [creditFacilitiesByCategory, workforceDetail?.credit_report?.credit_summary])
 
   const workforceMeta = useMemo(() => {
     const m = workforce?.meta

@@ -384,31 +384,43 @@ function SettingsProvider({ children }) {
 
   const createUser = useCallback(
     async (formData) => {
-      const res = await SettingsService.createUser(formData)
-      myToaster(res)
-      fetchUsers(userPage, userSearchTerm)
-      closeUserPanel()
+      try {
+        const res = await SettingsService.createUser(formData)
+        myToaster(res)
+        fetchUsers(userPage, userSearchTerm)
+        closeUserPanel()
+      } catch (err) {
+        myToaster(err)
+      }
     },
     [userPage, userSearchTerm, fetchUsers, closeUserPanel]
   )
 
   const updateUser = useCallback(
     async (id, formData) => {
-      const res = await SettingsService.updateUser(id, formData)
-      myToaster(res)
-      fetchUsers(userPage, userSearchTerm)
-      fetchUserDetail(id)
-      setUserPanel('detail')
+      try {
+        const res = await SettingsService.updateUser(id, formData)
+        myToaster(res)
+        fetchUsers(userPage, userSearchTerm)
+        fetchUserDetail(id)
+        setUserPanel('detail')
+      } catch (err) {
+        myToaster(err)
+      }
     },
     [userPage, userSearchTerm, fetchUsers, fetchUserDetail]
   )
 
   const deleteUsers = useCallback(
     async (ids) => {
-      const res = await SettingsService.deleteUsers(ids)
-      myToaster(res)
-      setSelectedUserIds([])
-      fetchUsers(userPage, userSearchTerm)
+      try {
+        const res = await SettingsService.deleteUsers(ids)
+        myToaster(res)
+        setSelectedUserIds([])
+        fetchUsers(userPage, userSearchTerm)
+      } catch (err) {
+        myToaster(err)
+      }
     },
     [userPage, userSearchTerm, fetchUsers]
   )

@@ -148,7 +148,7 @@ export default function UserTab() {
             )}
             <MyButton
               color="primary"
-              size="md"
+              size="sm"
               variant="outlined"
               onClick={exportUsers}
             >
@@ -157,7 +157,7 @@ export default function UserTab() {
             </MyButton>
             <MyButton
               color="secondary"
-              size="md"
+              size="sm"
               variant="outlined"
               onClick={openImportUser}
             >
@@ -167,7 +167,7 @@ export default function UserTab() {
             {canAddUser && (
               <MyButton
                 color="primary"
-                size="md"
+                size="sm"
                 variant="filled"
                 onClick={openCreateUser}
               >

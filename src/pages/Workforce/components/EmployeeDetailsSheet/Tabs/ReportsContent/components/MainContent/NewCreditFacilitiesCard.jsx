@@ -103,7 +103,7 @@ export default function NewCreditFacilitiesCard() {
     <ReportSummaryCard
       title="New Credit Facilities"
       description="Newly issued credit facilities over time, indicating borrowing activity and credit demand behavior."
-      onViewReport={() => {}} // TODO: Define action
+      onViewReport={false} // TODO: Define action
     >
       <div className="w-full pt-2 pb-2">
         <ReactApexChart options={options} series={series} type="bar" height={251} />

@@ -1,79 +1,54 @@
-import React, { useState } from 'react'
-import { XClose, SearchMd, FilterLines } from '@untitled-ui/icons-react'
+import React, { useMemo, useState } from 'react'
+import { debounce } from 'lodash'
+import { XClose, SearchLg, FilterLines } from '@untitled-ui/icons-react'
 import {
   MyModal,
   MyBgPatternDecorativeCircle,
   MyDataTable,
   MyColumn,
   MyButton,
+  MyTextField,
 } from '@interstellar-component'
+import { useWorkforce } from '../../../../../../Context'
 
-/**
- * @typedef {Object} CreditUtilizationModalProps
- * @property {boolean} open
- * @property {() => void} onClose
- */
+function formatIDR(n) {
+  const v = Number(n) || 0
+  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
 
-/**
- * @param {CreditUtilizationModalProps} props
- */
 export default function CreditUtilizationModal({ open, onClose }) {
-  const [searchTerm, setSearchTerm] = useState('')
+  const { workforceDetail } = useWorkforce()
+  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+  const [search, setSearch] = useState('')
 
-  const data = [
-    {
-      pelapor: 'PT Home Credit Indonesia',
-      id: '252909',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 90,
-    },
-    {
-      pelapor: 'PT Adira Dinamika Multi Finance',
-      id: '251030',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 10,
-    },
-    {
-      pelapor: 'PT Bank Seabank Indonesia',
-      id: '535',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 0,
-    },
-    {
-      pelapor: 'PT Home Credit Indonesia',
-      id: '252909',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 60,
-    },
-    {
-      pelapor: 'PT Home Credit Indonesia',
-      id: '252909',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 30,
-    },
-    {
-      pelapor: 'PT Home Credit Indonesia',
-      id: '252909',
-      jenis: 'Konsumsi',
-      bakiDebet: 'Rp 45,123,000',
-      plafon: 'Rp 45,123,000',
-      penggunaan: 60,
-    },
-  ]
-
-  const filteredData = data.filter((item) =>
-    item.pelapor.toLowerCase().includes(searchTerm.toLowerCase())
+  const allData = useMemo(
+    () =>
+      facilities.map((f, i) => {
+        const debit = Number(f.debit_balance) || 0
+        const limit = Number(f.credit_limit) || 0
+        const pct = limit > 0 ? Math.round((debit / limit) * 100) : 0
+        return {
+          id: i,
+          pelapor: f.provider ?? '—',
+          providerType: f.provider_type ?? '',
+          jenis: f.contract_type ?? '—',
+          bakiDebet: formatIDR(debit),
+          plafon: formatIDR(limit),
+          penggunaan: pct,
+        }
+      }),
+    [facilities]
   )
+
+  const filteredData = useMemo(() => {
+    if (!search) return allData
+    const q = search.toLowerCase()
+    return allData.filter(
+      (item) => item.pelapor.toLowerCase().includes(q) || item.jenis.toLowerCase().includes(q)
+    )
+  }, [allData, search])
+
+  const onSearchChange = useMemo(() => debounce((e) => setSearch(e.target.value ?? ''), 500), [])
 
   return (
     <MyModal open={open} onClose={onClose} forceBlur maxWidth={1000}>
@@ -111,16 +86,14 @@ export default function CreditUtilizationModal({ open, onClose }) {
           <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
             {/* Table Header / Toolbar */}
             <div className="flex p-4 items-center justify-between border-b border-gray-200 gap-4 sticky top-0 bg-white z-20">
-              <div className="relative flex-1 max-w-sm">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <SearchMd className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  className="blur-none block w-full rounded-lg border border-gray-300 bg-white p-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-brand/500 focus:outline-none focus:ring-1 focus:ring-brand/500"
+              <div className="w-full max-w-sm">
+                <MyTextField
                   placeholder="Search"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  startAdornment={
+                    <SearchLg className="size-5 text-gray-light/600" stroke="currentColor" />
+                  }
+                  focusColor="#42307D"
+                  onChangeForm={onSearchChange}
                 />
               </div>
               <MyButton color="secondary" variant="outlined" size="md">
@@ -179,17 +152,11 @@ export default function CreditUtilizationModal({ open, onClose }) {
               />
             </MyDataTable>
 
-            {/* Pagination Footer */}
-            <div className="flex items-center justify-between p-4 border-t border-gray-200">
-              <span className="text-sm text-gray-600 font-medium">Page 1 of 4</span>
-              <div className="flex items-center gap-3">
-                <MyButton color="secondary" variant="outlined" size="md" customClassname="px-4">
-                  Previous
-                </MyButton>
-                <MyButton color="secondary" variant="outlined" size="md" customClassname="px-4">
-                  Next
-                </MyButton>
-              </div>
+            {/* Footer */}
+            <div className="flex items-center px-6 py-4 border-t border-gray-200">
+              <span className="text-sm text-gray-600 font-medium">
+                {filteredData.length} record{filteredData.length === 1 ? '' : 's'}
+              </span>
             </div>
           </div>
         </section>

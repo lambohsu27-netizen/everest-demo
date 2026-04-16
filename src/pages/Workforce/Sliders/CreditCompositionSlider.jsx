@@ -1,26 +1,33 @@
 import React from 'react'
 import SimpleBar from 'simplebar-react'
 import { XClose } from '@untitled-ui/icons-react'
-import { MyButton, MyDataTable, MyColumn } from '@interstellar-component'
+import { MyDataTable, MyColumn } from '@interstellar-component'
 import { useWorkforce } from '../Context'
 
+function formatDate(value) {
+  if (!value) return '—'
+  const d = new Date(String(value).replace(/\//g, '-'))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function formatIDR(n) {
+  const v = Number(n) || 0
+  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
 export default function CreditCompositionSlider() {
-  const { handleCurrentSlider } = useWorkforce()
+  const { handleCurrentSlider, workforceDetail } = useWorkforce()
+  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
 
   const handleClose = () => handleCurrentSlider(null)
 
-  const data = [
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-    { tanggal: '5 Apr 2024', jenis: 'Konsumsi', total: 'Rp 233,100,000' },
-  ]
+  const data = facilities.map((f, i) => ({
+    id: i,
+    tanggal: formatDate(f.start_date),
+    jenis: f.contract_type ?? '—',
+    total: formatIDR(f.debit_balance),
+  }))
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white">
@@ -73,16 +80,10 @@ export default function CreditCompositionSlider() {
       </section>
 
       {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <footer className="flex items-center justify-between border-t border-gray/200 px-6 py-4 bg-white">
-        <span className="text-sm-medium text-gray/700">Page 1 of 4</span>
-        <div className="flex items-center gap-3">
-          <MyButton color="secondary" variant="outlined" size="md">
-            <span className="text-sm-semibold">Previous</span>
-          </MyButton>
-          <MyButton color="secondary" variant="outlined" size="md">
-            <span className="text-sm-semibold">Next</span>
-          </MyButton>
-        </div>
+      <footer className="flex items-center border-t border-gray/200 px-6 py-4 bg-white">
+        <span className="text-sm-medium text-gray/700">
+          {data.length} record{data.length === 1 ? '' : 's'}
+        </span>
       </footer>
     </div>
   )

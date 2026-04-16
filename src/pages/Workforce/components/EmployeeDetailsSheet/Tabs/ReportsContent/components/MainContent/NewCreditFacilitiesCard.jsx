@@ -1,12 +1,7 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
-
-// Figma: Line and bar chart, Chart style=Line (rendered as Bar), Legend=False, Axis labels=True
-// X-axis: 12 months (Jan–Dec), Y-axis: 0–1000 (step 200), label: "First plafon (mn. IDR)"
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-const SAMPLE_DATA = [800, 960, 640, 840, 640, 920, 800, 840, 800, 880, 960, 760]
+import { useWorkforce } from '../../../../../../Context'
 
 const AXIS_LABEL_STYLE = {
   colors: '#535862',
@@ -15,7 +10,33 @@ const AXIS_LABEL_STYLE = {
   fontWeight: 400,
 }
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 export default function NewCreditFacilitiesCard() {
+  const { workforceDetail } = useWorkforce()
+  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+
+  const { categories, data } = useMemo(() => {
+    // Bucket by YYYY-MM using start_date, last 12 months window (from newest seen)
+    const buckets = new Map()
+    facilities.forEach((f) => {
+      if (!f.start_date) return
+      const d = new Date(String(f.start_date).replace(/\//g, '-'))
+      if (Number.isNaN(d.getTime())) return
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+      buckets.set(key, (buckets.get(key) || 0) + 1)
+    })
+    const sortedKeys = Array.from(buckets.keys()).sort()
+    const last12 = sortedKeys.slice(-12)
+    return {
+      categories: last12.map((k) => {
+        const [, m] = k.split('-')
+        return MONTH_LABELS[Number(m) - 1]
+      }),
+      data: last12.map((k) => buckets.get(k) || 0),
+    }
+  }, [facilities])
+
   const options = {
     chart: {
       type: 'bar',
@@ -39,10 +60,8 @@ export default function NewCreditFacilitiesCard() {
       padding: { left: 0, right: 8 },
     },
     xaxis: {
-      categories: MONTHS,
-      labels: {
-        style: AXIS_LABEL_STYLE,
-      },
+      categories,
+      labels: { style: AXIS_LABEL_STYLE },
       axisBorder: { show: false },
       axisTicks: { show: false },
       title: {
@@ -58,14 +77,13 @@ export default function NewCreditFacilitiesCard() {
     },
     yaxis: {
       min: 0,
-      max: 1000,
       tickAmount: 5,
       labels: {
         style: AXIS_LABEL_STYLE,
-        formatter: (val) => val.toLocaleString(),
+        formatter: (val) => Math.round(val).toLocaleString(),
       },
       title: {
-        text: 'First plafon (mn. IDR)',
+        text: '# of new facilities',
         style: {
           color: '#535862',
           fontSize: '12px',
@@ -75,11 +93,11 @@ export default function NewCreditFacilitiesCard() {
       },
     },
     tooltip: {
-      y: { formatter: (val) => `${val.toLocaleString()} mn. IDR` },
+      y: { formatter: (val) => `${val} facility/ies` },
     },
   }
 
-  const series = [{ name: 'First Plafon', data: SAMPLE_DATA }]
+  const series = [{ name: 'New facilities', data }]
 
   return (
     <ReportSummaryCard

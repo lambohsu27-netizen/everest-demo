@@ -7,8 +7,8 @@ import { useWorkforce } from '../Context'
 export default function LoanCategorySlider() {
   const { popSlider, handleAccountDetail, currentSlider, activeAccountId, loanCategories, loanAccounts } = useWorkforce()
   
-  // Initialize with category from currentSlider if available, otherwise 'Credit card'
-  const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || 'Credit card')
+  const fallbackCategory = loanCategories?.[0]?.title ?? null
+  const [selectedCategory, setSelectedCategory] = useState(currentSlider?.category || fallbackCategory)
   const [selectedStatus, setSelectedStatus] = useState('All')
 
   // Sync state if currentSlider changes (e.g. user clicks another card while slider is open)
@@ -93,7 +93,7 @@ export default function LoanCategorySlider() {
             {/* Total Credit Section */}
             <div className="flex flex-col gap-1">
               <span className="text-sm-medium text-gray/600">Total credit</span>
-              <h2 className="text-2xl-semibold text-gray/900">{currentCategoryData.amount}</h2>
+              <h2 className="text-2xl-semibold text-gray/900">{currentCategoryData?.amount ?? '—'}</h2>
             </div>
 
             {/* Divider */}
@@ -101,8 +101,10 @@ export default function LoanCategorySlider() {
 
             {/* Section label */}
             <div className="flex items-center justify-between pb-2">
-              <span className="text-sm-semibold text-gray/900">Daftar akun {selectedCategory.toLowerCase()}</span>
-              <span className="text-sm-medium text-gray/600">{currentCategoryData.accountCount}</span>
+              <span className="text-sm-semibold text-gray/900">
+                Daftar akun {selectedCategory ? selectedCategory.toLowerCase() : ''}
+              </span>
+              <span className="text-sm-medium text-gray/600">{currentCategoryData?.accountCount}</span>
             </div>
 
             {/* Account list */}

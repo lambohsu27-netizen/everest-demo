@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, XClose } from '@untitled-ui/icons-react'
 import PropTypes from 'prop-types'
 
-export default function StackedPageSheet({ title, children, backUrl, closeUrl }) {
+export default function StackedPageSheet({ title, children, backUrl, closeUrl, isScrollFromTop = true }) {
   const [isVisible, setIsVisible] = useState(false)
   const navigate = useNavigate()
 
@@ -64,7 +64,11 @@ export default function StackedPageSheet({ title, children, backUrl, closeUrl })
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto px-8 pb-12">{children}</main>
+        <main
+          className={`flex flex-1 min-h-0 flex-col ${isScrollFromTop ? 'overflow-y-auto' : ''} px-8 pb-12`}
+        >
+          {children}
+        </main>
       </section>
     </section>
   )

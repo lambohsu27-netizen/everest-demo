@@ -2,10 +2,21 @@ import React, { useState } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
 import CreditUtilizationModal from './CreditUtilizationModal'
+import { useWorkforce } from '../../../../../../Context'
+
+function utilizationCopy(pct) {
+  if (pct >= 90) return { title: "You've almost reached your limit", tone: 'high' }
+  if (pct >= 70) return { title: 'High utilization level', tone: 'high' }
+  if (pct >= 30) return { title: 'Moderate utilization level', tone: 'medium' }
+  return { title: 'Low utilization level', tone: 'low' }
+}
 
 export default function CreditUtilizationCard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const percentage = 73
+  const { workforceDetail } = useWorkforce()
+  const util = workforceDetail?.credit_report?.credit_overview?.utilization ?? {}
+  const percentage = Number(util.percentage) || 0
+  const copy = utilizationCopy(percentage)
 
   const options = {
     chart: {
@@ -70,12 +81,9 @@ export default function CreditUtilizationCard() {
       </div>
 
       <div className="flex flex-col gap-1 mt-2">
-        <h5 className="text-base font-medium text-gray-900">
-          You&apos;ve almost reached your limit
-        </h5>
+        <h5 className="text-base font-medium text-gray-900">{copy.title}</h5>
         <p className="text-sm text-gray-500">
-          Used {percentage}% of your available credit limit, indicating a relatively high
-          utilization level.
+          Used {percentage}% of the available credit limit ({copy.tone} utilization).
         </p>
       </div>
       <CreditUtilizationModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />

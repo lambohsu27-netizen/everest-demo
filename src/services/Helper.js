@@ -3,6 +3,18 @@ import $ from 'jquery'
 import moment from 'moment'
 import CryptoJS from 'crypto-js'
 
+/** Maps BE `errors[].message` onto toaster body (keeps `myToaster` unchanged). */
+export function myToasterFromApi(err) {
+  const items = err?.errors
+  if (Array.isArray(items) && items.length > 0) {
+    const messages = items.map((e) => e?.message).filter(Boolean)
+    if (messages.length > 0) {
+      return myToaster({ ...err, message: messages.join(' ') })
+    }
+  }
+  return myToaster(err)
+}
+
 export const handleError =
   (func, control, config = {}) =>
   async (data) => {
@@ -10,7 +22,7 @@ export const handleError =
     if (!control) throw new Error('control is required')
     await func(data, config).catch((e) => {
       console.log(e)
-      myToaster(e)
+      myToasterFromApi(e)
       e.errors?.forEach((err, index) => {
         control.setError(err.path, { message: err.msg })
         if (index === 0)

@@ -14,9 +14,20 @@ function generateRandomPassword(length = 16) {
   return result
 }
 
-/** Huruf, angka, dan spasi (untuk nama). */
+/** Huruf (Unicode), angka, dan spasi saja (tanpa simbol). */
+const NAME_CHAR_PATTERN = /^[\p{L}\p{N} ]+$/u
+
 function sanitizeNameInput(value) {
-  return String(value ?? '').replace(/[^a-zA-Z0-9 ]/g, '')
+  return String(value ?? '').replace(/[^\p{L}\p{N} ]/gu, '')
+}
+
+function getNameFieldError(value) {
+  const raw = String(value ?? '')
+  if (!raw.trim()) return 'Full name is required.'
+  if (!NAME_CHAR_PATTERN.test(raw)) {
+    return 'Full name may only contain letters, numbers, and spaces.'
+  }
+  return null
 }
 
 /** Huruf, angka, dan simbol umum alamat email. */
@@ -24,9 +35,20 @@ function sanitizeEmailInput(value) {
   return String(value ?? '').replace(/[^a-zA-Z0-9@._+-]/g, '')
 }
 
+const PHONE_MAX_DIGITS = 16
+
 /** Hanya angka (nomor telepon). */
 function sanitizePhoneInput(value) {
   return String(value ?? '').replace(/\D/g, '')
+}
+
+function getPhoneFieldError(value) {
+  const digits = String(value ?? '').replace(/\D/g, '')
+  if (!digits) return 'Phone is required.'
+  if (digits.length > PHONE_MAX_DIGITS) {
+    return `Phone must be at most ${PHONE_MAX_DIGITS} digits.`
+  }
+  return null
 }
 
 export default function UserForm({ mode }) {
@@ -127,11 +149,13 @@ export default function UserForm({ mode }) {
 
   const validate = () => {
     const errs = {}
-    if (!name.trim()) errs.name = 'Full name is required.'
+    const nameErr = getNameFieldError(name)
+    if (nameErr) errs.name = nameErr
     if (!email.trim()) errs.email = 'Email is required.'
-    if (!phone.trim()) errs.phone = 'Phone is required.'
+    const phoneErr = getPhoneFieldError(phone)
+    if (phoneErr) errs.phone = phoneErr
     if (!selectedRole) errs.roleId = 'Role is required.'
-    // if (!selectedCompanies) errs.companyIds = 'Company is required.'
+    if (!selectedCompanies?.length) errs.companyIds = 'Company is required.'
     if (!isEdit && !password) errs.password = 'Password is required. Click generate.'
     return errs
   }
@@ -241,7 +265,7 @@ export default function UserForm({ mode }) {
                   {/* Profile Photo */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Profile photo <span className="text-brand/900">*</span>
+                      Profile photo 
                     </p>
                     <div className="flex items-center gap-4">
                       <MyAvatar size={64} photo={avatarFile ?? avatarPreview} />
@@ -283,8 +307,11 @@ export default function UserForm({ mode }) {
                       isError={!!errors.name}
                       helperText={errors.name || ''}
                       onChangeForm={(e) => {
-                        setName(sanitizeNameInput(e.target.value))
-                        clearError('name')
+                        const v = e.target.value
+                        setName(v)
+                        const err = getNameFieldError(v)
+                        if (err) setErrors((prev) => ({ ...prev, name: err }))
+                        else clearError('name')
                       }}
                       focusColor="#42307D"
                        
@@ -320,15 +347,18 @@ export default function UserForm({ mode }) {
                     </p>
                     <MyTextField
                       name="phone"
-                      type="text"
+                      type="number"
                       inputMode="numeric"
                       value={phone}
                       placeholder="e.g. 6281788173723"
                       isError={!!errors.phone}
                       helperText={errors.phone || ''}
                       onChangeForm={(e) => {
-                        setPhone(sanitizePhoneInput(e.target.value))
-                        clearError('phone')
+                        const v = sanitizePhoneInput(e.target.value)
+                        setPhone(v)
+                        const err = getPhoneFieldError(v)
+                        if (err) setErrors((prev) => ({ ...prev, phone: err }))
+                        else clearError('phone')
                       }}
                       focusColor="#42307D"
                        
@@ -378,9 +408,13 @@ export default function UserForm({ mode }) {
                       asyncFunction={asyncCompanyOptions}
                       value={selectedCompanies}
                       placeholder="Search companies"
+                      error={errors.companyIds}
                       isOptionEqualToValue={(option, val) => option?.id === val?.id}
                       getOptionLabel={(e) => e?.name || ''}
-                      onChange={(_e, val) => setSelectedCompanies(val)}
+                      onChange={(_e, val) => {
+                        setSelectedCompanies(val)
+                        clearError('companyIds')
+                      }}
                       focusColor="#42307D"
                        
                     />

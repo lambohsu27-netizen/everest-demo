@@ -1,126 +1,199 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+import { myToaster } from '@interstellar-component'
+import Service from './service'
 
 const ReportEnquiryContext = createContext()
 
+const STATUS_MAP = {
+  'All status': null,
+  'Awaiting Form': 'awaiting_form',
+  Verification: 'verification',
+  'Form Revision': 'form_revision',
+  'Sent to CLIK': 'sent_to_clik',
+  Completed: 'completed',
+  Failed: 'failed',
+  Canceled: 'canceled',
+}
+
 const INITIAL_METRICS = [
-  { label: 'All status', value: '382', active: true },
-  { label: 'Awaiting Admin', value: '12', active: false },
-  { label: 'Awaiting Consent', value: '8', active: false },
-  { label: 'Awaiting Form', value: '1.201', active: false },
-  { label: 'Verification', value: '382', active: false },
-  { label: 'Form Revision', value: '2.201', active: false },
-  { label: 'Sent to CLIK', value: '334', active: false },
-  { label: 'Completed', value: '8.921', active: false },
-  { label: 'Failed', value: '74', active: false },
-  { label: 'Canceled', value: '43', active: false },
+  { label: 'All status', key: 'all_status', value: 0, active: true },
+  { label: 'Awaiting Form', key: 'awaiting_form', value: 0, active: false },
+  { label: 'Verification', key: 'verification', value: 0, active: false },
+  { label: 'Form Revision', key: 'form_revision', value: 0, active: false },
+  { label: 'Sent to CLIK', key: 'sent_to_clik', value: 0, active: false },
+  { label: 'Completed', key: 'completed', value: 0, active: false },
+  { label: 'Failed', key: 'failed', value: 0, active: false },
+  { label: 'Canceled', key: 'canceled', value: 0, active: false },
 ]
 
-const INITIAL_ENQUIRIES = [
-  {
-    id: 1,
-    order: 'REQ-000038',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Phoenix Baker',
-    employeeId: 'ID-00192',
-    category: 'Employee',
-    entity: 'PT Everest Maju Bersama',
-    slaStatus: 'Awaiting Admin Approval'
-  },
-  {
-    id: 11,
-    order: 'REQ-000039',
-    orderDate: '27 Jun 2026 10:00 AM',
-    name: 'Drew Cano',
-    employeeId: 'ID-00199',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Awaiting Consent'
-  },
-  {
-    id: 1,
-    order: 'REQ-000038',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Phoenix Baker',
-    employeeId: 'ID-00192',
-    category: 'Employee',
-    entity: 'PT Everest Maju Bersama',
-    slaStatus: 'Sent to CLIK'
-  },
-  {
-    id: 2,
-    order: 'REQ-000037',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Lisa Steiner',
-    employeeId: 'ID-00193',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Awaiting Form'
-  },
-  {
-    id: 3,
-    order: 'REQ-000036',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Drew Cano',
-    employeeId: 'ID-00194',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Awaiting Form'
-  },
-  {
-    id: 4,
-    order: 'REQ-000035',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Candace Wu',
-    employeeId: 'ID-00195',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Form Revision'
-  },
-  {
-    id: 5,
-    order: 'REQ-000034',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Andi Lane',
-    employeeId: 'ID-00196',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Canceled'
-  },
-  {
-    id: 6,
-    order: 'REQ-000033',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Natali Craig',
-    employeeId: 'ID-00197',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Failed'
-  },
-  {
-    id: 7,
-    order: 'REQ-000032',
-    orderDate: '26 Jun 2026 17:00 PM',
-    name: 'Demi Wilkinson',
-    employeeId: 'ID-00198',
-    category: 'Candidate',
-    entity: 'PT Annapurna Tinggi Sejahtera',
-    slaStatus: 'Completed'
-  },
-]
+const STATUS_DISPLAY = {
+  awaiting_form: 'Awaiting Form',
+  awaiting_admin: 'Awaiting Admin Approval',
+  awaiting_consent: 'Awaiting Consent',
+  verification: 'Verification',
+  form_revision: 'Form Revision',
+  sent_to_clik: 'Sent to CLIK',
+  completed: 'Completed',
+  failed: 'Failed',
+  canceled: 'Canceled',
+}
 
 function ReportEnquiryProvider({ children }) {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+    search: '',
+    category: '',
+    status: '',
+    sort: null,
+    order: null,
+    filter: [],
+  })
+
+  const [enquiry, setEnquiry] = useState({
+    data: [],
+    meta: {},
+    filter: [],
+  })
+
   const [metrics, setMetrics] = useState(INITIAL_METRICS)
-  const [enquiries, setEnquiries] = useState(INITIAL_ENQUIRIES)
-  const [sortField, setSortField] = useState(null)
-  const [sortOrder, setSortOrder] = useState(null)
-  const [enquiryCategory, setEnquiryCategory] = useState('all')
-  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
   const [sliderStack, setSliderStack] = useState([])
 
+  // ── Fetch list ────────────────────────────────────────────────────────
+  const getList = useCallback(() => {
+    setLoading(true)
+    const apiParams = {
+      page: params.page,
+      limit: params.limit,
+    }
+    if (params.search) apiParams.search = params.search
+    if (params.category) apiParams.category = params.category
+    if (params.status) apiParams.status = params.status
+    if (params.sort) apiParams.sort = params.sort
+    if (params.order) apiParams.order = params.order
+
+    // Apply filters
+    if (Array.isArray(params.filter)) {
+      params.filter.forEach((f) => {
+        const key = f.field || f.name
+        if (key && f.value) apiParams[key] = f.value
+      })
+    }
+
+    Service.getList(apiParams)
+      .then((res) => {
+        const mappedData = (res.data || []).map((item) => ({
+          id: item.id,
+          order: item.reference_number,
+          orderDate: new Date(item.created_at).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+          name: item.workforce?.full_name || '-',
+          employeeId: item.workforce?.workforce_code || '-',
+          category: item.category === 'employee' ? 'Employee' : 'Candidate',
+          entity: item.company?.name || '-',
+          slaStatus: STATUS_DISPLAY[item.status] || item.status,
+          _raw: item,
+        }))
+
+        setEnquiry({
+          data: mappedData,
+          meta: res.meta || {},
+          filter: res.filter || [],
+        })
+
+        // Update metrics from response (when BE provides res.metrics)
+        if (res.metrics) {
+          setMetrics((prev) =>
+            prev.map((m) => ({
+              ...m,
+              value: m.key === null
+                ? res.metrics.total ?? 0
+                : res.metrics[m.key] ?? 0,
+            }))
+          )
+        }
+      })
+      .catch(myToaster)
+      .finally(() => setLoading(false))
+  }, [params])
+
+  useEffect(() => {
+    getList()
+  }, [getList])
+
+  // ── Metric click ──────────────────────────────────────────────────────
+  const handleMetricClick = useCallback((label) => {
+    setMetrics((prev) =>
+      prev.map((m) => ({ ...m, active: m.label === label }))
+    )
+    setParams((prev) => ({
+      ...prev,
+      status: STATUS_MAP[label] || '',
+      page: 1,
+    }))
+  }, [])
+
+  // ── Sort ──────────────────────────────────────────────────────────────
+  const handleSort = useCallback(({ sort, order }) => {
+    setParams((prev) => ({ ...prev, sort, order, page: 1 }))
+  }, [])
+
+  // ── Selection ─────────────────────────────────────────────────────────
+  const handleSelectionChange = useCallback((updated) => {
+    setEnquiry((prev) => ({ ...prev, data: updated.data }))
+  }, [])
+
+  // ── Pagination ────────────────────────────────────────────────────────
+  const handlePageChange = useCallback((newPage) => {
+    setParams((prev) => ({ ...prev, page: newPage }))
+  }, [])
+
+  // ── Search ────────────────────────────────────────────────────────────
+  const setSearchTerm = useCallback((value) => {
+    setParams((prev) => ({ ...prev, search: value, page: 1 }))
+  }, [])
+
+  // ── Category tab ──────────────────────────────────────────────────────
+  const setEnquiryCategory = useCallback((value) => {
+    setParams((prev) => ({
+      ...prev,
+      category: value === 'all' ? '' : value,
+      page: 1,
+    }))
+  }, [])
+
+  // ── Filter modal ─────────────────────────────────────────────────────
+  const handleFilter = useCallback((filter) => {
+    setParams((prev) => ({
+      ...prev,
+      filter,
+      page: 1,
+      search: '',
+    }))
+  }, [])
+
+  // ── Export ────────────────────────────────────────────────────────────
+  const downloadExport = useCallback(() => {
+    const url = Service.downloadExport(params)
+    if (url) window.open(url, '_blank')?.focus()
+  }, [params])
+
+  // ── Slider stack ──────────────────────────────────────────────────────
   const pushSlider = useCallback((slider) => {
     setSliderStack((prev) => {
-      // Prevent duplicate sliders of the same type
       if (prev.some((s) => s.current === slider.current)) return prev
       return [...prev, slider]
     })
@@ -138,140 +211,109 @@ function ReportEnquiryProvider({ children }) {
     }
   }, [])
 
-  const handlePageChange = useCallback((newPage) => {
-    setPage(newPage)
-  }, [])
-
-  // Reset page to 1 when search or filtered category changes
-  useEffect(() => {
-    setPage(1)
-  }, [searchTerm, enquiryCategory])
-
   const currentSlider = useMemo(
-    () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
+    () =>
+      sliderStack.length > 0
+        ? sliderStack[sliderStack.length - 1]
+        : null,
     [sliderStack]
   )
 
-  const handleMetricClick = useCallback((label) => {
-    setMetrics((prev) =>
-      prev.map((m) => ({
-        ...m,
-        active: m.label === label,
-      }))
-    )
-  }, [])
-
-  const handleSort = useCallback(
-    ({ sort, order }) => {
-      setSortField(sort)
-      setSortOrder(order)
-
-      if (!sort || !order) {
-        setEnquiries(INITIAL_ENQUIRIES)
-        return
-      }
-
-      const sortedData = [...enquiries].sort((a, b) => {
-        const valA = a[sort] || ''
-        const valB = b[sort] || ''
-
-        if (valA < valB) return order === 'asc' ? -1 : 1
-        if (valA > valB) return order === 'asc' ? 1 : -1
-        return 0
-      })
-
-      setEnquiries(sortedData)
-    },
-    [enquiries]
-  )
-
-  const handleSelectionChange = useCallback((updated) => {
-    setEnquiries(updated.data)
-  }, [])
-
-  const filteredEnquiries = useMemo(() => {
-    let result = enquiries
-    if (enquiryCategory !== 'all') {
-      result = result.filter((e) => e.category.toLowerCase() === enquiryCategory)
-    }
-    if (searchTerm) {
-      const lowerSearch = searchTerm.toLowerCase()
-      result = result.filter(
-        (e) =>
-          e.name.toLowerCase().includes(lowerSearch) ||
-          e.order.toLowerCase().includes(lowerSearch) ||
-          e.employeeId.toLowerCase().includes(lowerSearch)
-      )
-    }
-    // Note: If you want to filter by active metric, add that logic here
-    return result
-  }, [enquiries, searchTerm, enquiryCategory])
-
-  const limit = 10
-  const paginatedEnquiries = useMemo(() => {
-    const start = (page - 1) * limit
-    return filteredEnquiries.slice(start, start + limit)
-  }, [filteredEnquiries, page])
-
+  // ── Derived state ─────────────────────────────────────────────────────
   const pagination = useMemo(
     () => ({
-      page,
-      limit,
-      total: filteredEnquiries.length,
-      total_pages: Math.ceil(filteredEnquiries.length / limit),
+      page: enquiry.meta?.current_page ?? params.page,
+      limit: params.limit,
+      total: enquiry.meta?.total ?? 0,
+      total_pages: enquiry.meta?.total_page ?? 1,
     }),
-    [filteredEnquiries.length, page]
+    [enquiry.meta, params.page, params.limit]
+  )
+
+  const enquiryCategory = useMemo(
+    () => params.category || 'all',
+    [params.category]
   )
 
   const contextValue = useMemo(
     () => ({
-      searchTerm,
-      setSearchTerm,
+      // Data
+      enquiries: enquiry.data,
+      pagination,
       metrics,
-      handleMetricClick,
+      loading,
+      filters: enquiry.filter,
+
+      // Search & filter
+      searchTerm: params.search,
+      setSearchTerm,
       enquiryCategory,
       setEnquiryCategory,
-      enquiries: paginatedEnquiries,
-      pagination,
-      setPage: handlePageChange,
+      handleMetricClick,
+      handleFilter,
+      downloadExport,
+
+      // Sort
+      sortField: params.sort,
+      sortOrder: params.order,
       handleSort,
+
+      // Selection
       handleSelectionChange,
-      sortField,
-      sortOrder,
+
+      // Pagination
+      setPage: handlePageChange,
+
+      // Slider
       sliderStack,
       currentSlider,
       pushSlider,
       popSlider,
       handleCurrentSlider,
+
+      // Refresh
+      getList,
     }),
     [
-      searchTerm,
+      enquiry.data,
+      pagination,
       metrics,
-      handleMetricClick,
+      loading,
+      enquiry.filter,
+      params.search,
+      setSearchTerm,
       enquiryCategory,
       setEnquiryCategory,
-      paginatedEnquiries,
-      pagination,
-      handlePageChange,
+      handleMetricClick,
+      handleFilter,
+      downloadExport,
+      params.sort,
+      params.order,
       handleSort,
       handleSelectionChange,
-      sortField,
-      sortOrder,
+      handlePageChange,
       sliderStack,
       currentSlider,
       pushSlider,
       popSlider,
       handleCurrentSlider,
+      getList,
     ]
   )
 
-  return <ReportEnquiryContext.Provider value={contextValue}>{children}</ReportEnquiryContext.Provider>
+  return (
+    <ReportEnquiryContext.Provider value={contextValue}>
+      {children}
+    </ReportEnquiryContext.Provider>
+  )
 }
 
 const useReportEnquiry = () => {
   const context = useContext(ReportEnquiryContext)
   if (context === undefined) {
-    throw new Error('useReportEnquiry must be used within a ReportEnquiryProvider')
+    throw new Error(
+      'useReportEnquiry must be used within a ReportEnquiryProvider'
+    )
   }
   return context
 }

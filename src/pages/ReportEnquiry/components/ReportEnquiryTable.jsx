@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { debounce } from 'lodash'
-import { SearchLg, FilterLines, PackagePlus } from '@untitled-ui/icons-react'
-import { MyColumn, MyDataTable, MyButton, MyHorizontalTabV2, MyTextField } from '@interstellar-component'
+import { SearchLg, FilterLines, PackagePlus, DownloadCloud01 } from '@untitled-ui/icons-react'
+import { MyColumn, MyDataTable, MyButton, MyHorizontalTabV2, MyTextField, MyFilterModal } from '@interstellar-component'
 import { useReportEnquiry } from '../Context'
 import MySLAStatusChip from './MySLAStatusChip'
 
@@ -18,6 +18,10 @@ function ReportEnquiryTable() {
     setPage,
     enquiryCategory,
     setEnquiryCategory,
+    loading,
+    filters,
+    handleFilter,
+    downloadExport,
   } = useReportEnquiry()
 
   const debouncedSearch = useMemo(
@@ -51,6 +55,16 @@ function ReportEnquiryTable() {
             </span>
           </div>
           <div className="flex flex-wrap gap-3">
+            <MyButton
+              color="secondary"
+              variant="outlined"
+              size="md"
+              customClassname="gap-2"
+              onClick={downloadExport}
+            >
+              <DownloadCloud01 className="size-5" />
+              <p className="text-sm-semibold">Export</p>
+            </MyButton>
             <MyButton
               color="secondary"
               variant="outlined"
@@ -101,10 +115,23 @@ function ReportEnquiryTable() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <MyButton color="gray" size="sm" variant="tertiary" customClassname="text-gray-700">
-              <FilterLines className="h-4 w-4 text-gray-500" />
-              Filters
-            </MyButton>
+            <MyFilterModal
+              id="filter-report-enquiry"
+              currentFilters={filters}
+              onChange={handleFilter}
+              target={(open, handleClick) => (
+                <MyButton
+                  removeWhite
+                  onClick={handleClick}
+                  color="secondary"
+                  variant="outlined"
+                  size="sm"
+                >
+                  <FilterLines className="h-4 w-4 text-gray-500" />
+                  <p className="text-sm-semibold">Filters</p>
+                </MyButton>
+              )}
+            />
 
             <MyHorizontalTabV2
               value={enquiryCategory}
@@ -120,63 +147,65 @@ function ReportEnquiryTable() {
         </div>
 
         <div className="flex flex-1 min-h-0 flex-col">
-        <MyDataTable
-          values={values}
-          selectionMode="multiple"
-          onSelectionChange={handleSelectionChange}
-          currentSortFieldFromParams={sortField}
-          currentSortOrderFromParams={sortOrder}
-          onClick={(row) => {
-            if (row.slaStatus === 'Awaiting Admin Approval') {
-              handleCurrentSlider({ current: 'admin-verification', props: { data: row } })
-            } else if (row.slaStatus === 'Awaiting Consent') {
-              handleCurrentSlider({ current: 'awaiting-consent', props: { data: row } })
-            }
-          }}
-          paginator
-          onChangePagination={setPage}
-        >
-          <MyColumn
-            header="Order"
-            field="order"
-            onSort={handleSort}
-            body={(row) => (
-              <div className="flex flex-col gap-0.5 py-1">
-                <span className="text-sm font-medium text-brand/700">{row.order}</span>
-                <span className="text-sm text-gray-500">{row.orderDate}</span>
-              </div>
-            )}
-          />
-          <MyColumn
-            header="Name & Employee ID"
-            field="name"
-            onSort={handleSort}
-            body={(row) => (
-              <div className="flex flex-col gap-0.5 py-1">
-                <span className="text-sm font-medium text-gray-900">{row.name}</span>
-                <span className="text-sm text-gray-500">{row.employeeId}</span>
-              </div>
-            )}
-          />
-          <MyColumn
-            header="Category"
-            field="category"
-            onSort={handleSort}
-            body={(row) => <span className="text-sm text-gray-600">{row.category}</span>}
-          />
-          <MyColumn
-            header="Entity"
-            field="entity"
-            onSort={handleSort}
-            body={(row) => <span className="text-sm text-gray-600">{row.entity}</span>}
-          />
-          <MyColumn
-            header="SLA Status"
-            field="slaStatus"
-            onSort={handleSort}
-            body={(row) => <MySLAStatusChip status={row.slaStatus} />}
-          />
-        </MyDataTable>
+          <MyDataTable
+            values={values}
+            selectionMode="multiple"
+            onSelectionChange={handleSelectionChange}
+            currentSortFieldFromParams={sortField}
+            currentSortOrderFromParams={sortOrder}
+            loading={loading}
+            onClick={(row) => {
+              const status = row._raw?.status
+              if (status === 'verification') {
+                handleCurrentSlider({ current: 'admin-verification', props: { data: row } })
+              } else if (status === 'awaiting_form') {
+                handleCurrentSlider({ current: 'awaiting-consent', props: { data: row } })
+              }
+            }}
+            paginator
+            onChangePagination={setPage}
+          >
+            <MyColumn
+              header="Order"
+              field="order"
+              onSort={handleSort}
+              body={(row) => (
+                <div className="flex flex-col gap-0.5 py-1">
+                  <span className="text-sm font-medium text-brand/700">{row.order}</span>
+                  <span className="text-sm text-gray-500">{row.orderDate}</span>
+                </div>
+              )}
+            />
+            <MyColumn
+              header="Name & Employee ID"
+              field="name"
+              onSort={handleSort}
+              body={(row) => (
+                <div className="flex flex-col gap-0.5 py-1">
+                  <span className="text-sm font-medium text-gray-900">{row.name}</span>
+                  <span className="text-sm text-gray-500">{row.employeeId}</span>
+                </div>
+              )}
+            />
+            <MyColumn
+              header="Category"
+              field="category"
+              onSort={handleSort}
+              body={(row) => <span className="text-sm text-gray-600">{row.category}</span>}
+            />
+            <MyColumn
+              header="Entity"
+              field="entity"
+              onSort={handleSort}
+              body={(row) => <span className="text-sm text-gray-600">{row.entity}</span>}
+            />
+            <MyColumn
+              header="SLA Status"
+              field="slaStatus"
+              onSort={handleSort}
+              body={(row) => <MySLAStatusChip status={row.slaStatus} />}
+            />
+          </MyDataTable>
         </div>
       </div>
     </div>

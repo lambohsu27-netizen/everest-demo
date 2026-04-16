@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import SimpleBar from 'simplebar-react'
 import {
   XClose,
@@ -6,188 +6,84 @@ import {
   Plus,
   User01,
 } from '@untitled-ui/icons-react'
-// Shared Components
 import {
   MyButton,
   MyTextField,
   MyHorizontalTabV2,
   MyAvatar,
+  myToaster,
 } from '@interstellar-component'
-// Context
 import { useReportEnquiry } from '../Context'
 import EmployeeDetailHoverCard from './EmployeeDetailHoverCard'
+import Service from '../service'
 
-// ── static data ────────────────────────────────────────────────────────────────
-const EMPLOYEES_GROUPED = [
-  {
-    entity: 'PT Everest Maju Sejahtera',
-    employees: [
-      {
-        id: '357232',
-        label: 'Phoenix Baker',
-        position: 'Product Designer',
-        status: 'Expired',
-        avatar: null,
-        email: 'phoenix.baker@everest.com',
-        whatsapp: '08123456789',
-        entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-        level: { label: 'Supervisor', value: 'supervisor' },
-        positionObj: { label: 'Product Designer', value: 'product-designer' },
-        division: 'Design',
-      },
-      {
-        id: '357233',
-        label: 'Olivia Rhye',
-        position: 'UX Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'olivia.rhye@everest.com',
-        whatsapp: '08123456781',
-        entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-      {
-        id: '357234',
-        label: 'Lana Steiner',
-        position: 'UI Designer',
-        status: 'Expired',
-        avatar: null,
-        email: 'lana.steiner@everest.com',
-        whatsapp: '08123456780',
-        entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UI Designer', value: 'ui-designer' },
-        division: 'UI',
-      },
-      {
-        id: '357235',
-        label: 'Demi Wilkinson',
-        position: 'UX Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'demi.wilkinson@everest.com',
-        whatsapp: '08123456783',
-        entityObj: { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-    ],
-  },
-  {
-    entity: 'PT Annapurna Berdiri Tinggi',
-    employees: [
-      {
-        id: '357236',
-        label: 'Phoenix Baker',
-        position: 'Product Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'phoenix.baker@everest.com',
-        whatsapp: '08123456789',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Supervisor', value: 'supervisor' },
-        positionObj: { label: 'Product Designer', value: 'product-designer' },
-        division: 'Design',
-      },
-      {
-        id: '357237',
-        label: 'Olivia Rhye',
-        position: 'UX Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'olivia.rhye@everest.com',
-        whatsapp: '08123456781',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-      {
-        id: '357238',
-        label: 'Lana Steiner',
-        position: 'UI Designer',
-        status: 'Expired',
-        avatar: null,
-        email: 'lana.steiner@everest.com',
-        whatsapp: '08123456780',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UI Designer', value: 'ui-designer' },
-        division: 'UI',
-      },
-      {
-        id: '357239',
-        label: 'Demi Wilkinson',
-        position: 'UX Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'demi.wilkinson@everest.com',
-        whatsapp: '08123456783',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-      {
-        id: '357240',
-        label: 'Candice Wu',
-        position: 'UI Designer',
-        status: 'Active',
-        avatar: null,
-        email: 'candice.wu@everest.com',
-        whatsapp: '08123456784',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UI Designer', value: 'ui-designer' },
-        division: 'UI',
-      },
-      {
-        id: '357241',
-        label: 'Natali Craig',
-        position: '@natali',
-        status: 'Active',
-        avatar: null,
-        email: 'natali.craig@everest.com',
-        whatsapp: '08123456785',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-      {
-        id: '357242',
-        label: 'Drew Cano',
-        position: '@drew',
-        status: 'Active',
-        avatar: null,
-        email: 'drew.cano@everest.com',
-        whatsapp: '08123456786',
-        entityObj: { label: 'PT Annapurna Berdiri Tinggi', value: 'annapurna' },
-        level: { label: 'Staff', value: 'staff' },
-        positionObj: { label: 'UX Designer', value: 'ux-designer' },
-        division: 'UX',
-      },
-    ],
-  },
-]
-
-// ── main component ─────────────────────────────────────────────────────────────
 function EmployeeListSlider({ onSelect }) {
   const { popSlider, sliderStack } = useReportEnquiry()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusTab, setStatusTab] = useState('All status')
+  const [employeeGroups, setEmployeeGroups] = useState([])
+  const [loading, setLoading] = useState(false)
 
   // Hover Card state
   const [hoveredEmployee, setHoveredEmployee] = useState(null)
   const [isHoverCardVisible, setIsHoverCardVisible] = useState(false)
   const hoverTimeoutRef = React.useRef(null)
 
-  // Find this slider's index in the stack to determine horizontal positioning
-  const sliderIndex = sliderStack.findIndex((s) => s.current === 'employee-list')
+  const sliderIndex = sliderStack.findIndex(
+    (s) => s.current === 'employee-list'
+  )
   const currentOffset = sliderIndex >= 0 ? sliderIndex * 420 : 0
+
+  // ── Fetch employees from API ──────────────────────────────────────────
+  const fetchEmployees = useCallback(() => {
+    setLoading(true)
+    const params = {}
+    if (searchTerm) params.search = searchTerm
+    if (statusTab !== 'All status') {
+      params.consent_status = statusTab.toLowerCase()
+    }
+
+    Service.getEmployees(params)
+      .then((res) => {
+        const groups = (res.data || []).map((company) => ({
+          entity: company.name,
+          employees: (company.employees || []).map((emp) => ({
+            id: emp.id,
+            employeeId: emp.employee_id,
+            label: emp.full_name,
+            position:
+              emp.position?.name || emp.employment_level?.name || '-',
+            status:
+              emp.consent_status === 'active' ? 'Active' : 'Expired',
+            avatar: null,
+            email: emp.email,
+            whatsapp: emp.phone,
+            entityObj: {
+              label: company.name,
+              value: company.id,
+            },
+            level: emp.employment_level
+              ? {
+                  label: emp.employment_level.name,
+                  value: emp.employment_level.id,
+                }
+              : null,
+            positionObj: emp.position
+              ? { label: emp.position.name, value: emp.position.id }
+              : null,
+            division: null,
+            _raw: emp,
+          })),
+        }))
+        setEmployeeGroups(groups)
+      })
+      .catch(myToaster)
+      .finally(() => setLoading(false))
+  }, [searchTerm, statusTab])
+
+  useEffect(() => {
+    fetchEmployees()
+  }, [fetchEmployees])
 
   const handleClose = () => popSlider()
 
@@ -222,22 +118,20 @@ function EmployeeListSlider({ onSelect }) {
     popSlider()
   }
 
-  // Filtering logic
-  const filteredGroups = EMPLOYEES_GROUPED.map((group) => ({
-    ...group,
-    employees: group.employees.filter((emp) => {
-      const matchesSearch =
-        emp.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.id.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus =
-        statusTab === 'All status' || emp.status === statusTab
-      return matchesSearch && matchesStatus
-    }),
-  })).filter((group) => group.employees.length > 0)
+  const filteredGroups = employeeGroups
+    .map((group) => ({
+      ...group,
+      employees: group.employees.filter((emp) => {
+        const matchesStatus =
+          statusTab === 'All status' || emp.status === statusTab
+        return matchesStatus
+      }),
+    }))
+    .filter((group) => group.employees.length > 0)
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white shadow-xl">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <header className="relative flex items-start gap-x-4 px-6 py-6 border-b border-gray-100">
         <button
           type="button"
@@ -248,22 +142,26 @@ function EmployeeListSlider({ onSelect }) {
         </button>
 
         <div className="flex flex-1 flex-col gap-1 pt-1">
-          <p className="text-lg font-semibold text-gray-900">List of employee</p>
-          <p className="text-sm text-gray-500 font-medium">BCA_PM_220124_897641</p>
+          <p className="text-lg font-semibold text-gray-900">
+            List of employee
+          </p>
+          <p className="text-sm text-gray-500 font-medium">
+            Select an employee for the enquiry
+          </p>
         </div>
       </header>
 
-      {/* ── Top Controls ────────────────────────────────────────────────────── */}
+      {/* Top Controls */}
       <div className="flex flex-col gap-4 p-6 border-b border-gray-100">
-        {/* Search */}
         <MyTextField
           placeholder="Search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          startAdornment={<SearchMd className="size-4 text-gray-400" />}
+          startAdornment={
+            <SearchMd className="size-4 text-gray-400" />
+          }
         />
 
-        {/* Status Tabs */}
         <MyHorizontalTabV2
           value={statusTab}
           onChange={setStatusTab}
@@ -274,7 +172,6 @@ function EmployeeListSlider({ onSelect }) {
           ]}
         />
 
-        {/* Add New Action */}
         <MyButton
           variant="text"
           color="primary"
@@ -286,58 +183,75 @@ function EmployeeListSlider({ onSelect }) {
         </MyButton>
       </div>
 
-      {/* ── List Content ────────────────────────────────────────────────────── */}
+      {/* List Content */}
       <div className="flex-1 overflow-hidden">
         <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
           <div className="flex flex-col">
-            {filteredGroups.map((group) => (
-              <div key={group.entity} className="flex flex-col">
-                <div className="px-6 py-2 bg-gray-50 border-b border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {group.entity}
-                  </p>
-                </div>
-                {group.employees.map((emp) => (
-                  <button
-                    key={`${group.entity}-${emp.id}`}
-                    type="button"
-                    onClick={() => handleSelectEmployee(emp)}
-                    onMouseEnter={() => handleMouseEnter(emp)}
-                    onMouseLeave={handleMouseLeave}
-                    className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 border-b border-gray-50 text-left transition-colors"
-                  >
-                    <MyAvatar
-                      name={emp.label}
-                      src={emp.avatar}
-                      size="md"
-                      fallback={<User01 className="size-5 text-gray-400" />}
-                    />
-                    <div className="flex flex-1 flex-col gap-0.5">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900 whitespace-pre-wrap leading-tight">
-                          {emp.label}
-                          <br />
-                          <span className="text-xs text-gray-500 font-normal">
-                            ID-{emp.id}
-                          </span>
-                        </p>
-                        {emp.status === 'Expired' && (
-                          <span className="rounded-full bg-error/50 border border-error/200 px-2 py-0.5 text-[10px] font-semibold text-error/700">
-                            Expired
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500">{emp.position}</p>
-                    </div>
-                  </button>
-                ))}
+            {loading && (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-sm text-gray-500">Loading...</p>
               </div>
-            ))}
+            )}
+            {!loading &&
+              filteredGroups.map((group) => (
+                <div key={group.entity} className="flex flex-col">
+                  <div className="px-6 py-2 bg-gray-50 border-b border-gray-100">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      {group.entity}
+                    </p>
+                  </div>
+                  {group.employees.map((emp) => (
+                    <button
+                      key={`${group.entity}-${emp.id}`}
+                      type="button"
+                      onClick={() => handleSelectEmployee(emp)}
+                      onMouseEnter={() => handleMouseEnter(emp)}
+                      onMouseLeave={handleMouseLeave}
+                      className="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 border-b border-gray-50 text-left transition-colors"
+                    >
+                      <MyAvatar
+                        name={emp.label}
+                        src={emp.avatar}
+                        size="md"
+                        fallback={
+                          <User01 className="size-5 text-gray-400" />
+                        }
+                      />
+                      <div className="flex flex-1 flex-col gap-0.5">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-gray-900 whitespace-pre-wrap leading-tight">
+                            {emp.label}
+                            <br />
+                            <span className="text-xs text-gray-500 font-normal">
+                              {emp.employeeId}
+                            </span>
+                          </p>
+                          {emp.status === 'Expired' && (
+                            <span className="rounded-full bg-error/50 border border-error/200 px-2 py-0.5 text-[10px] font-semibold text-error/700">
+                              Expired
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {emp.position}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            {!loading && filteredGroups.length === 0 && (
+              <div className="flex items-center justify-center py-8">
+                <p className="text-sm text-gray-500">
+                  No employees found
+                </p>
+              </div>
+            )}
           </div>
         </SimpleBar>
       </div>
 
-      {/* ── Hover Modal ─────────────────────────────────────────────────────── */}
+      {/* Hover Modal */}
       <EmployeeDetailHoverCard
         employee={hoveredEmployee}
         isVisible={isHoverCardVisible}
@@ -345,7 +259,7 @@ function EmployeeListSlider({ onSelect }) {
         onMouseMove={handleModalKeepAlive}
         onMouseLeave={handleMouseLeave}
         style={{
-          right: `${currentOffset + 416}px`, // Slight 4px overlap to ensure no hover gap
+          right: `${currentOffset + 416}px`,
           top: '24px',
         }}
       />

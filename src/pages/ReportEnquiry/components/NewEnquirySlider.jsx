@@ -1,4 +1,5 @@
 // Libraries
+import { useCallback, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller, useWatch } from 'react-hook-form'
@@ -23,10 +24,12 @@ import {
   MyHorizontalTabV2,
   WhatsApp,
   MyCalendar,
+  myToaster,
 } from '@interstellar-component'
 import { format } from 'date-fns'
-// Context
+// Context & Service
 import { useReportEnquiry } from '../Context'
+import Service from '../service'
 
 // ── validation schema ──────────────────────────────────────────────────────────
 const schema = yup.object({
@@ -62,33 +65,12 @@ const schema = yup.object({
 })
 
 // ── static options ────────────────────────────────────────────────────────────
-const ENTITY_OPTIONS = [
-  { label: 'PT Everest Maju Sejahtera', value: 'everest' },
-  { label: 'PT Annapurna Tinggi Sejahtera', value: 'annapurna' },
-]
-
-const LEVEL_OPTIONS = [
-  { label: 'Intern', value: 'intern' },
-  { label: 'Staff', value: 'staff' },
-  { label: 'Supervisor', value: 'supervisor' },
-  { label: 'Manager', value: 'manager' },
-  { label: 'Director', value: 'director' },
-]
-
-const POSITION_OPTIONS = [
-  { label: 'Product Designer', value: 'product-designer' },
-  { label: 'Frontend Engineer', value: 'frontend-engineer' },
-  { label: 'Backend Engineer', value: 'backend-engineer' },
-  { label: 'HR Manager', value: 'hr-manager' },
-]
-
-
 const REPEAT_EVERY_OPTIONS = [
+  { label: 'None', value: 'none', subLabel: 'one time' },
   { label: 'Monthly', value: 'monthly', subLabel: 'every 1 month' },
-  { label: 'Bi-monthly', value: 'bi-monthly', subLabel: 'every 2 months' },
   { label: 'Quarterly', value: 'quarterly', subLabel: 'every 3 months' },
-  { label: 'Semiannual', value: 'semiannual', subLabel: 'every 6 months' },
-  { label: 'Annual', value: 'annual', subLabel: 'yearly' },
+  { label: 'Semiannual', value: 'semi_annually', subLabel: 'every 6 months' },
+  { label: 'Annual', value: 'annually', subLabel: 'yearly' },
 ]
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -130,7 +112,11 @@ function SelectField({
 
 // ── main component ─────────────────────────────────────────────────────────────
 function NewEnquirySlider() {
-  const { pushSlider, handleCurrentSlider } = useReportEnquiry()
+  const { pushSlider, handleCurrentSlider, getList } = useReportEnquiry()
+
+  const [entityOptions, setEntityOptions] = useState([])
+  const [levelOptions, setLevelOptions] = useState([])
+  const [positionOptions, setPositionOptions] = useState([])
 
   const {
     control,
@@ -154,9 +140,65 @@ function NewEnquirySlider() {
 
   const category = useWatch({ control, name: 'category' })
 
-  const onSubmit = handleSubmit(() => {
-    // TODO: wire to real API
-    handleCurrentSlider(null)
+  // ── Fetch dropdown options ────────────────────────────────────────────
+  const fetchOptions = useCallback(() => {
+    Service.getCompanyOptions()
+      .then((res) => {
+        setEntityOptions(
+          (res.data || []).map((c) => ({ label: c.name, value: c.id }))
+        )
+      })
+      .catch(() => {})
+
+    Service.getLevelOptions()
+      .then((res) => {
+        setLevelOptions(
+          (res.data || []).map((l) => ({ label: l.name, value: l.id }))
+        )
+      })
+      .catch(() => {})
+
+    Service.getPositionOptions()
+      .then((res) => {
+        setPositionOptions(
+          (res.data || []).map((p) => ({ label: p.name, value: p.id }))
+        )
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    fetchOptions()
+  }, [fetchOptions])
+
+  // ── Submit ────────────────────────────────────────────────────────────
+  const onSubmit = handleSubmit(async (data) => {
+    const payload = {
+      category: data.category.toLowerCase(),
+      workforce_id: data.category === 'Employee'
+        ? data.fullName?.value
+        : undefined,
+      // For candidate, send inline data
+      ...(data.category === 'Candidate' && {
+        full_name: data.fullName,
+        email: data.email,
+        phone: data.whatsapp || undefined,
+        company_id: data.entity?.value,
+        employment_level_id: data.level?.value,
+      }),
+      consent_expiry: data.consentExpiry
+        ? format(data.consentExpiry, 'yyyy-MM-dd')
+        : undefined,
+      repeat_every: data.repeatEvery?.value || 'none',
+    }
+
+    await Service.create(payload)
+      .then((res) => {
+        myToaster(res)
+        getList()
+        handleCurrentSlider(null)
+      })
+      .catch(myToaster)
   })
 
   const handleClose = () => handleCurrentSlider(null)
@@ -173,7 +215,7 @@ function NewEnquirySlider() {
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white shadow-xl">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <header className="relative flex items-start gap-x-4 px-6 py-6 border-b border-gray-100">
         <button
           type="button"
@@ -183,14 +225,15 @@ function NewEnquirySlider() {
           <XClose size={24} stroke="currentColor" />
         </button>
 
-        {/* Title + subtitle */}
         <div className="flex flex-1 flex-col gap-1 pt-1">
           <p className="text-lg font-semibold text-gray-900">New Request</p>
-          <p className="text-sm text-gray-500 font-medium">REQ-0000001</p>
+          <p className="text-sm text-gray-500 font-medium">
+            Create a new enquiry request
+          </p>
         </div>
       </header>
 
-      {/* ── Scrollable body ─────────────────────────────────────────────────── */}
+      {/* Scrollable body */}
       <form noValidate onSubmit={onSubmit} className="flex flex-1 flex-col overflow-hidden">
         <section className="flex-1 overflow-hidden">
           <SimpleBar forceVisible="y" style={{ maxHeight: '100%' }}>
@@ -210,7 +253,6 @@ function NewEnquirySlider() {
                           value={field.value}
                           onChange={(val) => {
                             field.onChange(val)
-                            // Clear fields when toggling
                             setValue('fullName', '')
                             setValue('entity', null)
                             setValue('level', null)
@@ -230,7 +272,7 @@ function NewEnquirySlider() {
                     )}
                   </div>
 
-                  {/* Full name - Searchable if Employee, text if Candidate */}
+                  {/* Full name */}
                   <div className="flex flex-col gap-0.5">
                     <FieldLabel required>Full name</FieldLabel>
                     {category === 'Employee' ? (
@@ -317,7 +359,7 @@ function NewEnquirySlider() {
                     required
                     name="entity"
                     control={control}
-                    options={ENTITY_OPTIONS}
+                    options={entityOptions}
                     placeholder="Select entity"
                     errors={errors?.entity?.message ?? errors?.entity?.value?.message}
                     startAdornment={<Building07 className="size-4 text-gray-400" />}
@@ -329,7 +371,7 @@ function NewEnquirySlider() {
                     required
                     name="level"
                     control={control}
-                    options={LEVEL_OPTIONS}
+                    options={levelOptions}
                     placeholder="Select level"
                     errors={errors?.level?.message ?? errors?.level?.value?.message}
                     startAdornment={<Briefcase02 className="size-4 text-gray-400" />}
@@ -342,7 +384,7 @@ function NewEnquirySlider() {
                       required
                       name="position"
                       control={control}
-                      options={POSITION_OPTIONS}
+                      options={positionOptions}
                       placeholder="Select position"
                       errors={errors?.position?.message ?? errors?.position?.value?.message}
                       startAdornment={<Building07 className="size-4 text-gray-400" />}
@@ -476,7 +518,7 @@ function NewEnquirySlider() {
           </SimpleBar>
         </section>
 
-        {/* ── Footer ──────────────────────────────────────────────────────────── */}
+        {/* Footer */}
         <footer className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
           <MyButton
             type="button"

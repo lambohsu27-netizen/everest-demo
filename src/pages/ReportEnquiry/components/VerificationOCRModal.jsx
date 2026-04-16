@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { XCircle } from '@untitled-ui/icons-react'
-import { MyButton, MyFeaturedIconV2 } from '@interstellar-component'
+import { MyButton, MyFeaturedIconV2, myToaster } from '@interstellar-component'
 import RejectResendForm from './RejectResendForm'
 
 export default function VerificationOCRModal({ open, data }) {
@@ -116,7 +116,7 @@ export default function VerificationOCRModal({ open, data }) {
             variant="outlined"
             size="lg"
             customClassname="px-6"
-            onClick={() => setIsRejectModalOpen(true)}
+            onClick={() => myToaster({ message: 'Coming soon', type: 'info' })}
           >
             Reject & resend form
           </MyButton>
@@ -125,6 +125,7 @@ export default function VerificationOCRModal({ open, data }) {
             variant="filled"
             size="lg"
             customClassname="px-6"
+            onClick={() => myToaster({ message: 'Coming soon', type: 'info' })}
           >
             Submit application & view next
           </MyButton>

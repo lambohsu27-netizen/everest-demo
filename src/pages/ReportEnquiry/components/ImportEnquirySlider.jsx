@@ -4,9 +4,10 @@ import SimpleBar from 'simplebar-react'
 // UI Icons
 import { XClose, DownloadCloud01 } from '@untitled-ui/icons-react'
 // Shared Components
-import { MyButton, MyDropzone } from '@interstellar-component'
-// Context
+import { MyButton, MyDropzone, myToaster } from '@interstellar-component'
+// Context & Service
 import { useReportEnquiry } from '../Context'
+import Service from '../service'
 
 // ── Accepted file types ────────────────────────────────────────────────────────
 const ACCEPT = ['csv', 'xls', 'xlsx']
@@ -14,7 +15,7 @@ const MAX_SIZE = 150 * 1024 * 1024 // 150 MB
 
 // ── Main component ─────────────────────────────────────────────────────────────
 function ImportEnquirySlider() {
-  const { handleCurrentSlider } = useReportEnquiry()
+  const { handleCurrentSlider, getList } = useReportEnquiry()
   const [files, setFiles] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -24,13 +25,17 @@ function ImportEnquirySlider() {
     if (!files.length) return
     setIsSubmitting(true)
     try {
-      // TODO: wire to real upload API
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000)
-      })
+      const formData = new FormData()
+      formData.append('file', files[0])
+      await Service.import(formData)
+        .then((res) => {
+          myToaster(res)
+          getList()
+          handleClose()
+        })
+        .catch(myToaster)
     } finally {
       setIsSubmitting(false)
-      handleClose()
     }
   }
 

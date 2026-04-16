@@ -99,43 +99,51 @@ export default function UserDetail() {
                     <h3 className="text-sm-semibold text-gray-900">Personal info</h3>
                   </div>
                   <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Full name</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
-                        <span className="text-sm-medium text-gray-900">{userDetail.name}</span>
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
+                        <span className="block w-full text-right text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                          {userDetail.name}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Email</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
-                        <span className="text-sm-medium text-gray-900">{userDetail.email}</span>
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
+                        <span className="block w-full text-right text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                          {userDetail.email}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Phone</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
-                        <span className="text-sm-medium text-gray-900">{userDetail.phone ?? '-'}</span>
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
+                        <span className="block w-full text-right text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                          {userDetail.phone ?? '-'}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Role</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
-                        <span className="text-sm-medium text-gray-900">{userDetail.role?.name ?? '-'}</span>
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
+                        <span className="block w-full text-right text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                          {userDetail.role?.name ?? '-'}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Status</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
                         <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium ${userDetail.is_active ? 'border-success/200 bg-success/50 text-success/700' : 'border-gray-200 bg-gray-100 text-gray-700'}`}>
                           <span className={`h-1.5 w-1.5 rounded-full ${userDetail.is_active ? 'bg-success/500' : 'bg-gray-500'}`} />
                           {userDetail.is_active ? 'Active' : 'Inactive'}

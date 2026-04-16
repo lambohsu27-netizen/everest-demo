@@ -81,9 +81,11 @@ export default function RoleDetail() {
           ) : (
             <>
               {/* Title */}
-              <div className="px-4 pb-0">
+              <div className="min-w-0 px-4 pb-0">
                 <div className="flex flex-col gap-0.5">
-                  <h2 className="text-xl-semibold text-gray-900">{roleDetail.name}</h2>
+                  <h2 className="text-xl-semibold text-gray-900 [overflow-wrap:anywhere]">
+                    {roleDetail.name}
+                  </h2>
                   <p className="text-md-regular text-gray-600">Role</p>
                 </div>
               </div>
@@ -95,24 +97,26 @@ export default function RoleDetail() {
                     <h3 className="text-sm-semibold text-gray-900">Information</h3>
                   </div>
                   <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-                    <div className="flex items-center border-b border-gray-200">
+                    <div className="flex items-start border-b border-gray-200">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Role name</span>
                       </div>
-                      <div className="flex-1 px-6 py-4 text-right">
-                        <span className="text-sm-medium text-gray-900">{roleDetail.name}</span>
+                      <div className="min-w-0 flex-1 px-6 py-4 text-right">
+                        <span className="block w-full text-right text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                          {roleDetail.name}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex">
+                    <div className="flex items-start">
                       <div className="w-[120px] shrink-0 px-6 py-4">
                         <span className="text-sm-regular text-gray-600">Access</span>
                       </div>
-                      <div className="flex-1 px-6 py-4">
+                      <div className="min-w-0 flex-1 px-6 py-4">
                         <div className="flex flex-wrap gap-3">
                           {accessLabels.map((label) => (
                             <span
                               key={label}
-                              className="text-xs-medium inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-gray-700"
+                              className="text-xs-medium inline-flex max-w-full items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-gray-700 [overflow-wrap:anywhere]"
                             >
                               {label}
                             </span>
@@ -132,14 +136,18 @@ export default function RoleDetail() {
                   </div>
                   <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
                     {changes?.last_modified?.timestamp && (
-                      <div className={`flex items-center ${changes?.created?.timestamp ? 'border-b border-gray-200' : ''}`}>
-                        <div className="w-[120px] shrink-0 self-start px-6 py-4">
+                      <div className={`flex items-start ${changes?.created?.timestamp ? 'border-b border-gray-200' : ''}`}>
+                        <div className="w-[120px] shrink-0 px-6 py-4">
                           <span className="text-sm-regular text-gray-600">Last modified</span>
                         </div>
-                        <div className="flex flex-1 items-center justify-end gap-3 px-6 py-4">
-                          <div className="flex flex-col items-end">
-                            <span className="text-sm-medium text-gray-900">{changes.last_modified.actor_name ?? '-'}</span>
-                            <span className="text-sm-regular text-gray-600">{changes.last_modified.actor_role ?? ''}</span>
+                        <div className="flex min-w-0 flex-1 items-start justify-end gap-3 px-6 py-4">
+                          <div className="flex min-w-0 flex-col items-end text-right">
+                            <span className="max-w-full text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                              {changes.last_modified.actor_name ?? '-'}
+                            </span>
+                            <span className="max-w-full text-sm-regular text-gray-600 [overflow-wrap:anywhere]">
+                              {changes.last_modified.actor_role ?? ''}
+                            </span>
                             <span className="text-xs-regular text-gray-600">{formatDate(changes.last_modified.timestamp)}</span>
                           </div>
                           {changes.last_modified.actor_avatar_url ? (
@@ -151,14 +159,18 @@ export default function RoleDetail() {
                       </div>
                     )}
                     {changes?.created?.timestamp && (
-                      <div className="flex items-center">
-                        <div className="w-[120px] shrink-0 self-start px-6 py-4">
+                      <div className="flex items-start">
+                        <div className="w-[120px] shrink-0 px-6 py-4">
                           <span className="text-sm-regular text-gray-600">Created</span>
                         </div>
-                        <div className="flex flex-1 items-center justify-end gap-3 px-6 py-4">
-                          <div className="flex flex-col items-end">
-                            <span className="text-sm-medium text-gray-900">{changes.created.actor_name ?? '-'}</span>
-                            <span className="text-sm-regular text-gray-600">{changes.created.actor_role ?? ''}</span>
+                        <div className="flex min-w-0 flex-1 items-start justify-end gap-3 px-6 py-4">
+                          <div className="flex min-w-0 flex-col items-end text-right">
+                            <span className="max-w-full text-sm-medium text-gray-900 [overflow-wrap:anywhere]">
+                              {changes.created.actor_name ?? '-'}
+                            </span>
+                            <span className="max-w-full text-sm-regular text-gray-600 [overflow-wrap:anywhere]">
+                              {changes.created.actor_role ?? ''}
+                            </span>
                             <span className="text-xs-regular text-gray-600">{formatDate(changes.created.timestamp)}</span>
                           </div>
                           {changes.created.actor_avatar_url ? (

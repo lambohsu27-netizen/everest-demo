@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { SearchMd, XClose } from '@untitled-ui/icons-react'
-import { MyButton, MyTextField } from '@interstellar-component'
+import { MyButton, MyTextField, myToaster } from '@interstellar-component'
 import { useSettings } from '../../Context'
+
+const PERMISSIONS_REQUIRED_MESSAGE = 'Please select at least one access menu.'
 
 export default function RoleForm({ mode }) {
   const {
@@ -42,10 +44,14 @@ export default function RoleForm({ mode }) {
       const allPerms = allPermissions.find((m) => m.module_key === moduleKey)
       const subKeys = allPerms?.sub_permissions?.map((s) => s.key ?? s) ?? []
       const allChecked = subKeys.length > 0 && subKeys.every((k) => current.has(k))
-      if (allChecked) {
+      const clearModule = () => {
         const next = { ...prev }
         delete next[moduleKey]
         return next
+      }
+      // Master switch reflects "any sub checked". Turning it off must clear all — including partial selection.
+      if (allChecked || current.size > 0) {
+        return clearModule()
       }
       return { ...prev, [moduleKey]: new Set(subKeys) }
     })
@@ -85,6 +91,10 @@ export default function RoleForm({ mode }) {
     setIsSubmitting(true)
     try {
       const payload = buildPayload()
+      if (payload.permissions.length === 0) {
+        myToaster({ status: 422, message: PERMISSIONS_REQUIRED_MESSAGE })
+        return
+      }
       if (isEdit) {
         await updateRole(activePanelRoleId, payload)
       } else {

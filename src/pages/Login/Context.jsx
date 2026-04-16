@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import CryptoJS from 'crypto-js'
@@ -6,7 +7,7 @@ import { myToaster } from '@interstellar-component'
 
 import { LoginService } from './service'
 import { useApp } from '../../AppContext'
-import { encryptPassword } from '@src/services/Helper'
+import { encryptPassword, myToasterFromApi } from '@src/services/Helper'
 
 const LoginContext = createContext()
 
@@ -82,7 +83,7 @@ function LoginProvider({ children }) {
           }
         })
         .catch((e) => {
-          myToaster(e)
+          myToasterFromApi(e)
         })
     }
     
@@ -93,7 +94,7 @@ function LoginProvider({ children }) {
         .then((res) => {
           setUser({ data: res.data })
         })
-        .catch(myToaster),
+        .catch(myToasterFromApi),
     []
   )
 
@@ -110,7 +111,7 @@ function LoginProvider({ children }) {
         getSession()
       })
       .catch((e) => {
-        myToaster(e)
+        myToasterFromApi(e)
         throw e
       })
   }, [])
@@ -134,7 +135,7 @@ function LoginProvider({ children }) {
         .then(getUser)
         .then(getSession)
         .then(shouldChangePassword ? () => {} : setIsProfileSliderOpen(false))
-        .catch(myToaster)
+        .catch(myToasterFromApi)
     },
     [getSession, getUser]
   )

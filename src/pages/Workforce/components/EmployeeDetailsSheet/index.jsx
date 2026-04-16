@@ -46,11 +46,13 @@ export default function EmployeeDetailsSheet() {
     <EmployeeDetailsSheetProvider>
       {/* Loan category → account detail (parent-child slider like Nasabah) */}
       <MyModalSlider
+        scrim
         open={sliderStack.length > 0 && sliderStack[0]?.current === 'loan-category'}
         element={<LoanCategorySlider />}
         onClose={() => handleCurrentSlider(null)}
       >
         <MyChildModalSlider
+          scrim
           open={sliderStack.length > 1 && sliderStack[1]?.current === 'loan-account-detail'}
           width={420}
           element={<LoanAccountSlider />}

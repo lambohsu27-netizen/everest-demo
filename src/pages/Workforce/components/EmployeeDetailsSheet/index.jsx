@@ -1,15 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useLocation, Outlet } from 'react-router-dom'
+import { MyModalSlider, MyChildModalSlider } from '@interstellar-component'
 import StackedPageSheet from '@src/components/StackedPageSheet'
 import { useWorkforce } from '../../Context'
 import { EmployeeDetailsSheetProvider } from './Context'
 import NoEmployeeData from './NoEmployeeData'
 import RenderEmployeeData from './RenderEmployeeData'
+import LoanCategorySlider from '../../Sliders/LoanCategorySlider'
+import LoanAccountSlider from '../../Sliders/LoanAccountSlider'
 
 export default function EmployeeDetailsSheet() {
   const { id } = useParams()
   const location = useLocation()
-  const { getEmployeeById, fetchWorkforceDetail, workforceDetail, isLoadingWorkforceDetail } =
+  const { getEmployeeById, fetchWorkforceDetail, workforceDetail, isLoadingWorkforceDetail, sliderStack, handleCurrentSlider } =
     useWorkforce()
 
   const navState = location.state?.row
@@ -39,9 +42,20 @@ export default function EmployeeDetailsSheet() {
     if (detail) return { ...(rowCache || {}), ...detail }
     return rowCache
   }, [workforceDetail, rowCache, id])
-  console.log(employee)
   return (
     <EmployeeDetailsSheetProvider>
+      {/* Loan category → account detail (parent-child slider like Nasabah) */}
+      <MyModalSlider
+        open={sliderStack.length > 0 && sliderStack[0]?.current === 'loan-category'}
+        element={<LoanCategorySlider />}
+        onClose={() => handleCurrentSlider(null)}
+      >
+        <MyChildModalSlider
+          open={sliderStack.length > 1 && sliderStack[1]?.current === 'loan-account-detail'}
+          width={420}
+          element={<LoanAccountSlider />}
+        />
+      </MyModalSlider>
       <StackedPageSheet backUrl="/workforce" closeUrl="/workforce" isScrollFromTop={false}>
         {employee ? (
           <RenderEmployeeData employee={employee} isLoadingDetail={isLoadingWorkforceDetail} />

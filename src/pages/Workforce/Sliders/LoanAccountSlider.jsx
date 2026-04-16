@@ -1,65 +1,102 @@
 import React, { useMemo } from 'react'
-import SimpleBar from 'simplebar-react'
 import { XClose } from '@untitled-ui/icons-react'
-import { 
-  MyDoubleCard, 
-  MyDetailView, 
-  MyChip, 
+import {
+  MyDoubleCard,
+  MyDetailView,
+  MyChip,
   MyBgPatternDecorativeCircle,
-  MySkeuomorphicContainer
+  MySkeuomorphicContainer,
 } from '@interstellar-component'
-import MyChartLine from '@interstellar-component/components/Chart/MyChartLine'
 import { useWorkforce } from '../Context'
 
-/**
- * LoanAccountSlider component
- * 
- * Provides a high-fidelity detailed view of a specific loan account.
- * Portrayed in Figma as the "BCA Master Card" detail modal.
- */
+function formatIDR(n) {
+  const v = Number(n) || 0
+  return `Rp${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+function formatDate(value) {
+  if (!value) return '—'
+  const d = new Date(String(value).replace(/\//g, '-'))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function formatMonthYear(value) {
+  if (!value) return '—'
+  const d = new Date(String(value).replace(/\//g, '-'))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+}
+
+function deriveBankCode(provider) {
+  if (!provider) return '??'
+  return String(provider)
+    .replace(/^PT\.?\s+/i, '')
+    .split(/\s+/)
+    .filter(Boolean)[0]
+    ?.slice(0, 4)
+    .toUpperCase() ?? '??'
+}
+
+function deriveAging(startDate) {
+  if (!startDate) return '—'
+  const start = new Date(String(startDate).replace(/\//g, '-'))
+  if (Number.isNaN(start.getTime())) return '—'
+  const now = new Date()
+  const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
+  if (months < 1) return '< 1 month'
+  if (months < 12) return `${months} month${months > 1 ? 's' : ''}`
+  const years = Math.floor(months / 12)
+  const rem = months % 12
+  return rem > 0 ? `${years}y ${rem}m` : `${years} year${years > 1 ? 's' : ''}`
+}
+
 function LoanAccountSlider() {
-  const { sliderStack, popSlider } = useWorkforce()
-  
-  // Get the data for the current active slider (the top of the stack)
+  const { sliderStack, popSlider, workforceDetail } = useWorkforce()
+
   const activeSlider = useMemo(
     () => (sliderStack.length > 0 ? sliderStack[sliderStack.length - 1] : null),
     [sliderStack]
   )
 
+  // Find the matching facility from BE data
   const accountData = activeSlider?.data || {}
-  const accountName = accountData.name || 'Account Detail'
-  const bankName = accountData.bank || 'BCA'
+  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+  const creditReport = workforceDetail?.credit_report
 
-  // Mock data for the Information section
+  // Match by provider name + category (best effort)
+  const facility = useMemo(() => {
+    if (accountData.name) {
+      return facilities.find((f) => f.provider === accountData.name) ?? null
+    }
+    return null
+  }, [facilities, accountData.name])
+
+  const provider = facility?.provider ?? accountData.name ?? 'Account Detail'
+  const bankCode = deriveBankCode(provider)
+  const creditLimit = Number(facility?.credit_limit) || 0
+  const debitBalance = Number(facility?.debit_balance) || 0
+  const available = creditLimit > 0 ? creditLimit - debitBalance : null
+  const reportDate = creditReport?.report_date
+  const kol = workforceDetail?.credit_report?.credit_summary?.collectability_status?.kol
+
   const informationData = {
-    'Collectibility status': <MyChip label="Kol 1" color="error" variant="filled" size="sm" rounded="full" />,
-    'Limit': 'Rp5,000,000',
-    'Outstanding': 'Rp5,000,000',
-    'Available': '-',
-    'Credit type': 'Kartu kredit',
-    'Start date': '12 Des 2024',
-    'Account aging': '10 bulan',
-    'Account expired': 'Jan 2026',
-  }
-
-  // Mock data for Collectibility History chart
-  const chartSeries = [
-    { name: 'Kol Status', data: [4, 4, 5, 5, 5, 5, 5, 5] }
-  ]
-  const chartLabels = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan']
-  
-  const chartOptions = {
-    yaxis: {
-      min: 1,
-      max: 5,
-      reversed: true,
-      labels: {
-        style: { colors: '#717680', fontSize: '12px' }
-      }
-    },
-    colors: ['#42307D'],
-    stroke: { curve: 'straight', width: 2 },
-    markers: { size: 4 },
+    'Collectibility status': kol ? (
+      <MyChip
+        label={`Kol ${kol}`}
+        color={kol >= 3 ? 'error' : kol === 2 ? 'warning' : 'success'}
+        variant="filled"
+        size="sm"
+        rounded="full"
+      />
+    ) : '—',
+    Limit: formatIDR(creditLimit),
+    Outstanding: formatIDR(debitBalance),
+    Available: available != null ? formatIDR(available) : '—',
+    'Credit type': facility?.contract_type ?? '—',
+    'Start date': formatDate(facility?.start_date),
+    'Account aging': deriveAging(facility?.start_date),
+    'Account expired': formatMonthYear(facility?.due_date),
   }
 
   return (
@@ -76,94 +113,72 @@ function LoanAccountSlider() {
 
         {/* Decorative background pattern */}
         <div className="absolute left-0 top-0 -z-10 opacity-20">
-            <MyBgPatternDecorativeCircle size="sm" />
+          <MyBgPatternDecorativeCircle size="sm" />
         </div>
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <MySkeuomorphicContainer className="size-14 flex items-center justify-center bg-white border border-gray/200 rounded-xl shadow-xs">
-              <span className="text-xl-bold text-[#0060AF]">{bankName}</span>
+              <span className="text-xl-bold text-[#0060AF]">{bankCode}</span>
             </MySkeuomorphicContainer>
-            
+
             <div className="flex flex-col gap-1">
-              <h3 className="text-lg-semibold text-gray/900">{accountName}</h3>
-              <p className="text-sm-regular text-gray/600">Data as 02 Oct 2025</p>
+              <h3 className="text-lg-semibold text-gray/900">{provider}</h3>
+              <p className="text-sm-regular text-gray/600">
+                {reportDate ? `Data as ${formatDate(reportDate)}` : '—'}
+              </p>
             </div>
           </div>
 
-          <div className="flex">
-            <div className="flex items-center gap-2 rounded-full border border-gray/200 bg-gray/50 px-3 py-1">
-              <span className="text-xs-medium text-gray/600">Loan ID</span>
-              <span className="text-xs-semibold text-gray/900">1122334455</span>
+          {facility?.contract_status && (
+            <div className="flex">
+              <div className="flex items-center gap-2 rounded-full border border-gray/200 bg-gray/50 px-3 py-1">
+                <span className="text-xs-medium text-gray/600">Status</span>
+                <span className="text-xs-semibold text-gray/900">{facility.contract_status}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </header>
 
       {/* ── Body ────────────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-hidden">
-        <SimpleBar style={{ maxHeight: '100%' }}>
+      <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="flex flex-col gap-6 px-4 py-6">
-            
             {/* Information Section */}
             <MyDoubleCard heading="Information" innerClassName="p-0">
-               <MyDetailView datas={informationData} />
+              <MyDetailView datas={informationData} />
             </MyDoubleCard>
 
-            {/* Payment History Section (Simplified Grid) */}
+            {/* Payment History Section */}
             <MyDoubleCard heading="Payment history" innerClassName="p-4">
-               <div className="flex flex-col gap-4">
-                 <div className="flex justify-between border-b border-gray/100 pb-3">
-                    <span className="text-sm text-gray/600">Perform</span>
-                    <span className="text-sm-semibold text-gray/900">3 times</span>
-                 </div>
-                 <div className="flex justify-between border-b border-gray/100 pb-3">
-                    <span className="text-sm text-gray/600">Non-perform</span>
-                    <span className="text-sm-semibold text-gray/900">7 times</span>
-                 </div>
-                 <div className="flex justify-between pb-1">
-                    <span className="text-sm text-gray/600">Last update</span>
-                    <span className="text-sm-semibold text-gray/900">10 Nov 2025</span>
-                 </div>
-                 
-                 {/* Dot Grid Placeholder logic - for brief demo */}
-                 <div className="bg-gray/25 rounded-lg p-3 flex flex-col gap-2">
-                    <div className="flex justify-between px-2 text-[10px] text-gray/400">
-                      <span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span>D</span>
-                    </div>
-                    <div className="flex justify-between items-center gap-1">
-                      <span className="text-[10px] text-gray/500 w-6">2024</span>
-                      <div className="flex-1 flex justify-between">
-                        {[...Array(11)].map((_, i) => <div key={i} className="size-2 rounded-full bg-gray/200" />)}
-                        <div className="size-2 rounded-full bg-primary/200 border border-primary/400" />
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center gap-1">
-                      <span className="text-[10px] text-gray/500 w-6">2025</span>
-                      <div className="flex-1 flex justify-between">
-                         <div className="size-2 rounded-full bg-primary/400" />
-                         <div className="size-2 rounded-full bg-primary/400" />
-                         {[...Array(7)].map((_, i) => <div key={i} className="size-2 rounded-full bg-error/400" />)}
-                         {[...Array(3)].map((_, i) => <div key={i} className="size-2 rounded-full bg-gray/200" />)}
-                      </div>
-                    </div>
-                 </div>
-               </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between border-b border-gray/100 pb-3">
+                  <span className="text-sm text-gray/600">Contract phase</span>
+                  <span className="text-sm-semibold text-gray/900">
+                    {facility?.contract_phase ?? '—'}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-gray/100 pb-3">
+                  <span className="text-sm text-gray/600">Overdue amount</span>
+                  <span className="text-sm-semibold text-gray/900">
+                    {formatIDR(facility?.overdue)}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-gray/100 pb-3">
+                  <span className="text-sm text-gray/600">Interest rate</span>
+                  <span className="text-sm-semibold text-gray/900">
+                    {facility?.interest_rate ?? '—'}
+                  </span>
+                </div>
+                <div className="flex justify-between pb-1">
+                  <span className="text-sm text-gray/600">Due date</span>
+                  <span className="text-sm-semibold text-gray/900">
+                    {formatDate(facility?.due_date)}
+                  </span>
+                </div>
+              </div>
             </MyDoubleCard>
-
-            {/* Collectibility History Section */}
-            <MyDoubleCard heading="Collectibility history" innerClassName="p-4">
-               <div className="h-[200px] w-full">
-                  <MyChartLine 
-                    series={chartSeries} 
-                    categories={chartLabels}
-                    options={chartOptions}
-                  />
-               </div>
-            </MyDoubleCard>
-
           </div>
-        </SimpleBar>
       </div>
     </div>
   )

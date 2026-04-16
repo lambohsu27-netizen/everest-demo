@@ -7,16 +7,12 @@ import WorkforceTable from './components/WorkforceTable'
 import NewEmployeeSlider from './Sliders/NewEmployeeSlider'
 import ImportWorkforceSlider from './Sliders/ImportWorkforceSlider'
 import CreditCompositionSlider from './Sliders/CreditCompositionSlider'
-import LoanCategorySlider from './Sliders/LoanCategorySlider'
-import LoanAccountSlider from './Sliders/LoanAccountSlider'
 import { useWorkforce } from './Context'
 
 const SLIDER_COMPONENTS = {
   'new-employee': NewEmployeeSlider,
   'import-workforce': ImportWorkforceSlider,
   'credit-composition': CreditCompositionSlider,
-  'loan-category': LoanCategorySlider,
-  'loan-account-detail': LoanAccountSlider,
 }
 
 function Workforce() {
@@ -24,7 +20,7 @@ function Workforce() {
 
   return (
     <div className="flex h-full w-full flex-col bg-gray-50/50">
-      {/* Dynamic Stacked Sliders */}
+      {/* Stacked sliders (new-employee, import, credit-composition) */}
       {sliderStack.map((slider, index) => {
         const Component = SLIDER_COMPONENTS[slider.current]
         if (!Component) return null
@@ -34,7 +30,7 @@ function Workforce() {
             key={`${slider.current}-${index}`}
             open
             offset={index * 420}
-            zIndex={1000 - index * 10}
+            zIndex={1000 + index * 10}
             element={<Component />}
             onClose={popSlider}
             scrim={index === 0}

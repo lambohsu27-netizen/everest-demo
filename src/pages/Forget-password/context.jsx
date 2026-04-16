@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { myToaster } from '@interstellar-component'
 import Service from './service'
-import { encryptPassword } from '../../services/Helper'
+import { encryptPassword, myToasterFromApi } from '../../services/Helper'
 import { post } from '../../services/NetworkUtils'
 
 const ForgetPasswordContext = createContext()
@@ -31,7 +31,7 @@ function ForgetPasswordProvider(props) {
         setCurrentStep({ step_2: true, step_1: false })
       })
       .catch((res) => {
-        myToaster(res)
+        myToasterFromApi(res)
         if (res?.message === 'an OTP for such user has already exist and still not expired') {
           const nextCountdown = res?.resend_eligible_at || res?.countdown_to_new_otp
           if (nextCountdown) {
@@ -72,7 +72,7 @@ function ForgetPasswordProvider(props) {
         })
       })
       .catch((res) => {
-        myToaster(res)
+        myToasterFromApi(res)
         if (res?.countdown_to_new_otp) {
           setCountdown(res.countdown_to_new_otp)
           localStorage.setItem('countdown_to_new_otp', res.countdown_to_new_otp)
@@ -107,7 +107,7 @@ function ForgetPasswordProvider(props) {
         localStorage.removeItem('countdown_to_new_otp')
         localStorage.removeItem('email_forget_password')
       })
-      .catch(myToaster)
+      .catch(myToasterFromApi)
   }
 
   return (

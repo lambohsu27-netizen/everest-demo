@@ -30,6 +30,21 @@ function normalizeListPagination(res) {
   }
 }
 
+const PERMISSIONS_EMPTY_TOAST_MESSAGE = 'Please select at least one access menu.'
+
+/** Friendly copy when BE returns 422 for empty permissions on role create/update. */
+function normalizeRoleSaveError(err) {
+  const status = Number(err?.status)
+  if (status !== 422 || !Array.isArray(err?.errors)) return err
+  const permissionsIssue = err.errors.some(
+    (e) =>
+      e?.field === 'permissions' &&
+      /non-empty|non empty|empty array/i.test(String(e?.message ?? ''))
+  )
+  if (!permissionsIssue) return err
+  return { ...err, message: PERMISSIONS_EMPTY_TOAST_MESSAGE }
+}
+
 function SettingsProvider({ children }) {
   // ── General Settings ────────────────────────────────────────────────────────
   const [sessionTimeout, setSessionTimeout] = useState('')
@@ -168,7 +183,10 @@ function SettingsProvider({ children }) {
         ...(roleSortOrder ? { order: roleSortOrder } : {}),
       }
       const res = await SettingsService.getRoles(params)
-      setRoles(res.data)
+      const rows = res.data ?? []
+      // New list = new view (search/filter/page); selection does not carry over.
+      setRoles(rows.map((r) => ({ ...r, checked: false })))
+      setSelectedRoleIds([])
       setRolePagination(res.meta)
       if (res.filter) setRoleFilters(res.filter)
     } catch (err) {
@@ -240,31 +258,43 @@ function SettingsProvider({ children }) {
   // CRUD
   const createRole = useCallback(
     async (data) => {
-      const res = await SettingsService.createRole(data)
-      myToaster(res)
-      fetchRoles(rolePage, roleSearchTerm)
-      closeRolePanel()
+      try {
+        const res = await SettingsService.createRole(data)
+        myToaster(res)
+        fetchRoles(rolePage, roleSearchTerm)
+        closeRolePanel()
+      } catch (err) {
+        myToaster(normalizeRoleSaveError(err))
+      }
     },
     [rolePage, roleSearchTerm, fetchRoles, closeRolePanel]
   )
 
   const updateRole = useCallback(
     async (id, data) => {
-      const res = await SettingsService.updateRole(id, data)
-      myToaster(res)
-      fetchRoles(rolePage, roleSearchTerm)
-      fetchRoleDetail(id)
-      setRolePanel('detail')
+      try {
+        const res = await SettingsService.updateRole(id, data)
+        myToaster(res)
+        fetchRoles(rolePage, roleSearchTerm)
+        fetchRoleDetail(id)
+        setRolePanel('detail')
+      } catch (err) {
+        myToaster(normalizeRoleSaveError(err))
+      }
     },
     [rolePage, roleSearchTerm, fetchRoles, fetchRoleDetail]
   )
 
   const deleteRoles = useCallback(
     async (ids) => {
-      const res = await SettingsService.deleteRoles(ids)
-      myToaster(res)
-      setSelectedRoleIds([])
-      fetchRoles(rolePage, roleSearchTerm)
+      try {
+        const res = await SettingsService.deleteRoles(ids)
+        myToaster(res)
+        setSelectedRoleIds([])
+        fetchRoles(rolePage, roleSearchTerm)
+      } catch (err) {
+        myToaster(err)
+      }
     },
     [rolePage, roleSearchTerm, fetchRoles]
   )
@@ -331,7 +361,10 @@ function SettingsProvider({ children }) {
         ...(userSortOrder ? { order: userSortOrder } : {}),
       }
       const res = await SettingsService.getUsers(params)
-      setUsers(res.data)
+      const rows = res.data ?? []
+      // New list = new view (tab/search/filter/page); selection does not carry over.
+      setUsers(rows.map((u) => ({ ...u, checked: false })))
+      setSelectedUserIds([])
       setUserPagination(res.meta)
       if (res.filter) setUserFilters(res.filter)
     } catch (err) {

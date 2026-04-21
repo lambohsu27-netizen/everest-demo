@@ -58,7 +58,7 @@ function ReportEnquiryTable() {
             <MyButton
               color="secondary"
               variant="outlined"
-              size="md"
+              size="sm"
               customClassname="gap-2"
               onClick={downloadExport}
             >
@@ -68,17 +68,17 @@ function ReportEnquiryTable() {
             <MyButton
               color="secondary"
               variant="outlined"
-              size="md"
+              size="sm"
               customClassname="gap-2"
               onClick={() => handleCurrentSlider({ current: 'import-enquiry' })}
             >
-              <PackagePlus />
+              <PackagePlus className="size-5" />
               <p className="text-sm-semibold">Bulk enquiry</p>
             </MyButton>
             <MyButton
               color="primary"
               variant="filled"
-              size="md"
+              size="sm"
               customClassname="gap-2"
               onClick={() => handleCurrentSlider({ current: 'new-enquiry' })}
             >

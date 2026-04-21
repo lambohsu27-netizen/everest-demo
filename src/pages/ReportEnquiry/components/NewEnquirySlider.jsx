@@ -148,7 +148,7 @@ function NewEnquirySlider() {
           (res.data || []).map((c) => ({ label: c.name, value: c.id }))
         )
       })
-      .catch(() => {})
+      .catch(() => { })
 
     Service.getLevelOptions()
       .then((res) => {
@@ -156,7 +156,7 @@ function NewEnquirySlider() {
           (res.data || []).map((l) => ({ label: l.name, value: l.id }))
         )
       })
-      .catch(() => {})
+      .catch(() => { })
 
     Service.getPositionOptions()
       .then((res) => {
@@ -164,7 +164,7 @@ function NewEnquirySlider() {
           (res.data || []).map((p) => ({ label: p.name, value: p.id }))
         )
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -294,11 +294,10 @@ function NewEnquirySlider() {
                                   },
                                 })
                               }
-                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${
-                                errors.fullName
-                                  ? 'border-red-300 ring-1 ring-red-300'
-                                  : 'border-gray-300 hover:border-brand/400 hover:ring-1 hover:ring-brand/400'
-                              }`}
+                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${errors.fullName
+                                ? 'border-red-300 ring-1 ring-red-300'
+                                : 'border-gray-300 hover:border-brand/400 hover:ring-1 hover:ring-brand/400'
+                                }`}
                             >
                               <div className="size-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-200 overflow-hidden shrink-0">
                                 {value?.avatar ? (
@@ -454,11 +453,10 @@ function NewEnquirySlider() {
                             <button
                               type="button"
                               onClick={show}
-                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${
-                                errors.consentExpiry
-                                  ? 'border-red-300 ring-1 ring-red-300 shadow-[0_0_0_4px_rgba(240,68,56,0.24)]'
-                                  : 'border-gray-300 hover:border-brand/400 hover:ring-4 hover:ring-brand/100'
-                              }`}
+                              className={`flex items-center gap-3 w-full rounded-lg border px-3.5 py-2.5 text-left transition-all ${errors.consentExpiry
+                                ? 'border-red-300 ring-1 ring-red-300 shadow-[0_0_0_4px_rgba(240,68,56,0.24)]'
+                                : 'border-gray-300 hover:ring-2 hover:ring-brand/400'
+                                }`}
                             >
                               <Calendar className="size-4 text-gray-400" />
                               <div className="flex flex-1 flex-col overflow-hidden">
@@ -509,8 +507,8 @@ function NewEnquirySlider() {
                         )}
                       </div>
                     )}
-                    focusColor="#7f56d9"
-                    focusShadow="#7f56d93d"
+                  // focusColor="#7f56d9"
+                  // focusShadow="#7f56d93d"
                   />
                 </div>
               </MyDoubleCard>

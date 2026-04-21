@@ -265,7 +265,7 @@ export default function UserForm({ mode }) {
                   {/* Profile Photo */}
                   <div className="flex flex-col gap-1.5">
                     <p className="text-sm font-medium leading-5 text-gray-700">
-                      Profile photo 
+                      Profile photo
                     </p>
                     <div className="flex items-center gap-4">
                       <MyAvatar size={64} photo={avatarFile ?? avatarPreview} />
@@ -314,7 +314,7 @@ export default function UserForm({ mode }) {
                         else clearError('name')
                       }}
                       focusColor="#42307D"
-                       
+
                     />
                   </div>
 
@@ -335,7 +335,7 @@ export default function UserForm({ mode }) {
                         clearError('email')
                       }}
                       focusColor="#42307D"
-                       
+
                       startAdornment={<Mail01 className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -361,7 +361,7 @@ export default function UserForm({ mode }) {
                         else clearError('phone')
                       }}
                       focusColor="#42307D"
-                       
+
                       startAdornment={<Phone className="h-5 w-5 text-gray-500" />}
                     />
                   </div>
@@ -392,8 +392,8 @@ export default function UserForm({ mode }) {
                       isOptionEqualToValue={(option, val) => option?.id === val?.id}
                       getOptionLabel={(e) => e?.name || ''}
                       onChange={(_e, val) => { setSelectedRole(val); clearError('roleId') }}
-                      focusColor="#42307D"
-                       
+                    // focusColor="#42307D"
+
                     />
                   </div>
 
@@ -416,7 +416,7 @@ export default function UserForm({ mode }) {
                         clearError('companyIds')
                       }}
                       focusColor="#42307D"
-                       
+
                     />
                   </div>
                 </div>
@@ -442,7 +442,7 @@ export default function UserForm({ mode }) {
                         isError={!!errors.password}
                         helperText={errors.password || ''}
                         focusColor="#42307D"
-                         
+
                       />
                     </div>
                     <button

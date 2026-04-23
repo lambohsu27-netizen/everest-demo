@@ -33,35 +33,85 @@ import Service from '../service'
 
 // ── validation schema ──────────────────────────────────────────────────────────
 const schema = yup.object({
-  category: yup.string().required('Category is required'),
+  category: yup
+    .string()
+    .oneOf(['Employee', 'Candidate'])
+    .required('Category is required'),
+
+  // Candidate-specific fields
+  fullName: yup.lazy((value) =>
+    typeof value === 'object' && value !== null
+      ? yup.mixed().required('Full name is required')
+      : yup.string().when('category', {
+          is: 'Candidate',
+          then: (s) =>
+            s
+              .trim()
+              .required('Full name is required')
+              .min(2, 'Full name must be 2-100 characters')
+              .max(100, 'Full name must be 2-100 characters'),
+          otherwise: (s) => s.required('Full name is required'),
+        })
+  ),
   entity: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
-    .required('Entity is required'),
-  fullName: yup.mixed().required('Full name is required'),
+    .when('category', {
+      is: 'Candidate',
+      then: (s) => s.required('Entity is required'),
+      otherwise: (s) => s.nullable(),
+    }),
   level: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
-    .required('Level is required'),
-  position: yup
+    .when('category', {
+      is: 'Candidate',
+      then: (s) => s.required('Level is required'),
+      otherwise: (s) => s.nullable(),
+    }),
+  email: yup.string().when('category', {
+    is: 'Candidate',
+    then: (s) =>
+      s
+        .trim()
+        .required('Email is required')
+        .email('Invalid email'),
+    otherwise: (s) => s.nullable(),
+  }),
+
+  // Employee-specific fields
+  consentExpiry: yup
+    .date()
+    .nullable()
+    .when('category', {
+      is: 'Employee',
+      then: (s) =>
+        s
+          .required('Consent expiry is required')
+          .test(
+            'not-past',
+            'Consent expiry must not be in the past',
+            (value) => {
+              if (!value) return true
+              const today = new Date()
+              today.setHours(0, 0, 0, 0)
+              return new Date(value) >= today
+            }
+          ),
+      otherwise: (s) => s.nullable(),
+    }),
+  repeatEvery: yup
     .object({ label: yup.string(), value: yup.string() })
     .nullable()
     .when('category', {
       is: 'Employee',
-      then: (yupSchema) => yupSchema.required('Position is required'),
-      otherwise: (yupSchema) => yupSchema.optional(),
+      then: (s) => s.required('Repeat every is required'),
+      otherwise: (s) => s.nullable(),
     }),
-  whatsapp: yup.string().when('category', {
-    is: 'Employee',
-    then: (yupSchema) => yupSchema.required('WhatsApp is required'),
-    otherwise: (yupSchema) => yupSchema.optional(),
-  }),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  consentExpiry: yup.date().nullable().required('Consent expiry is required'),
-  repeatEvery: yup
-    .object({ label: yup.string(), value: yup.string() })
-    .nullable()
-    .required('Repeat every is required'),
+
+  // Optional / UI-only fields
+  position: yup.mixed().nullable(),
+  whatsapp: yup.string().nullable(),
 })
 
 // ── static options ────────────────────────────────────────────────────────────
@@ -97,14 +147,23 @@ function SelectField({
   return (
     <div className="flex flex-col gap-0.5">
       <FieldLabel required={required}>{label}</FieldLabel>
-      <MyAutocomplete
+      <Controller
         name={name}
         control={control}
-        options={options}
-        placeholder={placeholder}
-        errors={errors}
-        startAdornment={startAdornment}
-        {...props}
+        render={({ field }) => (
+          <MyAutocomplete
+            name={name}
+            options={options}
+            placeholder={placeholder}
+            error={errors}
+            startAdornment={startAdornment}
+            value={field.value}
+            onChange={(_e, val) => field.onChange(val)}
+            isOptionEqualToValue={(opt, val) => opt?.value === val?.value}
+            getOptionLabel={(e) => e?.label || ''}
+            {...props}
+          />
+        )}
       />
     </div>
   )
@@ -173,24 +232,26 @@ function NewEnquirySlider() {
 
   // ── Submit ────────────────────────────────────────────────────────────
   const onSubmit = handleSubmit(async (data) => {
-    const payload = {
-      category: data.category.toLowerCase(),
-      workforce_id: data.category === 'Employee'
-        ? data.fullName?.value
-        : undefined,
-      // For candidate, send inline data
-      ...(data.category === 'Candidate' && {
-        full_name: data.fullName,
-        email: data.email,
-        phone: data.whatsapp || undefined,
-        company_id: data.entity?.value,
-        employment_level_id: data.level?.value,
-      }),
-      consent_expiry: data.consentExpiry
-        ? format(data.consentExpiry, 'yyyy-MM-dd')
-        : undefined,
-      repeat_every: data.repeatEvery?.value || 'none',
-    }
+    const isEmployee = data.category === 'Employee'
+    const payload = isEmployee
+      ? {
+          category: 'employee',
+          workforce_id: data.fullName?.value,
+          consent_expiry: data.consentExpiry
+            ? format(data.consentExpiry, 'yyyy-MM-dd')
+            : undefined,
+          repeat_every: data.repeatEvery?.value,
+        }
+      : {
+          category: 'candidate',
+          company_id: data.entity?.value,
+          full_name:
+            typeof data.fullName === 'string'
+              ? data.fullName
+              : data.fullName?.label,
+          employment_level_id: data.level?.value,
+          email: data.email,
+        }
 
     await Service.create(payload)
       .then((res) => {
@@ -436,7 +497,8 @@ function NewEnquirySlider() {
                 </div>
               </MyDoubleCard>
 
-              {/* Request option card */}
+              {/* Request option card (Employee only) */}
+              {category === 'Employee' && (
               <MyDoubleCard heading="Request option" innerClassName="p-4">
                 <div className="flex flex-col gap-5">
                   {/* Consent Expiry */}
@@ -512,6 +574,7 @@ function NewEnquirySlider() {
                   />
                 </div>
               </MyDoubleCard>
+              )}
             </div>
           </SimpleBar>
         </section>

@@ -3,35 +3,67 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { File02 } from '@untitled-ui/icons-react'
 import { MyConfirmModalWithChildren } from '@interstellar-component'
+import { format } from 'date-fns'
 
-export default function JobApplicationLetterModal({ open, onClose, content, zIndex = 3000 }) {
-  // Figma Default Content
-  const defaultContent = `
-    <p>Kepada Yth.<br>HRD / Bagian Sumber Daya Manusia<br><strong>[Nama Perusahaan]</strong><br>di Tempat</p>
+function formatDob(dateStr) {
+  if (!dateStr) return null
+  try {
+    return format(new Date(dateStr), 'd MMMM yyyy')
+  } catch {
+    return null
+  }
+}
+
+function buildLetterContent(data) {
+  const companyName = data?.companyName || '[Nama Perusahaan]'
+  const fullName = data?.fullName || '[Nama Lengkap]'
+  const birthPlace = data?.birthPlace || null
+  const dob = formatDob(data?.dateOfBirth)
+  const placeAndDob =
+    birthPlace && dob
+      ? `${birthPlace}, ${dob}`
+      : dob || birthPlace || '[Tempat, Tanggal Lahir]'
+  const email = data?.email || '[Alamat Email]'
+
+  return `
+    <p>Kepada Yth.<br>HRD / Bagian Sumber Daya Manusia<br><strong>${companyName}</strong><br>di Tempat</p>
     <p>Dengan hormat,<br>Saya yang bertanda tangan di bawah ini:</p>
-    <p>Nama lengkap : <strong>[Nama Lengkap]</strong><br>Tempat, tanggal lahir : <strong>[Tempat, Tanggal Lahir]</strong><br>Email : <strong>[Alamat Email]</strong></p>
-    <p>Dengan ini mengajukan lamaran pekerjaan di <strong>[Nama Perusahaan]</strong>. Saya bersedia mengikuti seluruh proses seleksi sesuai dengan ketentuan yang berlaku.</p>
+    <p>Nama lengkap : <strong>${fullName}</strong><br>Tempat, tanggal lahir : <strong>${placeAndDob}</strong><br>Email : <strong>${email}</strong></p>
+    <p>Dengan ini mengajukan lamaran pekerjaan di <strong>${companyName}</strong>. Saya bersedia mengikuti seluruh proses seleksi sesuai dengan ketentuan yang berlaku.</p>
     <p>Demikian surat lamaran ini saya sampaikan. Atas perhatian Bapak/Ibu, saya ucapkan terima kasih.</p>
-    <p>Hormat saya,<br><strong>[Nama Lengkap]</strong></p>
+    <p>Hormat saya,<br><strong>${fullName}</strong></p>
   `
+}
 
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: content || defaultContent,
-    editable: false,
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none text-[#535862] leading-relaxed',
+export default function JobApplicationLetterModal({
+  open,
+  onClose,
+  content,
+  data,
+  zIndex = 3000,
+}) {
+  const resolvedContent = content || buildLetterContent(data)
+
+  const editor = useEditor(
+    {
+      extensions: [StarterKit],
+      content: resolvedContent,
+      editable: false,
+      editorProps: {
+        attributes: {
+          class:
+            'prose prose-sm max-w-none focus:outline-none text-[#535862] leading-relaxed',
+        },
       },
     },
-  }, [content, open])
+    [resolvedContent, open]
+  )
 
-  // Reset content when modal opens/content changes
   React.useEffect(() => {
     if (editor && open) {
-      editor.commands.setContent(content || defaultContent)
+      editor.commands.setContent(resolvedContent)
     }
-  }, [editor, open, content, defaultContent])
+  }, [editor, open, resolvedContent])
 
   return (
     <MyConfirmModalWithChildren
@@ -51,7 +83,7 @@ export default function JobApplicationLetterModal({ open, onClose, content, zInd
       <div className="min-h-[300px] py-2">
         <EditorContent editor={editor} />
       </div>
-      
+
       <style>{`
         .prose strong {
           color: #181d27;

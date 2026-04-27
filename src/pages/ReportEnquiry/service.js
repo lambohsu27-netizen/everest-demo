@@ -2,7 +2,7 @@ import { get, post, patch, remove, download } from '../../services/NetworkUtils'
 
 const Service = {
   getList: async (params) => await get('/v1/report-enquiry', params),
-  show: async (id) => await get(`/v1/report-enquiry/${id}`),
+  show: async (id, params) => await get(`/v1/report-enquiry/${id}`, params),
   create: async (data) => await post('/v1/report-enquiry', data),
   import: async (data) => await post('/v1/report-enquiry/import', data, 'form-data'),
   delete: async (body) => await remove('/v1/report-enquiry', body),
@@ -18,6 +18,7 @@ const Service = {
   cancel: async (id) => await patch(`/v1/report-enquiry/${id}/cancel`),
   resend: async (id) => await patch(`/v1/report-enquiry/${id}/resend`),
   reject: async (id, data) => await patch(`/v1/report-enquiry/${id}/reject`, data),
+  submit: async (id) => await patch(`/v1/report-enquiry/${id}/submit`),
 
   // Options
   getCompanyOptions: async (params) =>

@@ -8,7 +8,7 @@ import {
   MyButton 
 } from '@interstellar-component'
 
-export default function RejectResendForm({ open, onClose, onConfirm, zIndex }) {
+export default function RejectResendForm({ open, onClose, onConfirm, zIndex, loading }) {
   const [notes, setNotes] = useState('')
   const [reasons, setReasons] = useState([])
 
@@ -28,6 +28,7 @@ export default function RejectResendForm({ open, onClose, onConfirm, zIndex }) {
         variant="outlined"
         size="lg"
         onClick={onClose}
+        disabled={loading}
       >
         Cancel
       </MyButton>
@@ -37,9 +38,10 @@ export default function RejectResendForm({ open, onClose, onConfirm, zIndex }) {
         variant="outlined"
         size="lg"
         onClick={() => onConfirm?.({ reasons, notes })}
+        disabled={loading}
         customClassname="!border-brand/300 !text-brand/700 hover:!bg-brand/50"
       >
-        Reject & Resend Form
+        {loading ? 'Submitting...' : 'Reject & Resend Form'}
       </MyButton>
     </div>
   )
@@ -94,8 +96,8 @@ export default function RejectResendForm({ open, onClose, onConfirm, zIndex }) {
           <div className="flex items-center gap-3">
             <MyCheckbox 
               name="reason2" 
-              checked={reasons.includes('face_mismatch')}
-              onChangeForm={(e) => handleReasonToggle('face_mismatch', e.target.checked)}
+              checked={reasons.includes('face_verify_failed')}
+              onChangeForm={(e) => handleReasonToggle('face_verify_failed', e.target.checked)}
             />
             <MyChip 
               label="Verifikasi wajah gagal" 

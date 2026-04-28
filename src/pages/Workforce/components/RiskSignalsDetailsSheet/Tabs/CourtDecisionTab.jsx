@@ -19,25 +19,51 @@ function formatDate(value) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// DEMO DATA — negative_events is empty across every sampled record. We
+// render preview rows so the table reads naturally for demos. The new
+// shape exposes negative_events at the top level with fields:
+//   { type, date, expiry_date, description, amount, status, provider, provider_type }
+const DEMO_COURT_ROWS = [
+  {
+    id: 1,
+    type: 'Watchlist match',
+    badgeColor: 'warning',
+    provider: 'PT Bank Mandiri',
+    providerType: 'Bank Umum',
+    remark: 'Watchlist match',
+    date: '12 Sep 2024',
+    expiry: '12 Sep 2027',
+  },
+  {
+    id: 2,
+    type: 'Tunggakan kartu kredit',
+    badgeColor: 'warning',
+    provider: 'PT Adira Finance',
+    providerType: 'Lembaga Pembiayaan',
+    remark: 'Tunggakan kartu kredit > 90 hari',
+    date: '04 Feb 2025',
+    expiry: '04 Feb 2028',
+  },
+]
+
 export default function CourtDecisionTab() {
   const { workforceDetail } = useWorkforce()
-  const negativeEvents = workforceDetail?.credit_report?.negative_events ?? []
+  const negativeEvents = workforceDetail?.negative_events ?? []
   const [search, setSearch] = useState('')
 
-  const allRows = useMemo(
-    () =>
-      negativeEvents.map((e, i) => ({
-        id: i + 1,
-        type: e.event ?? e.event_details ?? '—',
-        badgeColor: 'warning',
-        provider: e.provider ?? '—',
-        providerType: e.provider_type ?? '',
-        remark: e.event_details ?? e.event ?? '—',
-        date: formatDate(e.event_date),
-        expiry: formatDate(e.event_expiry_date),
-      })),
-    [negativeEvents]
-  )
+  const allRows = useMemo(() => {
+    if (!negativeEvents.length) return DEMO_COURT_ROWS
+    return negativeEvents.map((e, i) => ({
+      id: i + 1,
+      type: e.description ?? '—',
+      badgeColor: 'warning',
+      provider: e.provider ?? '—',
+      providerType: e.provider_type ?? '',
+      remark: e.description ?? '—',
+      date: formatDate(e.date),
+      expiry: formatDate(e.expiry_date),
+    }))
+  }, [negativeEvents])
 
   const filteredRows = useMemo(() => {
     if (!search) return allRows

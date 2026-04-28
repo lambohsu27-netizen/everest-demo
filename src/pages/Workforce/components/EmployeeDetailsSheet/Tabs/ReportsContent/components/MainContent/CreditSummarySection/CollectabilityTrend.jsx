@@ -1,25 +1,16 @@
 import React, { useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { useWorkforce } from '../../../../../../../Context'
-
-const MONTH_ORDER = {
-  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
-}
-
-function parseTrendDate(s) {
-  if (!s) return 0
-  const [year, mon] = String(s).split(' ')
-  return Number(year) * 12 + (MONTH_ORDER[mon] ?? 0)
-}
+import { formatMonthLabel, parseMonthKey } from '../../../../../adapters/workforceDetailAdapter'
 
 export default function CollectabilityTrend() {
-  const { workforceDetail } = useWorkforce()
-  const trend = workforceDetail?.credit_report?.collectability_trend ?? []
+  const { workforceDetailReport } = useWorkforce()
+  const trend = workforceDetailReport?.credit_summary?.collectability_trend ?? []
 
   const { categories, dpd, kol } = useMemo(() => {
-    const sorted = [...trend].sort((a, b) => parseTrendDate(a.date) - parseTrendDate(b.date))
+    const sorted = [...trend].sort((a, b) => parseMonthKey(a.date) - parseMonthKey(b.date))
     return {
-      categories: sorted.map((d) => d.date),
+      categories: sorted.map((d) => formatMonthLabel(d.date)),
       dpd: sorted.map((d) => Number(d.dpd) || 0),
       kol: sorted.map((d) => Number(d.kol) || 0),
     }

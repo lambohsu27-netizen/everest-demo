@@ -17,8 +17,11 @@ function formatDate(value) {
 }
 
 export default function SummaryListCard() {
-  const { workforceDetail } = useWorkforce()
-  const summary = workforceDetail?.credit_report?.credit_summary ?? {}
+  const { workforceDetailReport } = useWorkforce()
+  const summary = workforceDetailReport?.credit_summary ?? {}
+  // The new shape moved these three values into a single `lorem_ipsum` slot
+  // (placeholder card name from Figma) on credit_summary.
+  const li = summary.lorem_ipsum ?? {}
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col h-full">
@@ -30,19 +33,19 @@ export default function SummaryListCard() {
           <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular border-b border-gray-100 pb-6">
             <span className="text-gray-600 min-w-[120px]">Estimasi cicilan/bulan</span>
             <span className="font-bold text-gray-900 whitespace-nowrap">
-              {formatIDR(summary.monthly_installment_estimate)}
+              {formatIDR(li.estimated_monthly_installment)}
             </span>
           </div>
           <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular border-b border-gray-100 pb-6">
             <span className="text-gray-600 min-w-[120px]">Fasilitas paling awal</span>
             <span className="font-bold text-gray-900 whitespace-nowrap">
-              {formatDate(summary.facility_dates?.earliest)}
+              {formatDate(li.earliest_facility)}
             </span>
           </div>
           <div className="flex flex-wrap justify-between items-center gap-2 text-md-regular">
             <span className="text-gray-600 min-w-[120px]">Fasilitas terbaru</span>
             <span className="font-bold text-gray-900 whitespace-nowrap">
-              {formatDate(summary.facility_dates?.latest)}
+              {formatDate(li.latest_facility)}
             </span>
           </div>
         </div>

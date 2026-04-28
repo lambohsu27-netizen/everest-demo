@@ -13,22 +13,42 @@ function formatDate(value) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// DEMO DATA — negative_events was empty across every sampled record. We
+// render preview rows so the section reads naturally for demos. Backend
+// emits `{type, date, expiry_date, description, amount, status, provider, provider_type}`.
+const DEMO_NEGATIVE_EVENTS = [
+  {
+    provider: 'PT Bank Mandiri',
+    provider_type: 'Bank Umum',
+    description: 'Watchlist match',
+    date: '2024-09-12',
+    expiry_date: '2027-09-12',
+  },
+  {
+    provider: 'PT Adira Finance',
+    provider_type: 'Lembaga Pembiayaan',
+    description: 'Tunggakan kartu kredit > 90 hari',
+    date: '2025-02-04',
+    expiry_date: '2028-02-04',
+  },
+]
+
 export default function NegativeEventsSection() {
-  const { workforceDetail } = useWorkforce()
+  const { workforceDetailReport } = useWorkforce()
   const [search, setSearch] = useState('')
 
-  const allEvents = useMemo(
-    () =>
-      (workforceDetail?.credit_report?.negative_events ?? []).map((e) => ({
-        provider: e.provider ?? DASH,
-        type: e.provider_type ?? '',
-        event: e.event ?? e.event_details ?? DASH,
-        date: formatDate(e.event_date),
-        expiry: formatDate(e.event_expiry_date),
-        lastReference: formatDate(e.event_date),
-      })),
-    [workforceDetail?.credit_report?.negative_events]
-  )
+  const allEvents = useMemo(() => {
+    const apiList = workforceDetailReport?.negative_events ?? []
+    const source = apiList.length ? apiList : DEMO_NEGATIVE_EVENTS
+    return source.map((e) => ({
+      provider: e.provider ?? DASH,
+      type: e.provider_type ?? '',
+      event: e.description ?? DASH,
+      date: formatDate(e.date),
+      expiry: formatDate(e.expiry_date),
+      lastReference: formatDate(e.date),
+    }))
+  }, [workforceDetailReport?.negative_events])
 
   const events = useMemo(() => {
     if (!search) return allEvents

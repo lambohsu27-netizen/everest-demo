@@ -10,58 +10,83 @@ import {
 import { useWorkforce } from '../../../../../../Context'
 import RiskSignalCard from './RiskSignalCard'
 
+// Map risk_background_signals key → card config + fallback description used
+// when the AI rationale is not present.
+// DEMO DATA — backend can return a null rationale when the AI errors; the
+// static description is used as a placeholder so cards always render copy.
+const SIGNAL_DEFS = [
+  {
+    key: 'phone_numbers',
+    icon: Phone,
+    title: 'Phone Numbers',
+    highlightText: 'contact records',
+    fallback: (count) => `${count} contact record(s) found across reports.`,
+    color: 'text-green-400',
+  },
+  {
+    key: 'address_records',
+    icon: MarkerPin01,
+    title: 'Address Records',
+    highlightText: 'address',
+    fallback: (count) => `${count} address record(s) associated with this subject.`,
+    color: 'text-blue-light/600',
+  },
+  {
+    key: 'court_decisions',
+    icon: PenTool01,
+    title: 'Court Decision',
+    highlightText: 'court decisions',
+    fallback: () =>
+      'Records include financial disputes and debt-related cases, which may increase financial risk exposure.',
+    color: 'text-error/600',
+  },
+  {
+    key: 'employment_records',
+    icon: Briefcase02,
+    title: 'Employment Records',
+    highlightText: 'employment',
+    fallback: (count) => `${count} employment record(s) on file.`,
+    color: 'text-fuchsia-600',
+  },
+  {
+    key: 'footprint',
+    icon: FileSearch02,
+    title: 'Footprints',
+    highlightText: 'Footprints enquiry',
+    fallback: (count) => `${count} external enquiry/ies across financial institutions.`,
+    color: 'text-yellow-600',
+  },
+]
+
 export default function RiskSignalsSection() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { workforceDetail } = useWorkforce()
-  const rs = workforceDetail?.credit_report?.risk_signals ?? {}
+  const { workforceDetailReport } = useWorkforce()
+  const signalsApi = workforceDetailReport?.risk_background_signals ?? {}
 
   const handleViewDetails = (signal) => {
     navigate(`/workforce/employee/${id}/risk-signals?tab=${signal.title}`)
   }
 
-  const signals = [
-    {
-      icon: Phone,
-      title: 'Phone Numbers',
-      count: String(rs.contact_count ?? 0),
-      highlightText: 'contact records',
-      description: `${rs.contact_count ?? 0} contact record(s) found across reports.`,
-      color: 'text-green-400',
-    },
-    {
-      icon: MarkerPin01,
-      title: 'Address Records',
-      count: String(rs.address_count ?? 0),
-      highlightText: 'address',
-      description: `${rs.address_count ?? 0} address record(s) associated with this subject.`,
-      color: 'text-blue-light/600',
-    },
-    {
-      icon: PenTool01,
-      title: 'Court Decision',
-      count: String(rs.court_decision_count ?? 0),
-      highlightText: 'court decisions',
-      description: 'Records include financial disputes and debt-related cases, which may increase financial risk exposure.',
-      color: 'text-error/600',
-    },
-    {
-      icon: Briefcase02,
-      title: 'Employment Records',
-      count: String(rs.employment_count ?? 0),
-      highlightText: 'employment',
-      description: `${rs.employment_count ?? 0} employment record(s) on file.`,
-      color: 'text-fuchsia-600',
-    },
-    {
-      icon: FileSearch02,
-      title: 'Footprints',
-      count: String(rs.footprint_enquiry_count ?? 0),
-      highlightText: 'Footprints enquiry',
-      description: `${rs.footprint_enquiry_count ?? 0} external enquiry/ies across financial institutions.`,
-      color: 'text-yellow-600',
-    },
-  ]
+  // Older snapshots ship bare numbers for each signal (e.g. phone_numbers: 4).
+  // The new shape wraps each signal as { count, rationale }. We accept both
+  // so partially-baked records still render counts even when the AI rationale
+  // hasn't been produced yet.
+  const signals = SIGNAL_DEFS.map((def) => {
+    const cell = signalsApi[def.key]
+    const isObj = cell && typeof cell === 'object'
+    const count = Number(isObj ? cell.count : cell) || 0
+    const apiRationale = isObj ? cell.rationale : null
+    const description = apiRationale || def.fallback(count)
+    return {
+      icon: def.icon,
+      title: def.title,
+      count: String(count),
+      highlightText: def.highlightText,
+      description,
+      color: def.color,
+    }
+  })
 
   return (
     <div className="flex flex-col gap-6">

@@ -21,8 +21,11 @@ function relativeTime(value) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// DEMO DATA — backoffice-service/modules/workforce/workforce.repositories.js:147
+// TODO: wire activity_logs. The personal_information endpoint always returns
+// `activity: []` today. Until that joiner ships we synthesise a feed from the
+// list-row timestamps so the timeline always reads like a real audit trail.
 function deriveActivities(employee) {
-  const credit = employee?.credit_report
   const emp = employee?.employment_detail
   const items = []
   if (employee?.created_at) {
@@ -46,13 +49,6 @@ function deriveActivities(employee) {
       supportingText: 'Employment details verified.',
     })
   }
-  if (credit?.clik_completed_at) {
-    items.push({
-      title: 'CLIK report completed',
-      subtext: relativeTime(credit.clik_completed_at),
-      supportingText: `Credit report${credit.enquiry_id ? ` (${credit.enquiry_id})` : ''} retrieved from CLIK.`,
-    })
-  }
   if (employee?.updated_at && employee.updated_at !== employee.created_at) {
     items.push({
       title: 'Record updated',
@@ -63,8 +59,20 @@ function deriveActivities(employee) {
   return items.sort((a, b) => (a.subtext.length > b.subtext.length ? -1 : 1))
 }
 
-export default function ActivityFeed({ employee }) {
-  const activities = deriveActivities(employee)
+function mapApiActivity(item) {
+  // Backend shape (per workforce.repositories.js#buildPersonalInformationShape):
+  //   { id, action, change_summary, user: {id, name, avatar_url}, created_at }
+  return {
+    title: item.action ?? 'Activity',
+    subtext: relativeTime(item.created_at),
+    supportingText: item.change_summary ?? '',
+    avatarUrl: item.user?.avatar_url ?? null,
+  }
+}
+
+export default function ActivityFeed({ personalDetail, employee }) {
+  const apiList = personalDetail?.activity ?? []
+  const activities = apiList.length ? apiList.map(mapApiActivity) : deriveActivities(employee)
   if (activities.length === 0) {
     return (
       <div className="flex flex-col gap-[2px] rounded-xl border border-gray-200 bg-[#fdfdfd] shadow-sm">

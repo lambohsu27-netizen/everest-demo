@@ -3,37 +3,18 @@ import { MyDoubleCard } from '@interstellar-component'
 import { useWorkforce } from '../../../../../../Context'
 import RiskAssessmentTable from './RiskAssessmentTable'
 
-function formatIDR(n) {
-  const v = Number(n) || 0
-  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
-}
-
-function buildTakeaway(credit) {
-  if (!credit) return 'No credit report available yet.'
-  const summary = credit.credit_summary ?? {}
-  const kol = summary.collectability_status?.kol
-  const riskLevel = summary.credit_score?.risk_level
-  const overdue = summary.total_overdue_loans
-  const outstanding = summary.total_outstanding_loans
-  const negCount = credit.risk_signals?.negative_event_count
-  const lines = []
-  if (riskLevel) lines.push(`Overall credit risk is assessed as ${riskLevel}.`)
-  if (kol != null)
-    lines.push(
-      `Latest collectability status is KOL ${kol}${
-        summary.collectability_status?.worst_dpd ? ` (worst DPD ${summary.collectability_status.worst_dpd})` : ''
-      }.`
-    )
-  if (outstanding != null) lines.push(`Outstanding balance totals ${formatIDR(outstanding)} with overdue of ${formatIDR(overdue)}.`)
-  if (negCount != null && negCount > 0)
-    lines.push(`${negCount} negative event(s) recorded in the file.`)
-  if (lines.length === 0) return 'No significant credit signals detected.'
-  return lines.join(' ')
-}
+// DEMO DATA — overview.key_takeaway is null when the AI step errored or CLIK
+// returned no parseable data. Shown so the section never collapses to blank.
+const DEMO_KEY_TAKEAWAY =
+  'Watch-list: profil kredit kandidat masih tipis dan belum dapat dinilai secara penuh. '
+  + 'Tidak ada kejadian negatif yang tercatat, namun riwayat kontrak yang ditolak menandakan '
+  + 'reputasi pengajuan yang perlu diverifikasi langsung dengan kandidat sebelum onboarding.'
 
 export default function OverviewSection() {
-  const { workforceDetail } = useWorkforce()
-  const takeaway = buildTakeaway(workforceDetail?.credit_report)
+  const { workforceDetailReport } = useWorkforce()
+  const apiTakeaway = workforceDetailReport?.overview?.key_takeaway
+  const takeaway = apiTakeaway ?? DEMO_KEY_TAKEAWAY
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">

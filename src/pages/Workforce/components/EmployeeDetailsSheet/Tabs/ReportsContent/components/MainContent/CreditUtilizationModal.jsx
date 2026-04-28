@@ -16,29 +16,22 @@ function formatIDR(n) {
   return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
 }
 
+// DEMO DATA — backend dropped major_credit_facilities. The new shape only
+// exposes credit_overview.credit_utilization (aggregate) — no per-facility
+// breakdown. Until that data is re-exposed, we show a preview list so the
+// modal still reads as a credit-bureau drill-down.
+const DEMO_FACILITY_ROWS = [
+  { id: 1, pelapor: 'PT Bank Mandiri', providerType: 'Bank Umum', jenis: 'Credit Card', bakiDebet: 'Rp 8.200.000', plafon: 'Rp 12.000.000', penggunaan: 68 },
+  { id: 2, pelapor: 'PT Bank Central Asia', providerType: 'Bank Umum', jenis: 'Credit Card', bakiDebet: 'Rp 4.250.000', plafon: 'Rp 6.000.000', penggunaan: 71 },
+  { id: 3, pelapor: 'Kredivo', providerType: 'Fintech P2P', jenis: 'Paylater', bakiDebet: 'Rp 850.000', plafon: 'Rp 2.000.000', penggunaan: 43 },
+  { id: 4, pelapor: 'PT Bank Rakyat Indonesia', providerType: 'Bank Umum', jenis: 'KKB', bakiDebet: 'Rp 87.500.000', plafon: 'Rp 100.000.000', penggunaan: 88 },
+  { id: 5, pelapor: 'PT Bank Negara Indonesia', providerType: 'Bank Umum', jenis: 'KPR', bakiDebet: 'Rp 412.300.000', plafon: 'Rp 500.000.000', penggunaan: 82 },
+]
+
 export default function CreditUtilizationModal({ open, onClose }) {
-  const { workforceDetail } = useWorkforce()
-  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
   const [search, setSearch] = useState('')
 
-  const allData = useMemo(
-    () =>
-      facilities.map((f, i) => {
-        const debit = Number(f.debit_balance) || 0
-        const limit = Number(f.credit_limit) || 0
-        const pct = limit > 0 ? Math.round((debit / limit) * 100) : 0
-        return {
-          id: i,
-          pelapor: f.provider ?? '—',
-          providerType: f.provider_type ?? '',
-          jenis: f.contract_type ?? '—',
-          bakiDebet: formatIDR(debit),
-          plafon: formatIDR(limit),
-          penggunaan: pct,
-        }
-      }),
-    [facilities]
-  )
+  const allData = useMemo(() => DEMO_FACILITY_ROWS, [])
 
   const filteredData = useMemo(() => {
     if (!search) return allData

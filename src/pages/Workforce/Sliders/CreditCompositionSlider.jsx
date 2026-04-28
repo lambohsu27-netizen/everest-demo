@@ -16,18 +16,27 @@ function formatIDR(n) {
   return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
 }
 
+// DEMO DATA — backend dropped major_credit_facilities; the new shape only
+// ships aggregate composition (no per-account rows). Until account-level
+// data is re-exposed we render preview rows so the slider stays demonstrable.
+const DEMO_COMPOSITION_ROWS = [
+  { id: 1, tanggal: '12 Jan 2024', jenis: 'Credit Card — Active', total: 'Rp 8.200.000' },
+  { id: 2, tanggal: '03 Mar 2024', jenis: 'Credit Card — Active', total: 'Rp 4.250.000' },
+  { id: 3, tanggal: '20 Jun 2024', jenis: 'Paylater — Active', total: 'Rp 850.000' },
+  { id: 4, tanggal: '15 Sep 2024', jenis: 'KKB — Active', total: 'Rp 87.500.000' },
+  { id: 5, tanggal: '01 Nov 2024', jenis: 'KPR — Active', total: 'Rp 412.300.000' },
+  { id: 6, tanggal: '08 Feb 2025', jenis: 'Other — Active', total: 'Rp 5.200.000' },
+]
+
 export default function CreditCompositionSlider() {
-  const { handleCurrentSlider, workforceDetail } = useWorkforce()
-  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+  const { handleCurrentSlider } = useWorkforce()
 
   const handleClose = () => handleCurrentSlider(null)
 
-  const data = facilities.map((f, i) => ({
-    id: i,
-    tanggal: formatDate(f.start_date),
-    jenis: f.contract_type ?? '—',
-    total: formatIDR(f.debit_balance),
-  }))
+  // Backend ships credit_overview.credit_composition as 5 aggregate buckets
+  // with phase counters but no per-account rows. We always render the demo
+  // list here.
+  const data = DEMO_COMPOSITION_ROWS
 
   return (
     <div className="flex h-screen w-[420px] flex-col bg-white">

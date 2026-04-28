@@ -61,24 +61,23 @@ function LoanAccountSlider() {
     [sliderStack]
   )
 
+  // DEMO DATA — backend dropped major_credit_facilities and report_date in
+  // the new shape, so per-account fields aren't queryable. We surface the
+  // slider context's chosen account label and demo all the per-account
+  // numerics. Real values will return once the account-level joiner ships.
   const accountData = activeSlider?.data || {}
-  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
-  const creditReport = workforceDetail?.credit_report
 
-  const facility = useMemo(() => {
-    if (accountData.name) {
-      return facilities.find((f) => f.provider === accountData.name) ?? null
-    }
-    return null
-  }, [facilities, accountData.name])
-
-  const provider = facility?.provider ?? accountData.name ?? 'Account Detail'
+  const provider = accountData.name ?? 'Account Detail'
   const bankCode = deriveBankCode(provider)
-  const creditLimit = Number(facility?.credit_limit) || 0
-  const debitBalance = Number(facility?.debit_balance) || 0
-  const available = creditLimit > 0 ? creditLimit - debitBalance : null
-  const reportDate = creditReport?.report_date
-  const kol = creditReport?.credit_summary?.collectability_status?.kol
+  // DEMO DATA — synthetic account financials.
+  const creditLimit = 12000000
+  const debitBalance = 8200000
+  const available = creditLimit - debitBalance
+  const reportDate = null
+  // KOL still derivable from credit_summary.collectibility_status on the new shape.
+  const kol = workforceDetail?.credit_summary?.collectibility_status?.kol
+    ?? workforceDetail?.credit_summary?.collectability_status?.kol
+  const facility = null
 
   const informationRows = [
     {

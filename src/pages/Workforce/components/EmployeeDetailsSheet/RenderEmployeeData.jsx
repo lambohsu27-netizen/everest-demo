@@ -3,15 +3,15 @@ import ProfileHeader from './ProfileHeader'
 import PersonalInformation from './Tabs/PersonalInformation'
 import ReportsContent from './Tabs/ReportsContent/index'
 import NoReportData from './NoReportData'
+import { isNewReportShape } from './adapters/workforceDetailAdapter'
 
-/**
- * @param {object} props
- * @param {object} props.employee
- */
-export default function RenderEmployeeData({ employee, isLoadingDetail = false }) {
+export default function RenderEmployeeData({ employee, reportDetail, personalDetail, isLoadingDetail = false }) {
   const { currentTabs } = useEmployeeDetailsSheet()
 
-  const hasReportData = Boolean(employee.credit_report)
+  // Old snapshots (legacy shape) intentionally fall through to the empty
+  // state — see plan §"User-confirmed scope decisions". Only the new shape
+  // exposes report sections.
+  const hasReportData = isNewReportShape(reportDetail)
 
   const renderContent = () => {
     if (isLoadingDetail) {
@@ -22,7 +22,7 @@ export default function RenderEmployeeData({ employee, isLoadingDetail = false }
       )
     }
     if (currentTabs.type === 'personal_information') {
-      return <PersonalInformation employee={employee} />
+      return <PersonalInformation personalDetail={personalDetail} employee={employee} />
     }
     if (!hasReportData) {
       return <NoReportData />

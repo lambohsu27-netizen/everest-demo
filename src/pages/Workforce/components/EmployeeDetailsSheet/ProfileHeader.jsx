@@ -47,8 +47,12 @@ export default function ProfileHeader({ employee }) {
     { label: 'Personal information', value: 'personal_information' },
   ]
 
+  // The new detail response keeps consent at the top level under
+  // `consent_expiry_at`; the list row exposes the same value as
+  // `consent_expiry`. Read both so the header works whether we have just the
+  // row cache or the full detail.
   const consentStatus = employee.consent_status ?? employee.consentStatus
-  const consentExpiry = employee.consent_expiry ?? employee.consentExpiry
+  const consentExpiry = employee.consent_expiry_at ?? employee.consent_expiry ?? employee.consentExpiry
   const expiryLabel = formatConsentExpiry(consentExpiry)
   const code = employee.workforce_code ?? employee.code ?? employee.employeeId
 

@@ -1,25 +1,18 @@
 import React, { useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import { useWorkforce } from '../../../../../../../Context'
-
-const MONTH_ORDER = {
-  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
-}
-
-function parseTrendDate(s) {
-  if (!s) return 0
-  const [year, mon] = String(s).split(' ')
-  return Number(year) * 12 + (MONTH_ORDER[mon] ?? 0)
-}
+import { formatMonthLabel, parseMonthKey } from '../../../../../adapters/workforceDetailAdapter'
 
 export default function CreditScoreTrend() {
-  const { workforceDetail } = useWorkforce()
-  const trend = workforceDetail?.credit_report?.credit_score_trend ?? []
+  const { workforceDetailReport } = useWorkforce()
+  const trend = workforceDetailReport?.credit_summary?.credit_score_trend ?? []
 
   const { categories, outstanding, overdue } = useMemo(() => {
-    const sorted = [...trend].sort((a, b) => parseTrendDate(a.date) - parseTrendDate(b.date))
+    // Backend now ships YYYY-MM dates; we sort numerically and re-render the
+    // x-axis label as "MMM YYYY" so the chart still reads naturally.
+    const sorted = [...trend].sort((a, b) => parseMonthKey(a.date) - parseMonthKey(b.date))
     return {
-      categories: sorted.map((d) => d.date),
+      categories: sorted.map((d) => formatMonthLabel(d.date)),
       outstanding: sorted.map((d) => Number(d.outstanding) || 0),
       overdue: sorted.map((d) => Number(d.overdue) || 0),
     }

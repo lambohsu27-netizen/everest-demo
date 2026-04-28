@@ -16,28 +16,32 @@ function getName(obj) {
   return obj.name ?? null
 }
 
-/**
- * @param {object} props
- * @param {object} props.employee
- */
-export default function GeneralInfoCard({ employee }) {
-  const consentStatus = employee.consent_status ?? employee.consentStatus
-  const consentExpiry = employee.consent_expiry ?? employee.consentExpiry
-  const code = employee.workforce_code ?? employee.code ?? employee.employeeId
+// Reads from the new /v1/workforce/:id?type=personal_information shape:
+//   { general_information: {name, code, mobile_phone, email, gender, place_of_birth,
+//     date_of_birth, nik, level, category, company, consent_status, consent_expiry_at} }
+// `employee` is the merged list-row cache; we still pull `position` from there
+// because the personal_information mode doesn't include it.
+export default function GeneralInfoCard({ personalDetail, employee = {} }) {
+  const gi = personalDetail?.general_information ?? {}
+
+  const consentStatus = gi.consent_status
+  const consentExpiry = gi.consent_expiry_at
+  const code = gi.code ?? employee.workforce_code
 
   const fields = [
-    { label: 'Name & ID', value: employee.full_name ?? employee.name, subtext: code },
-    { label: 'Mobile phone', value: employee.phone ?? employee.phoneNumber },
-    { label: 'Email address', value: employee.email },
-    { label: 'Jenis Kelamin', value: employee.gender },
-    { label: 'Tanggal Lahir', value: formatDate(employee.date_of_birth ?? employee.birthDate) },
-    { label: 'NIK', value: employee.id_number ?? employee.nik },
-    { label: 'Level', value: getName(employee.employment_level) ?? employee.level },
+    { label: 'Name & ID', value: gi.name ?? employee.full_name ?? employee.name, subtext: code },
+    { label: 'Mobile phone', value: gi.mobile_phone ?? employee.phone },
+    { label: 'Email address', value: gi.email ?? employee.email },
+    { label: 'Jenis Kelamin', value: gi.gender ?? employee.gender },
+    { label: 'Tempat Lahir', value: gi.place_of_birth },
+    { label: 'Tanggal Lahir', value: formatDate(gi.date_of_birth ?? employee.date_of_birth) },
+    { label: 'NIK', value: gi.nik ?? employee.id_number },
+    { label: 'Level', value: gi.level ?? getName(employee.employment_level) },
     { label: 'Position', value: getName(employee.position) ?? employee.position_title },
-    { label: 'Category', value: employee.category },
-    { label: 'Company', value: getName(employee.company) },
-    ...(consentStatus !== undefined
-      ? [{ label: 'Consent Status', value: consentStatus ?? DASH, isBadge: true }]
+    { label: 'Category', value: gi.category ?? employee.category },
+    { label: 'Company', value: gi.company ?? getName(employee.company) },
+    ...(consentStatus !== undefined && consentStatus !== null
+      ? [{ label: 'Consent Status', value: consentStatus, isBadge: true }]
       : []),
     { label: 'Consent expiry', value: formatDate(consentExpiry) },
   ]

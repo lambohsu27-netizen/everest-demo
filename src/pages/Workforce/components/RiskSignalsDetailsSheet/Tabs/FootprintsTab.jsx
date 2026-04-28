@@ -18,23 +18,21 @@ function formatDate(value) {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// DEMO DATA — the new shape only ships `risk_background_signals.footprint.count`
+// (count + AI rationale, no per-enquiry rows). Backend doesn't expose the
+// underlying enquiry list. We render preview rows so the table reads naturally.
+const DEMO_FOOTPRINT_ENQUIRIES = [
+  { id: 1, name: 'PT Bank Mandiri', subtext: 'Bank Umum', purpose: 'Credit Card application', date: '12 Mar 2025' },
+  { id: 2, name: 'PT Adira Finance', subtext: 'Lembaga Pembiayaan', purpose: 'Vehicle loan', date: '04 Apr 2025' },
+  { id: 3, name: 'Kredivo', subtext: 'Fintech P2P', purpose: 'Paylater enrollment', date: '21 Apr 2025' },
+]
+
 export default function FootprintsTab() {
   const { workforceDetail } = useWorkforce()
-  const footprint = workforceDetail?.credit_report?.footprint ?? {}
-  const enquiryCounts = footprint.enquiry_counts ?? {}
+  const footprintCount = Number(workforceDetail?.risk_background_signals?.footprint?.count) || 0
   const [search, setSearch] = useState('')
 
-  const allRows = useMemo(
-    () =>
-      (footprint.last_enquiries ?? []).map((e, i) => ({
-        id: i,
-        name: e.institute ?? '—',
-        subtext: e.type ?? '',
-        purpose: e.purpose ?? '—',
-        date: formatDate(e.date),
-      })),
-    [footprint.last_enquiries]
-  )
+  const allRows = useMemo(() => DEMO_FOOTPRINT_ENQUIRIES, [])
 
   const filteredRows = useMemo(() => {
     if (!search) return allRows
@@ -49,7 +47,7 @@ export default function FootprintsTab() {
 
   const onSearchChange = useMemo(() => debounce((e) => setSearch(e.target.value ?? ''), 500), [])
 
-  const totalEnquiries = enquiryCounts['12_months'] ?? allRows.length
+  const totalEnquiries = footprintCount || allRows.length
 
   const indicators = [
     { label: 'Total enquiries (12m)', value: String(totalEnquiries) },

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import ReactApexChart from 'react-apexcharts'
 import ReportSummaryCard from './ReportSummaryCard'
 import { useWorkforce } from '../../../../../../Context'
+import { formatMonthLabel, parseMonthKey } from '../../../../adapters/workforceDetailAdapter'
 
 const AXIS_LABEL_STYLE = {
   colors: '#535862',
@@ -10,32 +11,36 @@ const AXIS_LABEL_STYLE = {
   fontWeight: 400,
 }
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+// DEMO DATA — credit_overview.new_credit_facilities is an empty array for
+// most snapshots in dev. We show a 12-month preview series so the bar chart
+// always has something to render.
+const DEMO_SERIES = [
+  { date: '2025-05', count: 0, total_limit: 0 },
+  { date: '2025-06', count: 1, total_limit: 5000000 },
+  { date: '2025-07', count: 0, total_limit: 0 },
+  { date: '2025-08', count: 2, total_limit: 18000000 },
+  { date: '2025-09', count: 1, total_limit: 9500000 },
+  { date: '2025-10', count: 0, total_limit: 0 },
+  { date: '2025-11', count: 3, total_limit: 22000000 },
+  { date: '2025-12', count: 1, total_limit: 7500000 },
+  { date: '2026-01', count: 2, total_limit: 14000000 },
+  { date: '2026-02', count: 0, total_limit: 0 },
+  { date: '2026-03', count: 1, total_limit: 6000000 },
+  { date: '2026-04', count: 1, total_limit: 8500000 },
+]
 
 export default function NewCreditFacilitiesCard() {
-  const { workforceDetail } = useWorkforce()
-  const facilities = workforceDetail?.credit_report?.major_credit_facilities ?? []
+  const { workforceDetailReport } = useWorkforce()
+  const apiSeries = workforceDetailReport?.credit_overview?.new_credit_facilities ?? []
+  const series = apiSeries.length ? apiSeries : DEMO_SERIES
 
   const { categories, data } = useMemo(() => {
-    // Bucket by YYYY-MM using start_date, last 12 months window (from newest seen)
-    const buckets = new Map()
-    facilities.forEach((f) => {
-      if (!f.start_date) return
-      const d = new Date(String(f.start_date).replace(/\//g, '-'))
-      if (Number.isNaN(d.getTime())) return
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-      buckets.set(key, (buckets.get(key) || 0) + 1)
-    })
-    const sortedKeys = Array.from(buckets.keys()).sort()
-    const last12 = sortedKeys.slice(-12)
+    const sorted = [...series].sort((a, b) => parseMonthKey(a.date) - parseMonthKey(b.date))
     return {
-      categories: last12.map((k) => {
-        const [, m] = k.split('-')
-        return MONTH_LABELS[Number(m) - 1]
-      }),
-      data: last12.map((k) => buckets.get(k) || 0),
+      categories: sorted.map((d) => formatMonthLabel(d.date)),
+      data: sorted.map((d) => Number(d.count) || 0),
     }
-  }, [facilities])
+  }, [series])
 
   const options = {
     chart: {
@@ -97,16 +102,16 @@ export default function NewCreditFacilitiesCard() {
     },
   }
 
-  const series = [{ name: 'New facilities', data }]
+  const seriesOpt = [{ name: 'New facilities', data }]
 
   return (
     <ReportSummaryCard
       title="New Credit Facilities"
       description="Newly issued credit facilities over time, indicating borrowing activity and credit demand behavior."
-      onViewReport={false} // TODO: Define action
+      onViewReport={false}
     >
       <div className="w-full pt-2 pb-2">
-        <ReactApexChart options={options} series={series} type="bar" height={251} />
+        <ReactApexChart options={options} series={seriesOpt} type="bar" height={251} />
       </div>
     </ReportSummaryCard>
   )

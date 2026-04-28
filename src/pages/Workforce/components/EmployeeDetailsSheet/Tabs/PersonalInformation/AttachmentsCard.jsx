@@ -34,21 +34,56 @@ const getPillColor = (type) => {
   }
 }
 
-export default function AttachmentsCard({ employee }) {
-  // Mocking attachments if not present
-  const attachments = employee.attachments || [
-    { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Feb 2026' },
-    { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Feb 2026' },
-    { type: 'PDF', name: 'Consent.pdf', date: '12 Feb 2026' },
-    { type: 'JPG', name: 'KTP.jpg', date: '12 Jan 2026' },
-    { type: 'GIF', name: 'Liveness.gif', date: '12 Feb 2026' },
-    { type: 'PDF', name: 'Surat keterangan kerja.pdf', date: '12 Feb 2026' },
-    { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Jan 2026' },
-    { type: 'PDF', name: 'Consent.pdf', date: '12 Jan 2026' },
-    { type: 'JPG', name: 'KTP.jpg', date: '12 Jan 2026' },
-    { type: 'GIF', name: 'Liveness.gif', date: '12 Jan 2026' },
-    { type: 'PDF', name: 'Surat lamaran kerja.pdf', date: '12 Jan 2026' },
-  ]
+// DEMO DATA — backoffice-service/modules/workforce/workforce.repositories.js:147
+// TODO: wire kyc_documents. The personal_information endpoint always returns
+// `attachments: []` today; we keep the original 11-row mock so the card has
+// something to render in demos.
+const DEMO_ATTACHMENTS = [
+  { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Feb 2026' },
+  { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Feb 2026' },
+  { type: 'PDF', name: 'Consent.pdf', date: '12 Feb 2026' },
+  { type: 'JPG', name: 'KTP.jpg', date: '12 Jan 2026' },
+  { type: 'GIF', name: 'Liveness.gif', date: '12 Feb 2026' },
+  { type: 'PDF', name: 'Surat keterangan kerja.pdf', date: '12 Feb 2026' },
+  { type: 'PDF', name: 'Credit report PDF.pdf', date: '12 Jan 2026' },
+  { type: 'PDF', name: 'Consent.pdf', date: '12 Jan 2026' },
+  { type: 'JPG', name: 'KTP.jpg', date: '12 Jan 2026' },
+  { type: 'GIF', name: 'Liveness.gif', date: '12 Jan 2026' },
+  { type: 'PDF', name: 'Surat lamaran kerja.pdf', date: '12 Jan 2026' },
+]
+
+function deriveType(att) {
+  // Real records ship mime_type and file_name; the demo rows ship `type`.
+  if (att.type) return String(att.type).toUpperCase()
+  if (att.mime_type) {
+    if (att.mime_type.includes('pdf')) return 'PDF'
+    if (att.mime_type.includes('jpeg') || att.mime_type.includes('jpg')) return 'JPG'
+    if (att.mime_type.includes('png')) return 'PNG'
+    if (att.mime_type.includes('gif')) return 'GIF'
+  }
+  if (att.file_name) {
+    const ext = att.file_name.split('.').pop()
+    if (ext) return ext.toUpperCase()
+  }
+  return 'FILE'
+}
+
+function deriveName(att) {
+  return att.name ?? att.file_name ?? '—'
+}
+
+function deriveDate(att) {
+  if (att.date) return att.date
+  const v = att.uploaded_at ?? att.created_at
+  if (!v) return ''
+  const d = new Date(v)
+  if (Number.isNaN(d.getTime())) return String(v)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+export default function AttachmentsCard({ personalDetail }) {
+  const apiList = personalDetail?.attachments ?? []
+  const attachments = apiList.length ? apiList : DEMO_ATTACHMENTS
 
   return (
     <div className="flex flex-col gap-[2px] rounded-xl border border-gray-200 bg-[#fdfdfd] shadow-sm overflow-hidden">
@@ -59,26 +94,29 @@ export default function AttachmentsCard({ employee }) {
 
       {/* Table Container */}
       <div className="bg-white mx-[1px] mb-[1px] rounded-[12px] border border-[#e9eaeb] overflow-hidden shadow-sm">
-        {attachments.map((item, index) => (
-          <div
-            key={index}
-            className={`flex items-center justify-between px-4 py-3 ${
-              index !== attachments.length - 1 ? 'border-b border-gray-100' : ''
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${getPillColor(item.type)}`}>
-                {getIcon(item.type)}
+        {attachments.map((item, index) => {
+          const type = deriveType(item)
+          return (
+            <div
+              key={index}
+              className={`flex items-center justify-between px-4 py-3 ${
+                index !== attachments.length - 1 ? 'border-b border-gray-100' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${getPillColor(type)}`}>
+                  {getIcon(type)}
+                </div>
+                <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
+                  {deriveName(item)}
+                </span>
               </div>
-              <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
-                {item.name}
+              <span className="text-sm text-gray-500 font-medium">
+                {deriveDate(item)}
               </span>
             </div>
-            <span className="text-sm text-gray-500 font-medium">
-              {item.date}
-            </span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

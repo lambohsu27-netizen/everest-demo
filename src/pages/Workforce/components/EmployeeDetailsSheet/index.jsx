@@ -3,17 +3,26 @@ import { useParams, useLocation, Outlet } from 'react-router-dom'
 import { MyModalSlider, MyChildModalSlider } from '@interstellar-component'
 import StackedPageSheet from '@src/components/StackedPageSheet'
 import { useWorkforce } from '../../Context'
-import { EmployeeDetailsSheetProvider } from './Context'
+import { EmployeeDetailsSheetProvider, useEmployeeDetailsSheet } from './Context'
 import NoEmployeeData from './NoEmployeeData'
 import RenderEmployeeData from './RenderEmployeeData'
 import LoanCategorySlider from '../../Sliders/LoanCategorySlider'
 import LoanAccountSlider from '../../Sliders/LoanAccountSlider'
 
-export default function EmployeeDetailsSheet() {
+function EmployeeDetailsSheetInner() {
   const { id } = useParams()
   const location = useLocation()
-  const { getEmployeeById, fetchWorkforceDetail, workforceDetail, isLoadingWorkforceDetail, sliderStack, handleCurrentSlider } =
-    useWorkforce()
+  const {
+    getEmployeeById,
+    fetchWorkforceDetail,
+    workforceDetailReport,
+    workforceDetailPersonal,
+    isLoadingReport,
+    isLoadingPersonal,
+    sliderStack,
+    handleCurrentSlider,
+  } = useWorkforce()
+  const { currentTabs } = useEmployeeDetailsSheet()
 
   const navState = location.state?.row
   const liveRowCache = navState ?? getEmployeeById(id)
@@ -33,17 +42,46 @@ export default function EmployeeDetailsSheet() {
     }
   }, [liveRowCache, id])
 
+  // Always fetch the report mode on mount/id change so the Report tab is
+  // ready, and lazy-fetch the personal_information mode the first time the
+  // user opens the Personal tab.
   useEffect(() => {
-    if (id) fetchWorkforceDetail(id)
+    if (id) fetchWorkforceDetail(id, 'report')
   }, [id, fetchWorkforceDetail])
 
+  useEffect(() => {
+    if (
+      id
+      && currentTabs.type === 'personal_information'
+      && (!workforceDetailPersonal || String(workforceDetailPersonal.id) !== String(id))
+    ) {
+      fetchWorkforceDetail(id, 'personal_information')
+    }
+  }, [id, currentTabs.type, workforceDetailPersonal, fetchWorkforceDetail])
+
+  const reportDetail = useMemo(
+    () => (workforceDetailReport && String(workforceDetailReport.id) === String(id) ? workforceDetailReport : null),
+    [workforceDetailReport, id]
+  )
+  const personalDetail = useMemo(
+    () => (workforceDetailPersonal && String(workforceDetailPersonal.id) === String(id) ? workforceDetailPersonal : null),
+    [workforceDetailPersonal, id]
+  )
+
+  // The header reads consent + identity from whichever mode is loaded; we
+  // merge the row cache (list payload) so the avatar + name show before the
+  // detail call resolves.
   const employee = useMemo(() => {
-    const detail = workforceDetail && String(workforceDetail.id) === String(id) ? workforceDetail : null
-    if (detail) return { ...(rowCache || {}), ...detail }
-    return rowCache
-  }, [workforceDetail, rowCache, id])
+    const merged = { ...(rowCache || {}) }
+    if (reportDetail) Object.assign(merged, reportDetail)
+    if (personalDetail) Object.assign(merged, personalDetail)
+    return merged.id ? merged : null
+  }, [reportDetail, personalDetail, rowCache])
+
+  const isLoadingDetail = currentTabs.type === 'personal_information' ? isLoadingPersonal : isLoadingReport
+
   return (
-    <EmployeeDetailsSheetProvider>
+    <>
       {/* Loan category → account detail (parent-child slider like Nasabah) */}
       <MyModalSlider
         scrim
@@ -60,8 +98,13 @@ export default function EmployeeDetailsSheet() {
       </MyModalSlider>
       <StackedPageSheet backUrl="/workforce" closeUrl="/workforce" isScrollFromTop={false}>
         {employee ? (
-          <RenderEmployeeData employee={employee} isLoadingDetail={isLoadingWorkforceDetail} />
-        ) : isLoadingWorkforceDetail ? (
+          <RenderEmployeeData
+            employee={employee}
+            reportDetail={reportDetail}
+            personalDetail={personalDetail}
+            isLoadingDetail={isLoadingDetail}
+          />
+        ) : isLoadingDetail ? (
           <div className="flex h-full items-center justify-center py-24">
             <p className="text-lg font-medium text-gray-500">Loading…</p>
           </div>
@@ -70,6 +113,14 @@ export default function EmployeeDetailsSheet() {
         )}
         <Outlet />
       </StackedPageSheet>
+    </>
+  )
+}
+
+export default function EmployeeDetailsSheet() {
+  return (
+    <EmployeeDetailsSheetProvider>
+      <EmployeeDetailsSheetInner />
     </EmployeeDetailsSheetProvider>
   )
 }

@@ -6,13 +6,18 @@ import { useWorkforce } from '../../../../../../Context'
 const PALETTE = ['#7f56d9', '#9e77ed', '#b692f6', '#d6bbfb', '#e9eaeb', '#c4b5fd', '#a78bfa']
 
 export default function CreditCompositionCard() {
-  const { handleCurrentSlider, workforceDetail } = useWorkforce()
-  const composition = workforceDetail?.credit_report?.credit_overview?.composition ?? []
-  const SERIES_DATA = composition.map((c, i) => ({
-    label: c.category,
-    color: PALETTE[i % PALETTE.length],
-    value: Number(c.total) || 0,
-  }))
+  const { handleCurrentSlider, workforceDetailReport } = useWorkforce()
+  const composition = workforceDetailReport?.credit_overview?.credit_composition ?? []
+  // The new shape always emits 5 rows (consumer/working/credit_card/installment/other).
+  // Empty buckets ship total=0 — the donut would render a single grey ring; we
+  // suppress those rows so the legend only shows buckets the user has activity in.
+  const SERIES_DATA = composition
+    .map((c, i) => ({
+      label: c.category,
+      color: PALETTE[i % PALETTE.length],
+      value: Number(c.total) || 0,
+    }))
+    .filter((s) => s.value > 0)
 
   const options = {
     chart: {

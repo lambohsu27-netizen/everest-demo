@@ -46,10 +46,21 @@ function ForgetPasswordProvider(props) {
       })
   }
 
-  // OTP is checked on final reset-password; only advance UI here
-  const continueWithOtp = (otpDigits) => {
-    localStorage.setItem('otp_number', otpDigits)
-    setCurrentStep({ step_1: false, step_2: false, step_3: true })
+  // Validate OTP against the BE before advancing. Uses a peek-style verify
+  // that does not consume the code, so reset-password can re-verify it.
+  const continueWithOtp = async (otpDigits) => {
+    const email = localStorage.getItem('email_forget_password')
+    if (!email) {
+      myToaster({ status: 400, message: 'Session expired. Please start forgot password again.' })
+      return
+    }
+    await Service.verifyForgotPasswordOtp({ email, code: otpDigits })
+      .then((res) => {
+        myToaster(res)
+        localStorage.setItem('otp_number', otpDigits)
+        setCurrentStep({ step_1: false, step_2: false, step_3: true })
+      })
+      .catch(myToasterFromApi)
   }
 
   const [countdown, setCountdown] = useState(null)

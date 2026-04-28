@@ -20,7 +20,8 @@ const SORT_FIELD_TO_API = {
   code: 'code',
   category: 'category',
   consent_status: 'consent_status',
-  consent_expiry: 'consent_expiry',
+  consent_expiry: 'consent_expiry_at',
+  consent_expiry_at: 'consent_expiry_at',
   created_at: 'created_at',
 }
 

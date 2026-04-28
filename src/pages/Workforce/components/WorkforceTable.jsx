@@ -292,10 +292,10 @@ function WorkforceTable() {
             />
             <MyColumn
               header="Consent expiry"
-              field="consent_expiry"
+              field="consent_expiry_at"
               onSort={handleWorkforceSort}
               body={(row) => (
-                <span className="text-sm text-gray-600">{formatDate(row.consent_expiry)}</span>
+                <span className="text-sm text-gray-600">{formatDate(row.consent_expiry_at)}</span>
               )}
             />
           </MyDataTable>

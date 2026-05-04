@@ -43,6 +43,13 @@ import EmploymentLevel from '@src/pages/Settings/EmploymentSettings/EmploymentLe
 import ConsentEditor from '@src/pages/Settings/GeneralSettings/ConsentEditor'
 import StepEmailVerified from '@src/pages/Register/components/StepEmailVerified'
 
+function PermGated({ moduleKey, fallback, children }) {
+  const { hasPermission, permissionsLoaded } = useApp()
+  if (!permissionsLoaded) return null
+  if (!hasPermission(moduleKey)) return fallback
+  return children
+}
+
 export function AuthenticatedRoutes() {
   const { hasPermission, permissionsLoaded } = useApp()
   const location = useLocation()
@@ -111,8 +118,28 @@ export function AuthenticatedRoutes() {
           <Route path="general" element={<GeneralSettings />} />
           <Route path="user-role-access" element={<UserRoleAccess />}>
             <Route index element={<Navigate to="user" replace />} />
-            <Route path="user" element={<UserTab />} />
-            <Route path="role" element={<RoleTab />} />
+            <Route
+              path="user"
+              element={
+                <PermGated
+                  moduleKey={Access.USER_MANAGEMENT}
+                  fallback={<Navigate to="/settings/user-role-access/role" replace />}
+                >
+                  <UserTab />
+                </PermGated>
+              }
+            />
+            <Route
+              path="role"
+              element={
+                <PermGated
+                  moduleKey={Access.ROLE_ACCESS}
+                  fallback={<Navigate to="/settings/user-role-access/user" replace />}
+                >
+                  <RoleTab />
+                </PermGated>
+              }
+            />
           </Route>
           <Route path="employment-level" element={<EmploymentLevel />} />
           <Route path="consent-editor" element={<ConsentEditor />} />
@@ -158,8 +185,28 @@ export function AuthenticatedRoutes() {
             <Route path="general" element={<GeneralSettings />} />
             <Route path="user-role-access" element={<UserRoleAccess />}>
               <Route index element={<Navigate to="user" replace />} />
-              <Route path="user" element={<UserTab />} />
-              <Route path="role" element={<RoleTab />} />
+              <Route
+                path="user"
+                element={
+                  <PermGated
+                    moduleKey={Access.USER_MANAGEMENT}
+                    fallback={<Navigate to="/settings/user-role-access/role" replace />}
+                  >
+                    <UserTab />
+                  </PermGated>
+                }
+              />
+              <Route
+                path="role"
+                element={
+                  <PermGated
+                    moduleKey={Access.ROLE_ACCESS}
+                    fallback={<Navigate to="/settings/user-role-access/user" replace />}
+                  >
+                    <RoleTab />
+                  </PermGated>
+                }
+              />
             </Route>
             <Route path="employment-level" element={<EmploymentLevel />} />
             <Route path="consent-editor" element={<ConsentEditor />} />

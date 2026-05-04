@@ -35,16 +35,23 @@ function sanitizeEmailInput(value) {
   return String(value ?? '').replace(/[^a-zA-Z0-9@._+-]/g, '')
 }
 
-const PHONE_MAX_DIGITS = 16
+const PHONE_MIN_DIGITS = 8
+const PHONE_MAX_DIGITS = 15
 
 /** Hanya angka (nomor telepon). */
 function sanitizePhoneInput(value) {
-  return String(value ?? '').replace(/\D/g, '')
+  return String(value ?? '').replace(/\D/g, '').slice(0, PHONE_MAX_DIGITS)
 }
 
 function getPhoneFieldError(value) {
   const digits = String(value ?? '').replace(/\D/g, '')
   if (!digits) return 'Phone is required.'
+  if (!digits.startsWith('62')) {
+    return 'Phone must start with country code 62.'
+  }
+  if (digits.length < PHONE_MIN_DIGITS) {
+    return `Phone must be at least ${PHONE_MIN_DIGITS} digits.`
+  }
   if (digits.length > PHONE_MAX_DIGITS) {
     return `Phone must be at most ${PHONE_MAX_DIGITS} digits.`
   }
@@ -98,9 +105,9 @@ export default function UserForm({ mode }) {
       setIsActive(userDetail.is_active ?? true)
       setAvatarPreview(userDetail.avatar_url ? userDetail.avatar_full_url : null)
       const companies = userDetail.user_companies?.map((c) => ({
-        id: c.id ?? c.company?.id,
-        name: c.name ?? c.company?.name,
-      })).filter((c) => c.name) ?? []
+        id: c.company?.id,
+        name: c.company?.name,
+      })).filter((c) => c.id && c.name) ?? []
       setSelectedCompanies(companies)
     }
   }, [isEdit, userDetail])

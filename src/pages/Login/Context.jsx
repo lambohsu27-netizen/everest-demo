@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import CryptoJS from 'crypto-js'
 
@@ -15,6 +15,14 @@ function LoginProvider({ children }) {
   const { getSession } = useApp()
   const [, setCookie] = useCookies(['token-backoffice', 'refresh-token-backoffice'])
   const [User, setUser] = useState()
+  // Tracks whether this LoginProvider instance is still mounted. Login flips the
+  // auth cookie which swaps App.jsx from unauthenticated → authenticated, unmounting
+  // the unauth LoginProvider while the login() promise is still resolving. Without
+  // this guard, the trailing `.then`/`.catch` callbacks fire myToaster again from
+  // the stale closure, producing phantom "Login successful." toasts on later
+  // navigations (esp. clicking Settings tabs while the toast is still on screen).
+  const isMountedRef = useRef(true)
+  useEffect(() => () => { isMountedRef.current = false }, [])
   const [isProfileSliderOpen, setIsProfileSliderOpen] = useState(false)
   const [currentModal, setCurrentModal] = useState({
     status: false,
@@ -39,52 +47,47 @@ function LoginProvider({ children }) {
   }, [])
 
   const login = async (body) => {
-      // console.log('body', body)
-
-      const formData = new FormData()
       const encryptedPassword = encryptPassword(body.password)
       const payload = {
         email: body.email,
         password: encryptedPassword,
       }
 
-      return await LoginService.login(payload)
-        .then(myToaster)
-        .then((result) => {
-          console.log('result', result)
-          localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result?.user_id) // user_id
+      try {
+        const result = await LoginService.login(payload)
 
-          setCookie('token-backoffice', result?.data?.access_token, {
-            path: '/',
-          })
+        // Toast + persist auth state ONLY while this LoginProvider is still
+        // mounted. After setCookie below, App.jsx swaps auth branches and unmounts
+        // this provider; any further firing of myToaster from a stale closure
+        // is suppressed.
+        if (!isMountedRef.current) return
+        myToaster(result)
 
-          setCookie('refresh-token-backoffice', result?.data?.refresh_token, {
-            path: '/',
-            maxAge: body?.remember_me ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
-          })
-
-          console.log(body.remember_me, '<<<< remember');
-          
-
-          if (body?.remember_me === true) {
-            const rememberMeData = {
-              email: body.email,
-              password: body.password,
-            }
-            localStorage.setItem(
-              'rv5zzc9noTdU5AD2', // remember_me
-              CryptoJS.AES.encrypt(
-                JSON.stringify(rememberMeData),
-                import.meta.env.VITE_APP_SECRET_KEY
-              ).toString()
-            )
-          } else {
-            localStorage.removeItem('rv5zzc9noTdU5AD2')
-          }
+        if (result?.user_id) {
+          localStorage.setItem('RrwF57&aRMoR5Eq23#Mi', result.user_id)
+        }
+        setCookie('token-backoffice', result?.data?.access_token, { path: '/' })
+        setCookie('refresh-token-backoffice', result?.data?.refresh_token, {
+          path: '/',
+          maxAge: body?.remember_me ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60,
         })
-        .catch((e) => {
-          myToasterFromApi(e)
-        })
+
+        if (body?.remember_me === true) {
+          const rememberMeData = { email: body.email, password: body.password }
+          localStorage.setItem(
+            'rv5zzc9noTdU5AD2',
+            CryptoJS.AES.encrypt(
+              JSON.stringify(rememberMeData),
+              import.meta.env.VITE_APP_SECRET_KEY,
+            ).toString(),
+          )
+        } else {
+          localStorage.removeItem('rv5zzc9noTdU5AD2')
+        }
+      } catch (e) {
+        if (!isMountedRef.current) return
+        myToasterFromApi(e)
+      }
     }
     
 

@@ -28,6 +28,11 @@ function AppProvider({ children }) {
   const [permissionsLoaded, setPermissionsLoaded] = useState(false)
   const location = useLocation()
   const timerRef = useRef(null)
+  // Read pathname via ref so getSession's identity is stable across navigations.
+  // Previously [location.pathname] was a useCallback dep, which made getSession a
+  // brand-new function on every nav and re-fired the mounting effect each click.
+  const pathnameRef = useRef(location.pathname)
+  pathnameRef.current = location.pathname
 
   const getSession = useCallback(
     () =>
@@ -45,11 +50,11 @@ function AppProvider({ children }) {
         })
         .catch((err) => {
           setPermissionsLoaded(true)
-          if (location.pathname !== '/login') {
+          if (pathnameRef.current !== '/login') {
             myToaster(err)
           }
         }),
-    [location.pathname]
+    []
   )
 
   const hasPermission = useCallback(
@@ -90,7 +95,9 @@ function AppProvider({ children }) {
     if (location.pathname !== '/login' && cookies['token-backoffice']) {
       getSession()
     }
-  }, [cookies, getSession, location.pathname])
+    // getSession is stable (deps: []); we only want to refetch when the auth cookie
+    // appears/disappears or the route enters/leaves /login — not on every tab click.
+  }, [cookies, location.pathname, getSession])
 
   //   useEffect(() => {
   //     const ttl = user?.general?.settings?.logout_timer

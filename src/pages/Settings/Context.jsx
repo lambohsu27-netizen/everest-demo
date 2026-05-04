@@ -91,9 +91,7 @@ function SettingsProvider({ children }) {
     setVerificationThreshold(savedGeneral.current.verification_threshold)
   }, [])
 
-  useEffect(() => {
-    fetchGeneralSettings()
-  }, [fetchGeneralSettings])
+  // NOTE: General Settings is fetched lazily by GeneralSettings.jsx when that tab mounts.
 
   // ── Consent Editor ──────────────────────────────────────────────────────────
   const [candidateContent, setCandidateContent] = useState('')
@@ -141,9 +139,7 @@ function SettingsProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => {
-    fetchConsentEditor()
-  }, [fetchConsentEditor])
+  // NOTE: Consent Editor is fetched lazily by ConsentEditor.jsx when that tab mounts.
 
   // ── Role Access (API-backed) ─────────────────────────────────────────────────
   const [roles, setRoles] = useState([])
@@ -288,7 +284,13 @@ function SettingsProvider({ children }) {
   const deleteRoles = useCallback(
     async (ids) => {
       try {
-        const res = await SettingsService.deleteRoles(ids)
+        // Super Admin is immune; strip it just in case it leaked into the selection.
+        const sanitized = (ids || []).filter((id) => id !== 'fa70fed3-9fc5-4753-a879-ceb2b92f8d77')
+        if (sanitized.length === 0) {
+          setSelectedRoleIds([])
+          return
+        }
+        const res = await SettingsService.deleteRoles(sanitized)
         myToaster(res)
         setSelectedRoleIds([])
         fetchRoles(rolePage, roleSearchTerm)
@@ -318,8 +320,12 @@ function SettingsProvider({ children }) {
   }, [])
 
   const handleRoleSelectionChange = useCallback((updated) => {
-    setRoles(updated.data)
-    setSelectedRoleIds(updated.data.filter((r) => r.checked).map((r) => r.id))
+    // Super Admin role is immune: force-uncheck it so it can never be bulk-deleted.
+    const sanitized = updated.data.map((r) =>
+      r.id === 'fa70fed3-9fc5-4753-a879-ceb2b92f8d77' && r.checked ? { ...r, checked: false } : r
+    )
+    setRoles(sanitized)
+    setSelectedRoleIds(sanitized.filter((r) => r.checked).map((r) => r.id))
   }, [])
 
   // ── User Management (API-backed) ────────────────────────────────────────────
@@ -538,6 +544,7 @@ function SettingsProvider({ children }) {
       verificationThreshold,
       setVerificationThreshold,
       isLoadingGeneral,
+      fetchGeneralSettings,
       updateGeneralSettings,
       cancelGeneralSettings,
 
@@ -548,6 +555,7 @@ function SettingsProvider({ children }) {
       setExistingContent,
       isLoadingConsent,
       isSavingConsent,
+      fetchConsentEditor,
       updateConsentEditor,
       cancelConsentEditor,
 
@@ -626,12 +634,14 @@ function SettingsProvider({ children }) {
       sessionTimeout,
       verificationThreshold,
       isLoadingGeneral,
+      fetchGeneralSettings,
       updateGeneralSettings,
       cancelGeneralSettings,
       candidateContent,
       existingContent,
       isLoadingConsent,
       isSavingConsent,
+      fetchConsentEditor,
       updateConsentEditor,
       cancelConsentEditor,
       roles,

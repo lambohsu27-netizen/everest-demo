@@ -119,6 +119,14 @@ instance.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    // Auth endpoints are NOT token-expiry failures — never silently retry them.
+    // A 401 from /auth/login is a wrong-password response; retrying it (even after
+    // a successful refresh) replays myToaster(response) and produces phantom toasts.
+    const url = originalRequest.url || ''
+    if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
+      return Promise.reject(error)
+    }
+
     originalRequest._retry = true
 
     try {

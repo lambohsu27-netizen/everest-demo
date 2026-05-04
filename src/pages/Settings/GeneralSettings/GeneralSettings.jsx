@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { MyButton } from '@interstellar-component'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
@@ -11,11 +12,17 @@ export default function GeneralSettings() {
     verificationThreshold,
     setVerificationThreshold,
     isLoadingGeneral,
+    fetchGeneralSettings,
     updateGeneralSettings,
     cancelGeneralSettings,
   } = useSettings()
 
   const canEdit = hasPermission(Access.GENERAL_SETTINGS, 'edit')
+  const canView = canEdit
+
+  useEffect(() => {
+    if (canView) fetchGeneralSettings()
+  }, [canView, fetchGeneralSettings])
 
   if (isLoadingGeneral) {
     return (

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import { useSettings } from '../Context'
@@ -12,11 +13,16 @@ export default function ConsentEditor() {
     setExistingContent,
     isLoadingConsent,
     isSavingConsent,
+    fetchConsentEditor,
     updateConsentEditor,
     cancelConsentEditor,
   } = useSettings()
 
   const canEdit = hasPermission(Access.CONSENT_EDITOR, 'edit')
+
+  useEffect(() => {
+    if (canEdit) fetchConsentEditor()
+  }, [canEdit, fetchConsentEditor])
 
   if (isLoadingConsent) {
     return (

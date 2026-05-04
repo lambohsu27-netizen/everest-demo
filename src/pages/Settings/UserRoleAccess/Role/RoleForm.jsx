@@ -5,6 +5,8 @@ import { MyButton, MyTextField, myToaster } from '@interstellar-component'
 import { useSettings } from '../../Context'
 
 const PERMISSIONS_REQUIRED_MESSAGE = 'Please select at least one access menu.'
+const WRITE_SUB_PERMISSION_KEYS = ['add_new', 'edit', 'delete']
+const SUPER_ADMIN_ROLE_ID = 'fa70fed3-9fc5-4753-a879-ceb2b92f8d77'
 
 export default function RoleForm({ mode }) {
   const {
@@ -18,6 +20,7 @@ export default function RoleForm({ mode }) {
   } = useSettings()
 
   const isEdit = mode === 'edit'
+  const isSuperAdminEdit = isEdit && activePanelRoleId === SUPER_ADMIN_ROLE_ID
 
   const [name, setName] = useState('')
   const [selected, setSelected] = useState({})
@@ -60,8 +63,28 @@ export default function RoleForm({ mode }) {
   const toggleSub = (moduleKey, subKey) => {
     setSelected((prev) => {
       const current = new Set(prev[moduleKey] ?? [])
-      if (current.has(subKey)) current.delete(subKey)
-      else current.add(subKey)
+      const allPerms = allPermissions.find((m) => m.module_key === moduleKey)
+      const subKeys = allPerms?.sub_permissions?.map((s) => s.key ?? s) ?? []
+      const moduleHasView = subKeys.includes('view')
+
+      if (current.has(subKey)) {
+        // Block unchecking "view" while any write key is still selected.
+        if (
+          subKey === 'view' &&
+          moduleHasView &&
+          WRITE_SUB_PERMISSION_KEYS.some((k) => current.has(k))
+        ) {
+          return prev
+        }
+        current.delete(subKey)
+      } else {
+        current.add(subKey)
+        // Auto-add "view" whenever a write key is checked, so the role isn't saved
+        // in the misleading "can edit but can't view" state.
+        if (moduleHasView && WRITE_SUB_PERMISSION_KEYS.includes(subKey)) {
+          current.add('view')
+        }
+      }
       return { ...prev, [moduleKey]: current }
     })
   }
@@ -221,11 +244,20 @@ export default function RoleForm({ mode }) {
                                     const subKey = sub.key ?? sub
                                     const subLabel = sub.label ?? subKey
                                     const checked = currentSet.has(subKey)
+                                    const moduleHasView = subKeys.includes('view')
+                                    const viewLocked =
+                                      subKey === 'view' &&
+                                      moduleHasView &&
+                                      WRITE_SUB_PERMISSION_KEYS.some((k) => currentSet.has(k))
                                     return (
-                                      <label key={subKey} className="flex cursor-pointer items-center gap-2">
+                                      <label
+                                        key={subKey}
+                                        className={`flex items-center gap-2 ${viewLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                        title={viewLocked ? 'View is required while Add New, Edit, or Delete is selected.' : undefined}
+                                      >
                                         <span
                                           onClick={() => toggleSub(moduleKey, subKey)}
-                                          className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border ${checked ? 'border-brand/900 bg-brand/900' : 'border-gray/300 bg-base-white'}`}
+                                          className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border ${checked ? 'border-brand/900 bg-brand/900' : 'border-gray/300 bg-base-white'} ${viewLocked ? 'opacity-60' : ''}`}
                                         >
                                           {checked && (
                                             <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -233,7 +265,7 @@ export default function RoleForm({ mode }) {
                                             </svg>
                                           )}
                                         </span>
-                                        <span className="text-sm font-normal leading-5 text-gray/600 font-inter">
+                                        <span className={`text-sm font-normal leading-5 font-inter ${viewLocked ? 'text-gray/400' : 'text-gray/600'}`}>
                                           {subLabel}
                                         </span>
                                       </label>
@@ -317,15 +349,17 @@ export default function RoleForm({ mode }) {
               >
                 Cancel
               </MyButton>
-              <MyButton
-                color="primary"
-                size="md"
-                variant="filled"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Submit'}
-              </MyButton>
+              {!isSuperAdminEdit && (
+                <MyButton
+                  color="primary"
+                  size="md"
+                  variant="filled"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Submit'}
+                </MyButton>
+              )}
             </div>
           </div>
         </div>

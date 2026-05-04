@@ -5,6 +5,8 @@ import { useApp } from '@src/AppContext'
 import { Access } from '@src/services/Helper'
 import { useSettings } from '../../Context'
 
+const SUPER_ADMIN_ROLE_ID = 'fa70fed3-9fc5-4753-a879-ceb2b92f8d77'
+
 function formatDate(dateString) {
   if (!dateString) return ''
   const d = new Date(dateString)
@@ -30,8 +32,9 @@ export default function RoleDetail() {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
+  const isSuperAdmin = roleDetail?.id === SUPER_ADMIN_ROLE_ID
   const canEdit = hasPermission(Access.ROLE_ACCESS, 'edit')
-  const canDelete = hasPermission(Access.ROLE_ACCESS, 'delete')
+  const canDelete = hasPermission(Access.ROLE_ACCESS, 'delete') && !isSuperAdmin
 
   const handleConfirmDelete = async () => {
     setDeleteConfirmOpen(false)

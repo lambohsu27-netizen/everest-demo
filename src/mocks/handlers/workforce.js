@@ -132,10 +132,10 @@ const ARCHETYPE_NARRATIVE = {
 }
 
 const ARCHETYPE_SIGNALS = {
-  clean: { phone_numbers: 2, address_records: 2, court_decisions: 0, employment_records: 2, footprint: 4 },
-  mid_risk: { phone_numbers: 3, address_records: 2, court_decisions: 0, employment_records: 3, footprint: 9 },
-  high_risk: { phone_numbers: 5, address_records: 4, court_decisions: 1, employment_records: 4, footprint: 14 },
-  no_match: { phone_numbers: 0, address_records: 0, court_decisions: 0, employment_records: 0, footprint: 0 },
+  clean: { phone_numbers: 4, address_records: 2, court_decisions: 0, employment_records: 2, footprint: 5 },
+  mid_risk: { phone_numbers: 6, address_records: 3, court_decisions: 1, employment_records: 3, footprint: 11 },
+  high_risk: { phone_numbers: 10, address_records: 5, court_decisions: 3, employment_records: 5, footprint: 18 },
+  no_match: { phone_numbers: 1, address_records: 1, court_decisions: 0, employment_records: 1, footprint: 0 },
 }
 
 const SIGNAL_RATIONALES = {
@@ -373,14 +373,243 @@ const buildCollectabilityTrend = (archetype) => {
   return TWELVE_MONTHS.map((date, i) => ({ date, dpd: dpd[i], kol: kol[i] }))
 }
 
-const buildSignals = (archetype) => {
+// ── Per-workforce signal item generators ──────────────────────────────────
+// All seeded by the workforce id so each person gets a deterministic but
+// distinct set of phones, addresses, employment history, and footprints.
+
+const hashSeed = (s) => {
+  let h = 2166136261 >>> 0
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619) >>> 0
+  }
+  return h
+}
+
+const seededInt = (seed, salt, max) => ((seed ^ hashSeed(String(salt))) >>> 0) % max
+
+const PROVIDER_NAMES = [
+  ['PT Bank Mandiri (Persero) Tbk', 'Bank Umum'],
+  ['PT Bank Central Asia Tbk', 'Bank Umum'],
+  ['PT Bank Rakyat Indonesia (Persero) Tbk', 'Bank Umum'],
+  ['PT Bank Negara Indonesia (Persero) Tbk', 'Bank Umum'],
+  ['PT Adira Dinamika Multi Finance', 'Lembaga Pembiayaan'],
+  ['PT Mega Finance', 'Lembaga Pembiayaan'],
+  ['PT Maybank Indonesia Finance', 'Lembaga Pembiayaan'],
+  ['Kredivo', 'Fintech P2P'],
+  ['Akulaku Finance', 'Fintech P2P'],
+  ['Indodana', 'Fintech P2P'],
+  ['Home Credit Indonesia', 'Lembaga Pembiayaan'],
+  ['BFI Finance Indonesia', 'Lembaga Pembiayaan'],
+]
+
+const FOOTPRINT_PURPOSES = [
+  'Credit Card application',
+  'Vehicle loan (KKB)',
+  'Personal loan (KTA)',
+  'Paylater enrollment',
+  'Mortgage application (KPR)',
+  'Onboarding / Background Check',
+  'Working capital loan',
+  'Multi-purpose loan',
+  'Re-enquiry / monitoring',
+]
+
+const ADDRESS_VARIATIONS = [
+  ['Jl. Kemang Raya No. ', ' RT 03/RW 04', 'Mampang Prapatan'],
+  ['Jl. Hibiskus Blok B', '/9', 'Cilandak'],
+  ['Jl. Palm Regency Blok ', ' No. 7', 'Pondok Indah'],
+  ['Jl. H. Junaidi Naim No. ', '', 'Tebet'],
+  ['Jl. Bendungan Hilir Raya No. ', ' Apt. 5B', 'Bendungan Hilir'],
+  ['Jl. Cipete Selatan No. ', '', 'Cipete'],
+  ['Komplek Bukit Permai Blok C', '/12', 'Cipayung'],
+  ['Jl. Kebon Jeruk Raya No. ', '', 'Kebon Jeruk'],
+]
+
+const CITY_BY_ARCHETYPE = ['Jakarta Selatan', 'Jakarta Barat', 'Tangerang Selatan', 'Depok', 'Bekasi']
+
+const OCCUPATIONS = [
+  ['Product Manager', 'Other / Mixed Industry'],
+  ['Customer Service', 'Banking & Financial Services'],
+  ['Operations Manager', 'Logistics & Distribution'],
+  ['Senior Software Engineer', 'Technology & Software'],
+  ['HR Business Partner', 'Other / Mixed Industry'],
+  ['Senior Accountant', 'Banking & Financial Services'],
+  ['Marketing Specialist', 'Retail & E-commerce'],
+  ['Compliance Officer', 'Banking & Financial Services'],
+]
+
+const formatDateAgo = (daysAgo) => {
+  const d = new Date('2026-04-30T00:00:00Z')
+  d.setDate(d.getDate() - daysAgo)
+  return d.toISOString().slice(0, 10)
+}
+
+const formatDateAgingLabel = (daysAgo) => {
+  if (daysAgo < 31) return `${Math.max(1, daysAgo)} day${daysAgo === 1 ? '' : 's'}`
+  const months = Math.round(daysAgo / 30)
+  return `${months} month${months === 1 ? '' : 's'}`
+}
+
+const buildPhoneItems = (workforce, count) => {
+  if (!count) return []
+  const seed = hashSeed(workforce.id)
+  const baseDigits = (workforce.mobile_phone || '+62 812 0000 0000').replace(/\D/g, '').slice(-10)
+  const items = []
+  for (let i = 0; i < count; i += 1) {
+    const lastFour = String((Number(baseDigits.slice(-4)) + i * 137) % 9999).padStart(4, '0')
+    const prefix = ['818', '877', '812', '813', '811', '821', '815'][seededInt(seed, `phone-pre-${i}`, 7)]
+    const middle = String((seededInt(seed, `phone-mid-${i}`, 9000)) + 1000).padStart(4, '0')
+    const ageDays = i === 0 ? 30 : 30 + i * (45 + seededInt(seed, `phone-age-${i}`, 90))
+    items.push({
+      number: `+62 ${prefix} ${middle} ${lastFour}`,
+      aging: formatDateAgingLabel(ageDays),
+      lastUpdate: formatDateAgo(ageDays),
+      status: i === 0 ? 'Current' : null,
+    })
+  }
+  return items
+}
+
+const buildDiscoveredContacts = (workforce, listedItems) => {
+  if (!listedItems.length) return []
+  const seed = hashSeed(workforce.id)
+  const labels = [
+    workforce.full_name,
+    `${workforce.full_name} - ${workforce.company?.name || 'Office'}`,
+    `${workforce.full_name} (HR)`,
+    'Marketing Contact',
+    'Family',
+    'Loan Agent',
+    'Spam',
+  ]
+  const len = Math.min(labels.length, Math.max(3, Math.ceil(listedItems.length * 1.2)))
+  return labels.slice(0, len).map((label, i) => ({
+    label,
+    count: 1 + seededInt(seed, `disc-${i}`, 18),
+    numbers: listedItems
+      .slice(0, 1 + seededInt(seed, `disc-pick-${i}`, Math.min(3, listedItems.length)))
+      .map((p) => p.number),
+    extra: i === 0 ? seededInt(seed, `disc-extra-${i}`, 6) : 0,
+  }))
+}
+
+const buildAddressItems = (workforce, count) => {
+  if (!count) return []
+  const seed = hashSeed(workforce.id)
+  const items = []
+  for (let i = 0; i < count; i += 1) {
+    const tpl = ADDRESS_VARIATIONS[seededInt(seed, `addr-${i}`, ADDRESS_VARIATIONS.length)]
+    const num = 5 + seededInt(seed, `addr-num-${i}`, 95)
+    const ageDays = 30 + i * (60 + seededInt(seed, `addr-age-${i}`, 120))
+    items.push({
+      address: i === 0
+        ? workforce.address?.full_address ?? `${tpl[0]}${num}${tpl[1]}`
+        : `${tpl[0]}${num}${tpl[1]}`,
+      aging: formatDateAgingLabel(ageDays),
+      count: String(2 + seededInt(seed, `addr-count-${i}`, 240)),
+      lastUpdate: formatDateAgo(ageDays),
+      city: i === 0 ? workforce.address?.city : tpl[2],
+    })
+  }
+  return items
+}
+
+const buildEmploymentItems = (workforce, count) => {
+  if (!count) return []
+  const seed = hashSeed(workforce.id)
+  const items = []
+  // Always include the current employment first
+  items.push({
+    occupation: workforce.employment_position?.name || 'Specialist',
+    subtext: workforce.company?.name || 'Current Company',
+    industry: 'Other / Mixed Industry',
+    location: 'Jakarta Selatan',
+    count: '1',
+    lastUpdate: '2026-03-12',
+  })
+  for (let i = 1; i < count; i += 1) {
+    const occ = OCCUPATIONS[seededInt(seed, `emp-occ-${i}`, OCCUPATIONS.length)]
+    const ageDays = 90 + i * (180 + seededInt(seed, `emp-age-${i}`, 240))
+    items.push({
+      occupation: occ[0],
+      subtext: ['PT Anugerah Texindo', 'PT Bank Central Asia', 'PT Tirtayasa', 'PT Cendana Mitra Sejahtera', 'PT Pratama Logistik Nusantara'][seededInt(seed, `emp-co-${i}`, 5)],
+      industry: occ[1],
+      location: CITY_BY_ARCHETYPE[seededInt(seed, `emp-loc-${i}`, CITY_BY_ARCHETYPE.length)],
+      count: String(1 + seededInt(seed, `emp-count-${i}`, 5)),
+      lastUpdate: formatDateAgo(ageDays),
+    })
+  }
+  return items
+}
+
+const buildFootprintItems = (workforce, count) => {
+  if (!count) return []
+  const seed = hashSeed(workforce.id)
+  const items = []
+  for (let i = 0; i < count; i += 1) {
+    const provider = PROVIDER_NAMES[seededInt(seed, `fp-prov-${i}`, PROVIDER_NAMES.length)]
+    const purpose = FOOTPRINT_PURPOSES[seededInt(seed, `fp-purp-${i}`, FOOTPRINT_PURPOSES.length)]
+    const ageDays = 7 + i * (15 + seededInt(seed, `fp-age-${i}`, 30))
+    items.push({
+      institution: provider[0],
+      provider_type: provider[1],
+      purpose,
+      enquiry_date: formatDateAgo(ageDays),
+    })
+  }
+  return items
+}
+
+const buildFootprintBuckets = (items) => {
+  const today = new Date('2026-04-30T00:00:00Z')
+  const dayAge = (iso) => Math.round((today - new Date(iso)) / (1000 * 60 * 60 * 24))
+  const buckets = { '1_month': 0, '3_months': 0, '6_months': 0, '12_months': 0 }
+  items.forEach((it) => {
+    const d = dayAge(it.enquiry_date)
+    if (d <= 30) buckets['1_month'] += 1
+    if (d <= 90) buckets['3_months'] += 1
+    if (d <= 180) buckets['6_months'] += 1
+    if (d <= 365) buckets['12_months'] += 1
+  })
+  return buckets
+}
+
+const buildSignals = (workforce) => {
+  const archetype = archetypeOf(workforce)
   const counts = ARCHETYPE_SIGNALS[archetype] ?? ARCHETYPE_SIGNALS.no_match
-  return Object.fromEntries(
-    Object.entries(counts).map(([k, count]) => [
-      k,
-      { count, rationale: SIGNAL_RATIONALES[k]?.[archetype] ?? '' },
-    ])
-  )
+  const phoneItems = buildPhoneItems(workforce, counts.phone_numbers)
+  const addressItems = buildAddressItems(workforce, counts.address_records)
+  const employmentItems = buildEmploymentItems(workforce, counts.employment_records)
+  const footprintItems = buildFootprintItems(workforce, counts.footprint)
+  return {
+    phone_numbers: {
+      count: phoneItems.length,
+      rationale: SIGNAL_RATIONALES.phone_numbers[archetype] ?? '',
+      items: phoneItems,
+      discovered_contacts: buildDiscoveredContacts(workforce, phoneItems),
+    },
+    address_records: {
+      count: addressItems.length,
+      rationale: SIGNAL_RATIONALES.address_records[archetype] ?? '',
+      items: addressItems,
+    },
+    court_decisions: {
+      count: counts.court_decisions,
+      rationale: SIGNAL_RATIONALES.court_decisions[archetype] ?? '',
+    },
+    employment_records: {
+      count: employmentItems.length,
+      rationale: SIGNAL_RATIONALES.employment_records[archetype] ?? '',
+      items: employmentItems,
+    },
+    footprint: {
+      count: footprintItems.length,
+      rationale: SIGNAL_RATIONALES.footprint[archetype] ?? '',
+      items: footprintItems,
+      bucket_counts: buildFootprintBuckets(footprintItems),
+    },
+  }
 }
 
 const archetypeOf = (w) => w.credit_archetype ?? 'no_match'

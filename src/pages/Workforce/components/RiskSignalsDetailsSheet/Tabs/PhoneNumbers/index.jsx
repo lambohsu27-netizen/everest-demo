@@ -1,56 +1,76 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { SearchMd, FilterLines, Stars01 } from '@untitled-ui/icons-react'
 import { MyButton, MyDoubleCard } from '@interstellar-component'
+import { useWorkforce } from '../../../../Context'
 import RiskAssessmentTable from '../../../EmployeeDetailsSheet/Tabs/ReportsContent/components/Sidebar/RiskAssessmentTable'
 import ListedNumberTable from './ListedNumberTable'
 import DiscoveredContactTable from './DiscoveredContactTable'
 
+function formatDate(value) {
+  if (!value) return '—'
+  const d = new Date(String(value))
+  if (Number.isNaN(d.getTime())) return String(value)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+const FALLBACK_LISTED = [
+  { number: '+62 818 1111 5121', aging: '4 months', lastUpdate: '8 Jan 2024', status: 'Current' },
+  { number: '+62 877 9089 6541', aging: '1 month', lastUpdate: '8 Jan 2024' },
+]
+
+const FALLBACK_DISCOVERED = [
+  { label: 'Personal Mobile', count: 4, numbers: ['+62 818 1111 5121'] },
+]
+
 export default function PhoneNumbersTab() {
+  const { workforceDetail } = useWorkforce()
+  const phoneSignal = workforceDetail?.risk_background_signals?.phone_numbers
+
+  const listedRaw = Array.isArray(phoneSignal?.items) && phoneSignal.items.length
+    ? phoneSignal.items
+    : FALLBACK_LISTED
+
+  const phoneData = useMemo(
+    () =>
+      listedRaw.map((p) => ({
+        number: p.number,
+        aging: p.aging,
+        lastUpdate: formatDate(p.lastUpdate),
+        status: p.status ?? null,
+      })),
+    [listedRaw]
+  )
+
+  const discoveredContactData = Array.isArray(phoneSignal?.discovered_contacts) && phoneSignal.discovered_contacts.length
+    ? phoneSignal.discovered_contacts
+    : FALLBACK_DISCOVERED
+
+  const total = phoneData.length
+
+  const indicators = useMemo(
+    () => [
+      { label: 'Phone numbers found', value: String(total) },
+      {
+        label: 'Active number',
+        value: String(phoneData.filter((p) => p.status === 'Current').length),
+      },
+      {
+        label: 'Overall risk',
+        badge: total >= 8 ? 'High' : total >= 5 ? 'Medium' : 'Low',
+        badgeColor: total >= 8 ? 'error' : total >= 5 ? 'warning' : 'success',
+      },
+    ],
+    [total, phoneData]
+  )
+
+  const takeaway =
+    phoneSignal?.rationale
+    || (total > 0
+      ? `Contact intelligence identified ${total} phone number(s) linked to the individual.`
+      : 'No phone records found for this individual.')
+
   const [contentTab, setContentTab] = useState('Listed number')
   const [searchTerm, setSearchTerm] = useState('')
-
-  const indicators = [
-    { label: 'Risk labels detected', value: '3 / 10' },
-    { label: 'Label consistency score', value: '2 / 10' },
-    { label: 'Longest active number', value: '5 / 10' },
-    { label: 'Overall risk', badge: 'High', badgeColor: 'error' },
-  ]
-
-  const phoneData = [
-    {
-      number: '+62 818 1111 5121',
-      aging: '4 months',
-      lastUpdate: '8 Jan 2024',
-      status: 'Current',
-    },
-    { number: '+62 877 9089 6541', aging: '1 month', lastUpdate: '8 Jan 2024' },
-    { number: '+62 812 9890 908', aging: '1 month', lastUpdate: '8 Jan 2024' },
-    { number: '+62 812 1965 4541', aging: '1 month', lastUpdate: '12 Des 2023' },
-    { number: '+62 877 9089 6541', aging: '1 month', lastUpdate: '10 Des 2023' },
-    { number: '+62 877 9089 6531', aging: '1 month', lastUpdate: '7 Aug 2023' },
-  ]
-
-  const discoveredContactData = [
-    {
-      label: 'Phoenix Baker',
-      count: 15,
-      numbers: ['+62 811 8822 1222', '+62 811 8822 1222', '+62 811 0000 1222'],
-      extra: 4,
-    },
-    { label: 'Phoenix Office', count: 12, numbers: ['+62 811 8822 1222', '+62 811 0000 1222'] },
-    { label: 'Phoenix Marketing', count: 8, numbers: ['+62 811 0000 1222'] },
-    { label: 'Phoenix Kantor', count: 2, numbers: ['+62 811 8822 1222'] },
-    { label: 'Debt Collector', count: 12, numbers: ['+62 811 8822 1222'] },
-    {
-      label: 'Loan Agent',
-      count: 6,
-      numbers: ['+62 811 8822 1222', '+62 811 8822 1222', '+62 811 0000 1222'],
-      extra: 2,
-    },
-    { label: 'Phoenix Main', count: 1, numbers: ['+62 811 8822 1222', '+62 811 0000 1222'] },
-    { label: 'Spam', count: 8, numbers: ['+62 811 8822 1222'] },
-  ]
-
   const isListed = contentTab === 'Listed number'
 
   return (
@@ -68,11 +88,7 @@ export default function PhoneNumbersTab() {
 
         <div className="flex flex-col gap-5">
           <MyDoubleCard heading="Key takeaway">
-            <p className="text-sm-regular text-gray-600 leading-relaxed">
-              Contact intelligence identified 8 phone numbers linked to the individual, with most
-              labels matching the individual’s name or professional identity, indicating consistent
-              recognition by others.
-            </p>
+            <p className="text-sm-regular text-gray-600 leading-relaxed">{takeaway}</p>
           </MyDoubleCard>
           <RiskAssessmentTable data={indicators} />
         </div>
@@ -137,15 +153,9 @@ export default function PhoneNumbersTab() {
           )}
 
           <div className="flex items-center justify-between p-4 border-t border-gray-200">
-            <span className="text-sm-regular text-gray-600">Page 1 of 4</span>
-            <div className="flex items-center gap-2">
-              <MyButton color="secondary" variant="outlined" size="sm">
-                Previous
-              </MyButton>
-              <MyButton color="secondary" variant="outlined" size="sm">
-                Next
-              </MyButton>
-            </div>
+            <span className="text-sm-regular text-gray-600">
+              {total} record{total === 1 ? '' : 's'}
+            </span>
           </div>
         </div>
       </div>

@@ -1,0 +1,30 @@
+/* EditorStyles.css */
+.demo-wrapper {
+    z-index: 1050;
+}
+
+.demo-editor {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 300px;
+}
+
+.rdw-editor-toolbar {
+    z-index: 1060;
+}
+
+.rdw-dropdown-wrapper {
+    z-index: 1061;
+    position: absolute !important;
+}
+
+.rdw-dropdown-optionwrapper {
+    z-index: 1062;
+    position: absolute !important;
+}
+
+.editor-container {
+    overflow: visible;
+}

@@ -1,4 +1,0 @@
-[submodule "interstellar-component"]
-	path = interstellar-component
-	url = git@github.com:kalachakra-dev/interstellar-component.git
-	branch = everest

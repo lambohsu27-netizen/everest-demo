@@ -202,76 +202,70 @@ function WorkforceProvider({ children }) {
     [workforce?.data]
   )
 
-  // DEMO DATA — backend no longer returns major_credit_facilities (the new
-  // shape only ships aggregate composition + time series). Until the loan
-  // category classifier and account-level re-export ship, we render six
-  // CLIK-style category cards with preview-only counts and amounts so the
-  // section looks complete in demos.
-  const DEMO_LOAN_CATEGORIES = [
-    { title: 'Credit Card', accountCount: '2 accounts', amount: 'Rp 12.450.000', color: 'Success', icon: 'CoinsStacked03' },
-    { title: 'Paylater', accountCount: '1 account', amount: 'Rp 850.000', color: 'Blue', icon: 'ShoppingBag03' },
-    { title: 'KKB', accountCount: '1 account', amount: 'Rp 87.500.000', color: 'Warning', icon: 'File06' },
-    { title: 'KPR', accountCount: '1 account', amount: 'Rp 412.300.000', color: 'Orange', icon: 'Shield02' },
-    { title: 'KTA', accountCount: 'No active loan', amount: 'Rp 0', color: 'Gray', icon: 'DotsVertical' },
-    { title: 'Other', accountCount: '1 account', amount: 'Rp 5.200.000', color: 'Gray', icon: 'DotsVertical' },
+  const BUCKETS = [
+    { key: 'credit_card', title: 'Credit Card', icon: 'CoinsStacked03', color: 'Success' },
+    { key: 'paylater', title: 'Paylater', icon: 'ShoppingBag03', color: 'Blue' },
+    { key: 'kkb', title: 'KKB', icon: 'File06', color: 'Warning' },
+    { key: 'kpr', title: 'KPR', icon: 'Shield02', color: 'Orange' },
+    { key: 'kta', title: 'KTA', icon: 'DotsVertical', color: 'Gray' },
+    { key: 'other', title: 'Other', icon: 'DotsVertical', color: 'Gray' },
   ]
 
+  // Per-workforce account-level data shipped by the new GET /v1/workforce/:id?type=report
+  // payload. Each category maps to an array of {bank, name, kol, label, amount}
+  // accounts. The slider iterates over these directly; the report card sums
+  // amounts per category.
+  const loanAccounts = useMemo(() => {
+    const apiAccounts = workforceDetailReport?.loan_accounts
+    if (!apiAccounts || typeof apiAccounts !== 'object') {
+      return BUCKETS.reduce((acc, b) => ({ ...acc, [b.title]: [] }), {})
+    }
+    return Object.fromEntries(
+      BUCKETS.map((b) => {
+        const rows = Array.isArray(apiAccounts[b.title]) ? apiAccounts[b.title] : []
+        return [
+          b.title,
+          rows.map((r) => {
+            const kolValue =
+              Number(r.kol_value)
+              || Number(String(r.kol ?? '').match(/\d+/)?.[0])
+              || null
+            return {
+              id: r.id,
+              bank: r.bank ?? deriveBankCode(r.name ?? r.provider),
+              name: r.name ?? r.provider,
+              kol: r.kol ?? null,
+              kolValue,
+              status: kolValue && kolValue > 1 ? 'Overdue' : 'On track',
+              label: r.label ?? 'Jumlah pinjaman',
+              amount: formatIDR(r.amount),
+              amountValue: Number(r.amount) || 0,
+              isActive: r.isActive ?? true,
+            }
+          }),
+        ]
+      })
+    )
+  }, [workforceDetailReport?.loan_accounts])
+
   const loanCategories = useMemo(() => {
-    const lc = workforceDetailReport?.loan_category
     const summary = workforceDetailReport?.credit_summary
     const kol = summary?.collectibility_status?.kol ?? summary?.collectability_status?.kol
     const kolBadge = kol ? `KOL ${kol}` : null
-    const buckets = [
-      { key: 'credit_card', title: 'Credit Card', icon: 'CoinsStacked03', color: 'Success' },
-      { key: 'paylater', title: 'Paylater', icon: 'ShoppingBag03', color: 'Blue' },
-      { key: 'kkb', title: 'KKB', icon: 'File06', color: 'Warning' },
-      { key: 'kpr', title: 'KPR', icon: 'Shield02', color: 'Orange' },
-      { key: 'kta', title: 'KTA', icon: 'DotsVertical', color: 'Gray' },
-      { key: 'other', title: 'Other', icon: 'DotsVertical', color: 'Gray' },
-    ]
-    const allNull = !lc || buckets.every((b) => lc[b.key] == null)
-    if (allNull) {
-      // DEMO DATA — loan_category bucket classifier deferred backend-side.
-      return DEMO_LOAN_CATEGORIES.map((c) => ({ ...c, kolBadge }))
-    }
-    return buckets.map((b) => {
-      const count = Number(lc[b.key]) || 0
+    return BUCKETS.map((b) => {
+      const accounts = loanAccounts[b.title] ?? []
+      const count = accounts.length
+      const totalAmount = accounts.reduce((sum, a) => sum + (a.amountValue || 0), 0)
       return {
         title: b.title,
         accountCount: count > 0 ? `${count} account${count === 1 ? '' : 's'}` : 'No active loan',
-        amount: formatIDR(0), // backend doesn't ship per-bucket amounts yet
+        amount: formatIDR(totalAmount),
         kolBadge,
         color: b.color,
         icon: b.icon,
       }
     })
-  }, [workforceDetailReport?.loan_category, workforceDetailReport?.credit_summary])
-
-  // DEMO DATA — backend dropped major_credit_facilities so account-level rows
-  // are not available. The slider previously listed real accounts; we ship
-  // preview-only entries so the slider remains demonstrable.
-  const loanAccounts = useMemo(() => {
-    const summary = workforceDetailReport?.credit_summary
-    const kol = summary?.collectibility_status?.kol ?? summary?.collectability_status?.kol
-    const kolLabel = kol ? `Kol ${kol}` : null
-    const demoAccount = (i, provider, balance) => ({
-      id: `demo-${i}`,
-      bank: deriveBankCode(provider),
-      name: provider,
-      kol: kolLabel,
-      label: 'Jumlah pinjaman',
-      amount: formatIDR(balance),
-      isActive: true,
-    })
-    return {
-      'Credit Card': [demoAccount(1, 'PT Bank Mandiri', 8200000), demoAccount(2, 'PT Bank Central Asia', 4250000)],
-      'Paylater': [demoAccount(3, 'Kredivo', 850000)],
-      'KKB': [demoAccount(4, 'PT Bank Rakyat Indonesia', 87500000)],
-      'KPR': [demoAccount(5, 'PT Bank Negara Indonesia', 412300000)],
-      'KTA': [],
-      'Other': [demoAccount(6, 'PT Adira Finance', 5200000)],
-    }
-  }, [workforceDetailReport?.credit_summary])
+  }, [loanAccounts, workforceDetailReport?.credit_summary])
 
   const workforceMeta = useMemo(() => {
     const m = workforce?.meta

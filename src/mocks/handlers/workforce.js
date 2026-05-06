@@ -701,15 +701,99 @@ const buildCreditOverview = (w) => {
   }
 }
 
-const buildLoanCategoryDetail = (w) => {
-  const lc = w.loan_category ?? {}
-  return Object.fromEntries(
-    Object.entries(lc).map(([k, count]) => [k, Number(count) || 0])
+const CATEGORY_KEY_TO_TITLE = {
+  credit_card: 'Credit Card',
+  paylater: 'Paylater',
+  kkb: 'KKB',
+  kpr: 'KPR',
+  kta: 'KTA',
+  other: 'Other',
+}
+
+const buildLoanCategoryDetail = (accountsByCategory) =>
+  Object.fromEntries(
+    Object.entries(CATEGORY_KEY_TO_TITLE).map(([key, title]) => [
+      key,
+      accountsByCategory[title]?.length ?? 0,
+    ])
   )
+
+// Per-archetype loan account templates. Each entry: {bank code, provider, balance, kol}
+// Templates render the per-category accounts shown in the LoanAccountSlider; the
+// category card on the report tab sums the balances and uses the count as the
+// "X account(s)" label so card and slider stay in sync.
+const LOAN_ACCOUNT_TEMPLATES = {
+  clean: {
+    'Credit Card': [
+      ['MAN', 'PT Bank Mandiri', 8_200_000, 1],
+      ['BCA', 'PT Bank Central Asia', 4_250_000, 1],
+    ],
+    Paylater: [['KRD', 'Kredivo', 850_000, 1]],
+    KKB: [],
+    KPR: [],
+    KTA: [],
+    Other: [],
+  },
+  mid_risk: {
+    'Credit Card': [
+      ['MAN', 'PT Bank Mandiri', 12_780_000, 1],
+      ['BCA', 'PT Bank Central Asia', 9_500_000, 2],
+    ],
+    Paylater: [['KRD', 'Kredivo', 850_000, 1]],
+    KKB: [['BRI', 'PT Bank Rakyat Indonesia', 187_500_000, 2]],
+    KPR: [],
+    KTA: [['ADI', 'PT Adira Dinamika Multi Finance', 88_300_000, 1]],
+    Other: [['BFI', 'BFI Finance Indonesia', 19_850_000, 2]],
+  },
+  high_risk: {
+    'Credit Card': [
+      ['MAN', 'PT Bank Mandiri', 14_500_000, 3],
+      ['BCA', 'PT Bank Central Asia', 11_200_000, 3],
+      ['CIM', 'PT Bank CIMB Niaga', 5_740_000, 4],
+    ],
+    Paylater: [
+      ['KRD', 'Kredivo', 2_100_000, 3],
+      ['AKL', 'Akulaku Finance', 1_650_000, 4],
+    ],
+    KKB: [['BRI', 'PT Bank Rakyat Indonesia', 47_120_000, 4]],
+    KPR: [['BNI', 'PT Bank Negara Indonesia', 481_220_000, 4]],
+    KTA: [['MEG', 'PT Mega Finance', 142_220_000, 4]],
+    Other: [['ADI', 'PT Adira Finance', 10_440_000, 3]],
+  },
+  no_match: {
+    'Credit Card': [],
+    Paylater: [],
+    KKB: [],
+    KPR: [],
+    KTA: [],
+    Other: [],
+  },
+}
+
+const buildLoanAccounts = (w) => {
+  const arch = archetypeOf(w)
+  const tpl = LOAN_ACCOUNT_TEMPLATES[arch] ?? LOAN_ACCOUNT_TEMPLATES.no_match
+  const result = {}
+  Object.entries(tpl).forEach(([category, rows]) => {
+    result[category] = rows.map(([bank, provider, balance, kol], i) => ({
+      id: `loan-${w.id}-${category.toLowerCase().replace(/\s+/g, '-')}-${i + 1}`,
+      bank,
+      name: provider,
+      provider,
+      kol: `Kol ${kol}`,
+      kol_value: kol,
+      label: category === 'Credit Card' ? 'Limit terpakai' : 'Jumlah pinjaman',
+      amount: balance,
+      isActive: true,
+      category,
+    }))
+  })
+  return result
 }
 
 const buildReportPayload = (w) => {
   const enquiries = enquiriesForWorkforce(w.id)
+  const loanAccounts = buildLoanAccounts(w)
   return {
     id: w.id,
     full_name: w.full_name,
@@ -726,7 +810,8 @@ const buildReportPayload = (w) => {
     risk_background_signals: buildSignals(w),
     credit_summary: buildCreditSummary(w),
     credit_overview: buildCreditOverview(w),
-    loan_category: buildLoanCategoryDetail(w),
+    loan_category: buildLoanCategoryDetail(loanAccounts),
+    loan_accounts: loanAccounts,
     risk_signals: w.risk_signals,
     negative_events: NEGATIVE_EVENTS_BY_ARCHETYPE[archetypeOf(w)] ?? [],
     linked_enquiries: enquiries.map((e) => ({

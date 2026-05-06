@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import SimpleBar from 'simplebar-react'
 import { XClose } from '@untitled-ui/icons-react'
 import { MyChip, MyHorizontalTabV2 } from '@interstellar-component'
 import { useWorkforce } from '../Context'
+
+const formatIDR = (n) => {
+  const v = Number(n) || 0
+  return `Rp ${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
 
 export default function LoanCategorySlider() {
   const { popSlider, handleAccountDetail, currentSlider, activeAccountId, loanCategories, loanAccounts } = useWorkforce()
@@ -21,7 +26,19 @@ export default function LoanCategorySlider() {
   const handleClose = () => popSlider()
 
   const currentCategoryData = loanCategories.find((c) => c.title === selectedCategory) || loanCategories[0]
-  const accounts = loanAccounts[selectedCategory] || []
+  const allAccounts = loanAccounts[selectedCategory] || []
+  const accounts = useMemo(() => {
+    if (selectedStatus === 'All') return allAccounts
+    return allAccounts.filter((acc) => acc.status === selectedStatus)
+  }, [allAccounts, selectedStatus])
+
+  const filteredTotal = useMemo(
+    () => accounts.reduce((sum, a) => sum + (a.amountValue || 0), 0),
+    [accounts]
+  )
+  const filteredCountLabel = accounts.length
+    ? `${accounts.length} account${accounts.length === 1 ? '' : 's'}`
+    : 'No active loan'
 
   const categoryTabs = loanCategories.map((c) => ({ label: c.title, value: c.title }))
 
@@ -94,8 +111,18 @@ export default function LoanCategorySlider() {
 
             {/* Total Credit Section */}
             <div className="flex flex-col gap-1">
-              <span className="text-sm-medium text-gray/600">Total credit</span>
-              <h2 className="text-2xl-semibold text-gray/900">{currentCategoryData?.amount ?? '—'}</h2>
+              <span className="text-sm-medium text-gray/600">
+                {selectedStatus === 'All'
+                  ? 'Total credit'
+                  : selectedStatus === 'On track'
+                    ? 'Total on-track credit'
+                    : 'Total overdue credit'}
+              </span>
+              <h2 className="text-2xl-semibold text-gray/900">
+                {selectedStatus === 'All'
+                  ? (currentCategoryData?.amount ?? '—')
+                  : formatIDR(filteredTotal)}
+              </h2>
             </div>
 
             {/* Divider */}
@@ -106,7 +133,9 @@ export default function LoanCategorySlider() {
               <span className="text-sm-semibold text-gray/900">
                 Daftar akun {selectedCategory ? selectedCategory.toLowerCase() : ''}
               </span>
-              <span className="text-sm-medium text-gray/600">{currentCategoryData?.accountCount}</span>
+              <span className="text-sm-medium text-gray/600">
+                {selectedStatus === 'All' ? currentCategoryData?.accountCount : filteredCountLabel}
+              </span>
             </div>
 
             {/* Account list */}

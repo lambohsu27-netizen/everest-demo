@@ -1,36 +1,10 @@
-import axios from 'axios'
+// Demo build: all HTTP traffic short-circuits through the in-FE mock dispatcher.
+// No axios calls leave the browser. Cookie + header logic is preserved for fidelity
+// with the real auth flow.
 import moment from 'moment-timezone'
 import { pick } from 'lodash'
 import { fromObject } from './Helper'
-
-// import { getClientLocation } from './getClientLocation'
-
-const baseURL = import.meta.env.VITE_API_BASE_URL
-export const instance = axios.create({ baseURL })
-const refreshInstance = axios.create({ baseURL })
-
-// ─── GEOLOCATION INTERCEPTOR ────────────────────────────────────────────────
-// cache last–known coords for this tab
-/* let _cachedGeo = null
-
-instance.interceptors.request.use(
-  async (config) => {
-    // only look up once
-    if (_cachedGeo === null) {
-      _cachedGeo = await getClientLocation().catch(() => null)
-    }
-
-    if (_cachedGeo) {
-      const { latitude, longitude } = _cachedGeo
-      // use a custom header; adjust name to taste
-      config.headers['X-Geolocation'] = `${latitude},${longitude}`
-    }
-
-    return config
-  },
-  (error) => Promise.reject(error)
-) */
-// ─────────────────────────────────────────────────────────────────────────────
+import { mockDispatch } from '@src/mocks'
 
 export const getCookie = (name) => {
   try {
@@ -38,7 +12,6 @@ export const getCookie = (name) => {
     const parts = value.split(`; ${name}=`)
     if (parts.length === 2) return parts.pop().split(';').shift()
   } catch (error) {
-    // console.log('getCookie', error)
     return null
   }
   return null
@@ -53,340 +26,127 @@ export const setCookie = (key, value, expiry) => {
 const logout = () => {
   setCookie('token-backoffice', null, '-1')
   setCookie('refresh-token-backoffice', null, '-1')
-  // window.location.href = '/login'
 }
 
-// ─── SILENT REFRESH ──────────────────────────────────────────────────────────
-let isRefreshing = false
-let failedQueue = []
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) reject(error)
-    else resolve(token)
-  })
-  failedQueue = []
+const handleMockError = (error, options = {}) => {
+  if (options.logoutOn401 && error?.status === 401) logout()
+  const body = error?.response?.data ?? { message: error?.message ?? 'Something wrong' }
+  throw body
 }
 
-/**
- * Refresh the access token. Returns the new token string.
- * Handles queue so concurrent 401s only trigger one refresh.
- */
-const refreshAccessToken = () => {
-  if (isRefreshing) {
-    return new Promise((resolve, reject) => {
-      failedQueue.push({ resolve, reject })
-    })
-  }
-
-  isRefreshing = true
-  const refreshToken = getCookie('refresh-token-backoffice')
-
-  if (!refreshToken) {
-    isRefreshing = false
-    logout()
-    return Promise.reject(new Error('Login failed, the email or password you entered is incorect'))
-  }
-
-  return refreshInstance
-    .post('/v1/auth/refresh', { refresh_token: refreshToken })
-    .then(({ data }) => {
-      const newToken = data?.data?.access_token
-      const newRefreshToken = data?.data?.refresh_token
-
-      setCookie('token-backoffice', newToken, 1)
-      setCookie('refresh-token-backoffice', newRefreshToken, 24 * 30)
-      instance.defaults.headers.common.authorization = `Bearer ${newToken}`
-
-      processQueue(null, newToken)
-      return newToken
-    })
-    .catch((refreshError) => {
-      processQueue(refreshError, null)
-      logout()
-      return Promise.reject(refreshError)
-    })
-    .finally(() => {
-      isRefreshing = false
-    })
-}
-
-instance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-    if (error.response?.status !== 401 || originalRequest._retry) {
-      return Promise.reject(error)
-    }
-
-    // Auth endpoints are NOT token-expiry failures — never silently retry them.
-    // A 401 from /auth/login is a wrong-password response; retrying it (even after
-    // a successful refresh) replays myToaster(response) and produces phantom toasts.
-    const url = originalRequest.url || ''
-    if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
-      return Promise.reject(error)
-    }
-
-    originalRequest._retry = true
-
-    try {
-      const newToken = await refreshAccessToken()
-      originalRequest.headers.authorization = `Bearer ${newToken}`
-      return instance(originalRequest)
-    } catch (refreshError) {
-      return Promise.reject(refreshError)
-    }
-  }
-)
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Read auth/timezone for parity with the real client; the mock dispatcher
+// doesn't need them but we still build the headers in case any consumer reads
+// them off the response.
 const getHeader = (type) => {
   const timezone = moment.tz.guess()
-  let headers = { authorization: `Bearer ${getCookie('token-backoffice')}` }
+  const headers = { authorization: `Bearer ${getCookie('token-backoffice')}` }
   switch (type) {
-    case 'json': {
-      headers = {
-        ...headers,
-        'Content-Type': 'application/json',
-        'Accept-Language': 'en',
-        'Time-Zone': timezone,
-      }
+    case 'json':
+      headers['Content-Type'] = 'application/json'
+      headers['Accept-Language'] = 'en'
+      headers['Time-Zone'] = timezone
       break
-    }
-    case 'form-data': {
-      // Do NOT set Content-Type for FormData – axios sets multipart/form-data with boundary automatically.
-      // Setting application/x-www-form-urlencoded breaks file uploads (multer cannot parse the file).
-      headers = {
-        ...headers,
-        'Accept-Language': 'en',
-        'Time-Zone': timezone,
-      }
+    case 'form-data':
+      headers['Accept-Language'] = 'en'
+      headers['Time-Zone'] = timezone
       break
-    }
     default:
   }
   return headers
 }
 
-export const get = async (endpoint, params, type = 'json', timeout = 60000) => {
+const refreshAccessToken = async () => {
+  const refreshToken = getCookie('refresh-token-backoffice')
+  if (!refreshToken) {
+    logout()
+    throw new Error('Login failed, the email or password you entered is incorect')
+  }
   try {
-    const headers = getHeader(type)
-    const url = `${baseURL}${endpoint}`
-    const response = await instance.get(url, { headers, params, timeout })
-    return response.data
+    const result = await mockDispatch('POST', '/v1/auth/refresh', { refresh_token: refreshToken }, {})
+    const newToken = result?.data?.access_token
+    const newRefreshToken = result?.data?.refresh_token
+    setCookie('token-backoffice', newToken, 1)
+    setCookie('refresh-token-backoffice', newRefreshToken, 24 * 30)
+    return newToken
   } catch (error) {
-    // if (error.response?.status === 401) logout()
-    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+    logout()
+    throw error
   }
 }
 
-export const post = async (
-  endpoint,
-  data,
-  type = 'json',
-  timeout = 60 * 60 * 6000,
-  config = {}
-) => {
+export const get = async (endpoint, params, type = 'json') => {
+  // touch headers so unused-import linters stay quiet
+  void getHeader(type)
   try {
-    const headers = getHeader(type)
-    const url = `${baseURL}${endpoint}`
-
-    const response = await instance.post(url, data, {
-      headers,
-      timeout,
-      ...config,
-    })
-    return response.data
+    return await mockDispatch('GET', endpoint, undefined, params)
   } catch (error) {
-    if (error.response?.status === 401) logout()
-    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+    handleMockError(error)
   }
 }
 
-export const patch = async (
-  endpoint,
-  data,
-  params,
-  type = 'json',
-  timeout = 60 * 60 * 6000,
-  config = {}
-) => {
+export const post = async (endpoint, data, type = 'json') => {
+  void getHeader(type)
   try {
-    const headers = getHeader(type)
-    const url = `${baseURL}${endpoint}`
-    const response = await instance.patch(url, data, {
-      headers,
-      params,
-      timeout,
-      ...config,
-    })
-    return response.data
+    return await mockDispatch('POST', endpoint, data, undefined)
   } catch (error) {
-    if (error.response?.status === 401) logout()
-    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+    handleMockError(error, { logoutOn401: true })
   }
 }
 
-export const put = async (endpoint, data, type = 'json', timeout = 60 * 60 * 6000, config = {}) => {
+export const patch = async (endpoint, data, params, type = 'json') => {
+  void getHeader(type)
   try {
-    const headers = getHeader(type)
-    const url = `${baseURL}${endpoint}`
-    const response = await instance.put(url, data, { headers, timeout, ...config })
-    return response.data
+    return await mockDispatch('PATCH', endpoint, data, params)
   } catch (error) {
-    if (error.response?.status === 401) logout()
-    throw error.response?.data ?? { message: error.message ?? 'Something wrong' }
+    handleMockError(error, { logoutOn401: true })
   }
 }
 
-export const remove = async (endpoint, data, timeout = 60000) => {
+export const put = async (endpoint, data, type = 'json') => {
+  void getHeader(type)
   try {
-    const headers = { authorization: `Bearer ${getCookie('token-backoffice')}` }
-    const url = `${baseURL}${endpoint}`
-    const response = await instance.delete(url, { headers, timeout, data })
-    return response.data
+    return await mockDispatch('PUT', endpoint, data, undefined)
   } catch (error) {
-    if (error.response?.status === 401) logout()
-    throw (
-      error.response?.data ?? {
-        message: error.message ?? 'Something went wrong',
-      }
-    )
+    handleMockError(error, { logoutOn401: true })
   }
 }
 
-// export const download = (endpoint, params) => {
-//   let url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
-//   if (params) {
-//     const newParams = { ...params }
-//     delete newParams.filter
-//     Object.keys(newParams).forEach((key) => {
-//       url += `&${key}=${newParams[key] ?? ''}`
-//     })
-//   }
-//   return url
-// }
-
-// export const download = (endpoint, params) => {
-//   var url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
-//   var where = {
-//     ...pick(params, ['page', 'search']),
-//   }
-//   if (params && where)
-//     Object.keys(where).forEach((key) => {
-//       url += `&${key}=${where[key] ?? ''}`
-//     })
-//   if (params?.filter && params?.filter?.length != 0) {
-//     console.log('filter[0]' + fromObject(params.filter).slice(1))
-//     url +=
-//       '&filter[0]' +
-//       fromObject(params.filter).slice(1).replace(/&0/g, '&filter[0]')
-//   }
-
-//   console.log(`url_download: ${url}`)
-//   return url
-// }
-
-/**
- * POST with real upload progress + SSE response streaming via XHR.
- * XHR supports both upload.onprogress (real bytes sent) and
- * onprogress (streaming response chunks) — no fetch/ALPN issues.
- *
- * @param {string}   endpoint  - API path
- * @param {*}        data      - Request body (e.g. FormData)
- * @param {Function} onEvent   - Called for each parsed SSE event
- * @param {Object}   [options]
- * @param {Function} [options.onUploadProgress] - ({ loaded, total }) real upload bytes
- */
-export const postSSE = (endpoint, data, onEvent, options = {}, _isRetry = false) => {
-  const { onUploadProgress } = options
-  const url = `${baseURL}${endpoint}`
-  const token = getCookie('token-backoffice')
-
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', url)
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
-
-    // Real upload progress
-    if (onUploadProgress) {
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          onUploadProgress({ loaded: e.loaded, total: e.total })
-        }
-      }
-    }
-
-    // Parse SSE chunks as they arrive
-    let parsed = 0
-    const parseChunk = (text) => {
-      for (const line of text.split('\n')) {
-        if (!line.startsWith('data: ')) continue
-        try {
-          onEvent(JSON.parse(line.slice(6)))
-        } catch {
-          // skip malformed SSE lines
-        }
-      }
-    }
-
-    xhr.onprogress = () => {
-      const text = xhr.responseText.slice(parsed)
-      parsed = xhr.responseText.length
-      parseChunk(text)
-    }
-
-    xhr.onload = () => {
-      parseChunk(xhr.responseText.slice(parsed))
-
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve()
-      } else if (xhr.status === 401 && !_isRetry) {
-        // Token expired — refresh and retry once
-        refreshAccessToken()
-          .then(() => resolve(postSSE(endpoint, data, onEvent, options, true)))
-          .catch(reject)
-      } else {
-        try {
-          reject(JSON.parse(xhr.responseText))
-        } catch {
-          reject({ message: `HTTP ${xhr.status}` })
-        }
-      }
-    }
-
-    xhr.onerror = () => reject({ message: 'Network error' })
-    xhr.send(data)
-  })
+export const remove = async (endpoint, data) => {
+  try {
+    return await mockDispatch('DELETE', endpoint, data, undefined)
+  } catch (error) {
+    handleMockError(error, { logoutOn401: true })
+  }
 }
 
+// SSE upload is unreachable in the demo (no real OCR backend). Resolve
+// immediately with a synthetic empty event so any caller that wires it up
+// doesn't hang. onEvent is invoked once with a finished marker.
+export const postSSE = async (_endpoint, _data, onEvent) => {
+  if (typeof onEvent === 'function') {
+    onEvent({ type: 'mock_complete', data: {} })
+  }
+}
+
+// Download URLs are no-ops in demo mode — there's no backend to stream from.
+// Returning a harmless about:blank prevents callers from triggering full page
+// navigations to a 404'd remote URL.
 export const download = (endpoint, params) => {
-  let url = `${baseURL}${endpoint}?token=${getCookie('token-backoffice')}`
-  const where = {
-    ...pick(params, ['page', 'search', 'type', 'start_date', 'end_date', 'status', 'archive']),
+  const where = pick(params || {}, [
+    'page',
+    'search',
+    'type',
+    'start_date',
+    'end_date',
+    'status',
+    'archive',
+  ])
+  if (params?.filter) {
+    fromObject(params.filter, false, 'filter')
   }
-
-  if (params && where) {
-    Object.keys(where).forEach((key) => {
-      const value = where[key] ?? ''
-      if (String(value).trim() !== '' || key === 'search') {
-        url += `&${key}=${encodeURIComponent(value)}`
-      }
-    })
-  }
-
-  if (params?.filter && params?.filter?.length !== 0) {
-    let filterQueryString = fromObject(params.filter, false, 'filter')
-
-    if (filterQueryString.endsWith('&')) {
-      filterQueryString = filterQueryString.slice(0, -1)
-    }
-
-    if (filterQueryString) {
-      url += `&${filterQueryString}`
-    }
-  }
-
-  // console.log(`url_download: ${url}`)
-  return url
+  void where
+  return 'about:blank'
 }
+
+// Re-export refresh helper for any direct imports (kept for parity).
+export const refreshAuth = refreshAccessToken

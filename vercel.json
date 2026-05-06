@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api-wilayah/:path*",
+      "destination": "https://emsifa.github.io/api-wilayah-indonesia/api/:path*"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}

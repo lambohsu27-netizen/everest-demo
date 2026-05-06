@@ -150,9 +150,12 @@ export default function AdminVerificationSlider({ data }) {
   const handleClose = () => popSlider()
 
   const ocrOpen = !!identityData
+  // Modal renders `portrait` on the LEFT (smaller box) and `ktp` on the RIGHT
+  // (wider box). For the demo, we want the LEFT slot to show the e-KTP card
+  // and the RIGHT slot to show the employee's selfie.
   const ocrData = {
-    portrait: identityData?.selfie_photo_url,
-    ktp: identityData?.ktp_photo_url,
+    portrait: identityData?.ktp_photo_url,
+    ktp: identityData?.selfie_photo_url,
     score: parseInt(identityData?.face_match_score) || 0,
   }
 

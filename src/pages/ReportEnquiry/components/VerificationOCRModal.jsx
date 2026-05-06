@@ -119,14 +119,14 @@ export default function VerificationOCRModal({
           <div className="flex min-w-[200px] flex-1 max-w-[261px] shrink-0 overflow-hidden rounded-3xl border border-gray-100 shadow-sm aspect-[261/353]">
             <img
               src={displayData.portrait}
-              alt="Portrait of the employee"
+              alt="Scan of the employee ID card (KTP)"
               className="h-full w-full object-cover"
             />
           </div>
           <div className="flex-[2] min-w-[300px] overflow-hidden rounded-xl border border-gray-100 shadow-sm bg-gray-50 flex items-center justify-center aspect-[545/353]">
             <img
               src={displayData.ktp}
-              alt="Scan of the employee ID card (KTP)"
+              alt="Selfie of the employee"
               className="h-full w-full object-cover"
             />
           </div>

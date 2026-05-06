@@ -7,6 +7,7 @@ import { companyHandlers } from './handlers/company'
 import { workforceHandlers } from './handlers/workforce'
 import { reportEnquiryHandlers } from './handlers/report-enquiry'
 import { inquiryHandlers } from './handlers/inquiry'
+// trigger deploy 1
 
 const ALL_HANDLERS = {
   ...authHandlers,
